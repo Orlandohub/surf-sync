@@ -21,7 +21,7 @@ They should not contain booking logic, verification state transitions, availabil
 "use server";
 
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/server";
 import { bookingService } from "@/lib/services/booking";
 
 const requestBookingInput = z.object({
@@ -81,6 +81,13 @@ A service function:
 - Talks to the database through Drizzle.
 - Queues background work through the jobs module.
 - Does not import `headers()`, `cookies()`, `FormData`, or any Next.js or React API.
+
+## Database Access
+
+- The shared Drizzle client lives in `lib/db/index.ts`.
+- Database schemas live in `lib/db/schema/`.
+- Services import `db` from `@/lib/db`.
+- Feature code should not create its own `Pool` or Drizzle client.
 
 ## Anti-Pattern
 

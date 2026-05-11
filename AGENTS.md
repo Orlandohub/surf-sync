@@ -39,6 +39,8 @@ Base UI components should come from Shadcn/ui. Create custom components only whe
 
 For project-specific Next.js conventions, see [`docs/architecture/nextjs.md`](./docs/architecture/nextjs.md).
 
+Auth conventions live in [`docs/architecture/auth.md`](./docs/architecture/auth.md). Environment variable conventions live in [`docs/architecture/environment.md`](./docs/architecture/environment.md).
+
 ### Service layer
 
 All business logic lives in `lib/services/`. Server Actions and any future Route Handlers are thin transport wrappers that do four things, in order:
