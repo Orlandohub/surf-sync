@@ -13,7 +13,7 @@ Use `.env.example` as the committed contract for required keys.
 
 ## Required Local Keys
 
-- `DATABASE_URL`: Neon Postgres connection string used by Drizzle and Better Auth.
+- `DATABASE_URL`: Neon Postgres connection string used by Drizzle and Better Auth. Prefer `sslmode=verify-full` for local and deployed connections.
 - `BETTER_AUTH_SECRET`: Better Auth signing secret.
 - `BETTER_AUTH_URL`: Base URL where the app is running, usually `http://localhost:3000` locally.
 - `BETTER_AUTH_API_KEY`: Better Auth infrastructure API key for dashboard endpoints.
