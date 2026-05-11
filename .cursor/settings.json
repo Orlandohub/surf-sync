@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "notion-workspace": {
+      "enabled": true
+    },
+    "vercel": {
+      "enabled": true
+    },
+    "shadcn": {
+      "enabled": true
+    },
+    "neon-postgres": {
+      "enabled": true
+    }
+  }
+}
