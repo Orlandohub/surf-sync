@@ -45,6 +45,13 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Unit tests
+        run: pnpm test
+        env:
+          # Pool is lazy: pure-logic tests never connect, but db-backed
+          # modules need the var present at import time.
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/surfsync_test
+
       - name: Typecheck
         run: pnpm typecheck
 

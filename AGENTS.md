@@ -35,6 +35,8 @@ SurfSync is a two-sided subscription marketplace connecting verified surf instru
 
 Use App Router conventions and keep React Server Component boundaries explicit. Prefer Server Components by default, add `"use client"` only for interactivity or browser APIs, and keep props crossing the server/client boundary serializable.
 
+**i18n rule (SUR-31):** no hardcoded user-facing strings in JSX — all copy flows through next-intl namespaces in `messages/pt.json` (page-level namespaces, e.g. `SignInPage.title`). Email templates render from `lib/email/templates/` and are exempt (they render outside React app context).
+
 Base UI components should come from Shadcn/ui. Create custom components only when Shadcn/ui does not provide a suitable base or composition pattern.
 
 For project-specific Next.js conventions, see [`docs/architecture/nextjs.md`](./docs/architecture/nextjs.md).

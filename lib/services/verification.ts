@@ -58,3 +58,20 @@ export async function enforceVerificationEmailRateLimit(
 export async function recordVerificationEmailSent(email: string): Promise<void> {
   await db.insert(verificationEmailLog).values({ email });
 }
+
+/**
+ * Pure helpers for the verification-email rate limiter. The DB-bound
+ * functions stay above; the window arithmetic lives here so it can be
+ * unit-tested without a database.
+ */
+
+/** True if a send at `lastSentAt` violates the 1/min minimum interval. */
+export function withinMinuteWindow(lastSentAt: Date, now: Date): boolean {
+  return now.getTime() - lastSentAt.getTime() < MIN_INTERVAL_MS;
+}
+
+/** Remaining sends allowed in the rolling 24h window. */
+export function dailyRemaining(recentCount: number): number {
+  return Math.max(0, DAILY_MAX - recentCount);
+}
+
