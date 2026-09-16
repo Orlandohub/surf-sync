@@ -300,6 +300,23 @@ export const notification = pgTable("notification", {
   createdAt,
 });
 
+/**
+ * Better Auth 1.6 issues stateless JWT verification tokens (not stored in the
+ * `verification` table), so send volume is not observable there. This log
+ * provides the durable per-email history the rate limit needs.
+ */
+export const verificationEmailLog = pgTable(
+  "verification_email_log",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    sentAt: timestamp("sent_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("verification_email_log_email_sent_idx").on(table.email, table.sentAt),
+  ],
+);
+
 export const schoolRelations = relations(school, ({ many }) => ({
   staff: many(schoolStaff),
   bookings: many(booking),

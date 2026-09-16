@@ -1,3 +1,11 @@
+CREATE TABLE "verification_email_log" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"email" text NOT NULL,
+	"sent_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE INDEX "verification_email_log_email_sent_idx" ON "verification_email_log" USING btree ("email","sent_at");
+--> statement-breakpoint
 -- Account type is immutable (Auth PRD P0): set once at signup, never mutated.
 -- Application-level guards live in lib/auth/server.ts (databaseHooks); this
 -- trigger is the hard database-level backstop required by SUR-15.
@@ -12,9 +20,7 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS user_type_immutable ON "user";
-
+--> statement-breakpoint
 CREATE TRIGGER user_type_immutable
   BEFORE UPDATE ON "user"
   FOR EACH ROW

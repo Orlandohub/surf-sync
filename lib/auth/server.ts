@@ -5,12 +5,32 @@ import { nextCookies } from "better-auth/next-js";
 import { APIError } from "better-auth/api";
 import { db } from "@/lib/db";
 import * as authSchema from "@/lib/db/schema/auth";
+import { sendVerificationEmail } from "@/lib/email/send-verification";
+import {
+  enforceVerificationEmailRateLimit,
+  recordVerificationEmailSent,
+} from "@/lib/services/verification";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema: authSchema }),
   baseURL: process.env.BETTER_AUTH_URL,
   emailAndPassword: { enabled: true },
   plugins: [dash(), nextCookies()], // nextCookies must be last
+  emailVerification: {
+    expiresIn: 60 * 60 * 24, // 24 hours, single-use token
+    sendOnSignUp: true, // auto-send after signup (no sign-in wall — onboarding step)
+    sendVerificationEmail: async ({ user, url }) => {
+      if (user.emailVerified) {
+        throw new APIError("BAD_REQUEST", {
+          message: "Email is already verified.",
+        });
+      }
+
+      await enforceVerificationEmailRateLimit(user.email);
+      await sendVerificationEmail({ to: user.email, url });
+      await recordVerificationEmailSent(user.email);
+    },
+  },
   user: {
     additionalFields: {
       type: {

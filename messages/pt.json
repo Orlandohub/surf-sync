@@ -31,10 +31,22 @@
     "submitting": "A criar conta...",
     "back": "Voltar",
     "success": "Conta criada com sucesso!",
+    "checkEmail": "Enviamos um link de verificação para o seu email. Verifique a sua caixa de entrada (e o spam) para continuar.",
+    "resend": "Reenviar email de verificação",
+    "resending": "A reenviar...",
+    "resent": "Email reenviado. Verifique a sua caixa de entrada.",
+    "resendError": "Não foi possível reenviar o email. Aguarde um minuto e tente novamente.",
     "errors": {
       "emailTaken": "Este email já tem uma conta. Tente iniciar sessão.",
       "generic": "Não foi possível criar a conta. Verifique os dados e tente novamente.",
       "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres."
     }
+  },
+  "VerifyEmailPage": {
+    "title": "Email verificado!",
+    "description": "O seu email foi confirmado com sucesso. Já pode iniciar sessão.",
+    "failedTitle": "Link inválido ou expirado",
+    "failedDescription": "Este link de verificação não é válido ou já expirou. Peça um novo email de verificação ao iniciar o processo de criação de conta novamente.",
+    "backToSignUp": "Voltar ao início"
   }
 }

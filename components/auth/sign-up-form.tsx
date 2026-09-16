@@ -26,6 +26,10 @@ export function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [done, setDone] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendState, setResendState] = useState<"idle" | "sent" | "error">(
+    "idle",
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -43,6 +47,7 @@ export function SignUpForm() {
         email,
         password,
         type: accountType,
+        callbackURL: "/verify-email",
       });
 
       if (error) {
@@ -69,14 +74,50 @@ export function SignUpForm() {
     }
   }
 
+  async function handleResend() {
+    setResendState("idle");
+    setResending(true);
+    try {
+      const { error } = await authClient.sendVerificationEmail({
+        email,
+        callbackURL: "/verify-email",
+      });
+      setResendState(error ? "error" : "sent");
+    } catch {
+      setResendState("error");
+    } finally {
+      setResending(false);
+    }
+  }
+
   if (done) {
     return (
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">{t("success")}</p>
+        <CardContent className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">{t("checkEmail")}</p>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleResend}
+              disabled={resending}
+            >
+              {resending ? t("resending") : t("resend")}
+            </Button>
+            {resendState === "sent" && (
+              <p className="text-sm text-muted-foreground" role="status">
+                {t("resent")}
+              </p>
+            )}
+            {resendState === "error" && (
+              <p className="text-sm text-destructive" role="alert">
+                {t("resendError")}
+              </p>
+            )}
+          </div>
         </CardContent>
       </Card>
     );
