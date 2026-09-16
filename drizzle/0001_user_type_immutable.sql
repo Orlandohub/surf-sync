@@ -7,7 +7,7 @@ RETURNS trigger AS $$
 BEGIN
   IF NEW.type IS DISTINCT FROM OLD.type THEN
     RAISE EXCEPTION 'user.type is immutable'
-      USING ERRCODE = 'check_violation';
+      USING ERRCODE = 'P0001';
   END IF;
   RETURN NEW;
 END;

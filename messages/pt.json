@@ -29,6 +29,7 @@
     },
     "submit": "Criar conta",
     "submitting": "A criar conta...",
+    "back": "Voltar",
     "success": "Conta criada com sucesso!",
     "errors": {
       "emailTaken": "Este email já tem uma conta. Tente iniciar sessão.",

@@ -1,8 +1,10 @@
 import { SignUpForm } from "@/components/auth/sign-up-form";
+import { getTranslations } from "next-intl/server";
 
-export const metadata = {
-  title: "Criar conta",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("SignUpPage");
+  return { title: t("title") };
+}
 
 export default function SignUpPage() {
   return (

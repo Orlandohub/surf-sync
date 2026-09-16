@@ -1,5 +1,6 @@
 // SUR-15 contract verification against a running dev server + real DB.
-// Run: npx tsx scripts/verify-sur15.ts (dev server on :3111)
+// Run: npx pnpm dev (port 3000, must match BETTER_AUTH_URL), then
+// npx tsx scripts/verify-sur15.ts
 const BASE = "http://localhost:3000";
 const API = `${BASE}/api/auth`;
 

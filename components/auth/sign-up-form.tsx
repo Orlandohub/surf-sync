@@ -37,29 +37,36 @@ export function SignUpForm() {
     }
 
     setPending(true);
-    const { error } = await authClient.signUp.email({
-      name,
-      email,
-      password,
-      type: accountType,
-    });
-    setPending(false);
+    try {
+      const { error } = await authClient.signUp.email({
+        name,
+        email,
+        password,
+        type: accountType,
+      });
 
-    if (error) {
-      // better-auth@1.6 returns USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL (422)
-      // for duplicate emails on the sign-up endpoint.
-      if (
-        error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL" ||
-        error.status === 422
-      ) {
-        setError(t("errors.emailTaken"));
-      } else {
-        setError(t("errors.generic"));
+      if (error) {
+        // better-auth@1.6 returns USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL (422)
+        // for duplicate emails on the sign-up endpoint.
+        if (
+          error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL" ||
+          error.status === 422
+        ) {
+          setError(t("errors.emailTaken"));
+        } else {
+          setError(t("errors.generic"));
+        }
+        return;
       }
-      return;
-    }
 
-    setDone(true);
+      setDone(true);
+    } catch {
+      // Network-level failure: better-fetch only converts HTTP errors into
+      // { error }; transport errors reject the promise.
+      setError(t("errors.generic"));
+    } finally {
+      setPending(false);
+    }
   }
 
   if (done) {
@@ -173,7 +180,7 @@ export function SignUpForm() {
             onClick={() => setStep("type")}
             className="text-sm text-muted-foreground underline-offset-4 hover:underline"
           >
-            ← {t("subtitle")}
+            ← {t("back")}
           </button>
         </form>
       </CardContent>
