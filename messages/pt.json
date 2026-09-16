@@ -209,6 +209,7 @@
   },
   "SchoolDashboardPage": {
     "title": "Escola",
+    "findInstructors": "Encontrar instrutores",
     "create": {
       "title": "Criar a sua escola",
       "description": "Dados da escola para o perfil e contactos. Poderá convidar colegas depois.",
@@ -232,6 +233,44 @@
       "invite": "Convidar",
       "inviting": "A enviar convite...",
       "invited": "Convite enviado. A pessoa fica ligada à escola ao criar conta com esse email."
+    }
+  },
+  "DiscoveryPage": {
+    "title": "Encontrar instrutores",
+    "subtitle": "Pesquise instrutores ativos por zona, experiência e disponibilidade.",
+    "filters": {
+      "location": "Zona",
+      "anyLocation": "Qualquer zona",
+      "experience": "Experiência",
+      "anyExperience": "Qualquer nível",
+      "day": "Dia disponível",
+      "anyDay": "Qualquer dia"
+    },
+    "resultsCount": "{count, plural, =0 {Nenhum instrutor encontrado} one {# instrutor encontrado} other {# instrutores encontrados}}",
+    "noResults": "Nenhum instrutor corresponde aos filtros. Experimente alargar a pesquisa.",
+    "bookmark": "Guardar",
+    "backToSearch": "Voltar à pesquisa",
+    "profile": {
+      "title": "Perfil do instrutor",
+      "bio": "Sobre",
+      "locations": "Zonas",
+      "availability": "Disponibilidade",
+      "none": "—"
+    },
+    "experience": {
+      "beginner": "Iniciante",
+      "intermediate": "Intermédio",
+      "advanced": "Avançado",
+      "expert": "Especialista"
+    },
+    "days": {
+      "mon": "Segunda",
+      "tue": "Terça",
+      "wed": "Quarta",
+      "thu": "Quinta",
+      "fri": "Sexta",
+      "sat": "Sábado",
+      "sun": "Domingo"
     }
   }
 }

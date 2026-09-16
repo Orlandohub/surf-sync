@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createSchoolAction, inviteStaffAction } from "@/lib/actions/school";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -126,6 +127,9 @@ export function SchoolDashboard({ data }: { data: SchoolDashboardData }) {
         <p className="text-sm text-muted-foreground">
           {data.school.address}, {data.school.city}
         </p>
+        <Link href="/school/discovery" className="text-sm text-muted-foreground underline underline-offset-4">
+          {t("findInstructors")} →
+        </Link>
       </div>
 
       <Card className="w-full max-w-2xl">

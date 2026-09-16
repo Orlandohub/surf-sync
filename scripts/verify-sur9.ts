@@ -33,7 +33,7 @@ async function main() {
   const colleagueEmail = `sur9-colleague-${suffix}@example.test`;
   const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 
-  const { getSchoolDashboard, createSchool, inviteSchoolStaff, acceptPendingInvitation } =
+  const { getSchoolDashboard, createSchool, inviteSchoolStaff } =
     await import("../lib/services/school");
 
   try {
