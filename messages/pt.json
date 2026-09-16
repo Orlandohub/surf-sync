@@ -48,5 +48,63 @@
     "failedTitle": "Link inválido ou expirado",
     "failedDescription": "Este link de verificação não é válido ou já expirou. Peça um novo email de verificação ao iniciar o processo de criação de conta novamente.",
     "backToSignUp": "Voltar ao início"
+  },
+  "SignInPage": {
+    "title": "Iniciar sessão",
+    "subtitle": "Bem-vindo de volta ao SurfSync",
+    "email": {
+      "label": "Email",
+      "placeholder": "nome@exemplo.pt"
+    },
+    "password": {
+      "label": "Palavra-passe"
+    },
+    "forgotPassword": "Esqueceu-se da palavra-passe?",
+    "submit": "Entrar",
+    "submitting": "A entrar...",
+    "signUpInstead": "Não tem conta? Criar conta",
+    "resetSuccess": "Palavra-passe redefinida com sucesso. Inicie sessão com a sua nova palavra-passe.",
+    "errors": {
+      "invalidCredentials": "Email ou palavra-passe incorretos.",
+      "generic": "Não foi possível iniciar sessão. Tente novamente."
+    }
+  },
+  "ForgotPasswordPage": {
+    "title": "Recuperar palavra-passe",
+    "subtitle": "Indique o seu email e enviaremos um link para redefinir a palavra-passe.",
+    "email": {
+      "label": "Email",
+      "placeholder": "nome@exemplo.pt"
+    },
+    "submit": "Enviar link",
+    "submitting": "A enviar...",
+    "checkEmail": "Se este email existe na nossa base, enviámos um link de redefinição. Verifique a sua caixa de entrada (e o spam). O link é válido durante 1 hora.",
+    "useAnotherEmail": "Usar outro email",
+    "errors": {
+      "generic": "Não foi possível enviar o email. Tente novamente."
+    }
+  },
+  "ResetPasswordPage": {
+    "title": "Redefinir palavra-passe",
+    "subtitle": "Escolha uma nova palavra-passe para a sua conta.",
+    "newPassword": {
+      "label": "Nova palavra-passe"
+    },
+    "confirmPassword": {
+      "label": "Confirmar nova palavra-passe"
+    },
+    "submit": "Redefinir palavra-passe",
+    "submitting": "A redefinir...",
+    "invalid": {
+      "title": "Link inválido ou expirado",
+      "description": "Este link de redefinição não é válido ou já expirou (validade de 1 hora, utilização única).",
+      "requestNew": "Pedir novo link"
+    },
+    "errors": {
+      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres.",
+      "passwordMismatch": "As palavras-passe não coincidem.",
+      "invalidToken": "Este link já foi utilizado ou expirou. Peça um novo link de redefinição.",
+      "generic": "Não foi possível redefinir a palavra-passe. Tente novamente."
+    }
   }
 }

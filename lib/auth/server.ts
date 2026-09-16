@@ -6,6 +6,7 @@ import { APIError } from "better-auth/api";
 import { db } from "@/lib/db";
 import * as authSchema from "@/lib/db/schema/auth";
 import { sendVerificationEmail } from "@/lib/email/send-verification";
+import { sendPasswordResetEmail } from "@/lib/email/send-password-reset";
 import {
   enforceVerificationEmailRateLimit,
   recordVerificationEmailSent,
@@ -14,7 +15,29 @@ import {
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema: authSchema }),
   baseURL: process.env.BETTER_AUTH_URL,
-  emailAndPassword: { enabled: true },
+  emailAndPassword: {
+    enabled: true,
+    // SUR-17: 1-hour, single-use, server-stored reset tokens; a successful
+    // reset revokes every session for the user.
+    resetPasswordTokenExpiresIn: 60 * 60,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ user, url }) => {
+      // The hook runs inline in /request-password-reset, which returns a
+      // generic "check your email" response for unknown addresses
+      // (anti-enumeration). Only real accounts reach this hook, so any
+      // error thrown here — e.g. our rate limiter — would leak account
+      // existence. Swallow rate-limit errors; let transport errors
+      // surface (they'd affect known and unknown addresses alike).
+      try {
+        await enforceVerificationEmailRateLimit(user.email);
+      } catch (e) {
+        if (e instanceof APIError && e.status === 429) return;
+        throw e;
+      }
+      await sendPasswordResetEmail({ to: user.email, url });
+      await recordVerificationEmailSent(user.email);
+    },
+  },
   plugins: [dash(), nextCookies()], // nextCookies must be last
   emailVerification: {
     expiresIn: 60 * 60 * 24, // 24 hours, single-use token

@@ -7,6 +7,12 @@ import { verificationEmailLog } from "@/lib/db/schema/app";
  * Rate limits for verification-email sends, per the Auth PRD (SUR-16):
  * max 1 per minute and max 5 per 24h per email address.
  *
+ * Also applied to password-reset emails (SUR-17): the same per-email
+ * budget is shared between both email kinds, which keeps the total
+ * email volume per address bounded. Reset tokens themselves are stored
+ * server-side (verification table) and are strictly single-use, unlike
+ * the stateless JWT verification tokens.
+ *
  * Better Auth 1.6 verification tokens are stateless JWTs — the `verification`
  * table stays empty — so send volume is tracked in `verification_email_log`.
  * The caller records the send (recordVerificationEmailSent) only after the
