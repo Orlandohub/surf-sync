@@ -148,5 +148,63 @@
       "invalidPassword": "A palavra-passe atual está incorreta.",
       "generic": "Não foi possível alterar a palavra-passe. Tente novamente."
     }
+  },
+  "InstructorDashboardPage": {
+    "title": "Painel do instrutor",
+    "status": {
+      "active": "Perfil ativo — visível para escolas na pesquisa.",
+      "inactive": "Perfil pausado — não aparece na pesquisa. Reative quando quiser voltar.",
+      "incomplete": "Complete os passos abaixo para ativar o seu perfil."
+    },
+    "steps": {
+      "1": "Passo 1",
+      "2": "Passo 2",
+      "3": "Passo 3"
+    },
+    "stepLabels": {
+      "verify_email": "Verificar email",
+      "complete_profile": "Completar perfil",
+      "set_availability": "Definir disponibilidade"
+    },
+    "profile": {
+      "title": "O seu perfil",
+      "description": "Nome apresentado às escolas, bio, experiência e zonas onde dá aulas.",
+      "displayName": "Nome apresentado",
+      "bio": "Bio",
+      "experience": "Nível de experiência",
+      "locations": "Zonas",
+      "save": "Guardar perfil",
+      "saving": "A guardar...",
+      "saved": "Perfil guardado."
+    },
+    "availability": {
+      "title": "Disponibilidade semanal",
+      "description": "O template recorrente de disponibilidade por dia da semana.",
+      "save": "Guardar disponibilidade",
+      "saving": "A guardar...",
+      "saved": "Disponibilidade guardada."
+    },
+    "days": {
+      "mon": "Segunda",
+      "tue": "Terça",
+      "wed": "Quarta",
+      "thu": "Quinta",
+      "fri": "Sexta",
+      "sat": "Sábado",
+      "sun": "Domingo"
+    },
+    "experience": {
+      "beginner": "Iniciante",
+      "intermediate": "Intermédio",
+      "advanced": "Avançado",
+      "expert": "Especialista"
+    },
+    "pause": {
+      "title": "Pausar perfil",
+      "description": "Perfil pausado deixa de aparecer nos resultados de pesquisa das escolas.",
+      "pause": "Pausar perfil",
+      "reactivate": "Reativar perfil",
+      "notAvailable": "Disponível após completar perfil e disponibilidade."
+    }
   }
 }

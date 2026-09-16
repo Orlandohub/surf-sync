@@ -48,7 +48,8 @@ export function SignInForm() {
         return;
       }
 
-      // Signed in — land on the placeholder dashboard until M1 routing lands.
+      // Signed in — instructors land on their dashboard, staff on home
+      // (school surfaces arrive with Epic 5).
       window.location.href = "/";
     } catch {
       setError(t("errors.generic"));
