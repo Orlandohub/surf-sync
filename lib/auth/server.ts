@@ -38,6 +38,18 @@ export const auth = betterAuth({
       await recordVerificationEmailSent(user.email);
     },
   },
+  // Sessions (SUR-18, per Auth PRD P0):
+  // - 30-day sliding sessions: expires 30d out, and the expiry slides
+  //   forward whenever the session is used and updateAge has elapsed.
+  // - Deliberate override of BA defaults (7d/1d) — the PRD asks for 30d.
+  // - Multi-device: one row per device; nothing limits concurrent sessions.
+  // - No cookieCache: revocations (sign-out-everywhere, password change,
+  //   reset) must take effect immediately on other devices; cookie caching
+  //   would keep revoked sessions alive until the cache TTL lapses.
+  session: {
+    expiresIn: 60 * 60 * 24 * 30, // 30 days
+    updateAge: 60 * 60 * 24, // refresh expiry once per day of activity
+  },
   plugins: [dash(), nextCookies()], // nextCookies must be last
   emailVerification: {
     expiresIn: 60 * 60 * 24, // 24 hours, single-use token

@@ -119,5 +119,34 @@
       "invalidToken": "Este link já foi utilizado ou expirou. Peça um novo link de redefinição.",
       "generic": "Não foi possível redefinir a palavra-passe. Tente novamente."
     }
+  },
+  "AccountSettingsPage": {
+    "title": "Definições de conta",
+    "sessions": {
+      "title": "Sessões ativas",
+      "description": "Dispositivos com sessão iniciada na sua conta. Terminar uma sessão faz logout nesse dispositivo.",
+      "loading": "A carregar sessões...",
+      "current": "esta sessão",
+      "expires": "expira a",
+      "revoke": "Terminar",
+      "revoking": "A terminar...",
+      "revokeOthers": "Terminar outras sessões",
+      "signOutEverywhere": "Terminar sessão em todos os dispositivos"
+    },
+    "password": {
+      "title": "Alterar palavra-passe",
+      "description": "Ao alterar, todas as outras sessões serão terminadas.",
+      "current": "Palavra-passe atual",
+      "new": "Nova palavra-passe",
+      "submit": "Alterar palavra-passe",
+      "submitting": "A alterar..."
+    },
+    "passwordChanged": "Palavra-passe alterada. As outras sessões foram terminadas.",
+    "errors": {
+      "revokeFailed": "Não foi possível terminar a sessão. Tente novamente.",
+      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres.",
+      "invalidPassword": "A palavra-passe atual está incorreta.",
+      "generic": "Não foi possível alterar a palavra-passe. Tente novamente."
+    }
   }
 }
