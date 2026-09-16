@@ -1,6 +1,19 @@
 {
   "HomePage": {
-    "title": "SurfSync"
+    "title": "SurfSync",
+    "tagline": "Staffing de instrutores verificados para escolas de surf na zona de Lisboa.",
+    "cta": {
+      "signUp": "Criar conta",
+      "signIn": "Iniciar sessão"
+    },
+    "forSchools": {
+      "title": "Para escolas de surf",
+      "description": "Encontre e reserve instrutores verificados para as suas aulas, com disponibilidade semanal."
+    },
+    "forInstructors": {
+      "title": "Para instrutores",
+      "description": "Receba pedidos de trabalho de escolas de surf na sua zona e gestione a sua disponibilidade."
+    }
   },
   "SignUpPage": {
     "title": "Criar conta",
