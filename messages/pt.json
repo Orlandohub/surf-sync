@@ -206,5 +206,32 @@
       "reactivate": "Reativar perfil",
       "notAvailable": "Disponível após completar perfil e disponibilidade."
     }
+  },
+  "SchoolDashboardPage": {
+    "title": "Escola",
+    "create": {
+      "title": "Criar a sua escola",
+      "description": "Dados da escola para o perfil e contactos. Poderá convidar colegas depois.",
+      "name": "Nome da escola",
+      "descriptionField": "Descrição",
+      "contactEmail": "Email de contacto",
+      "contactPhone": "Telefone de contacto",
+      "address": "Morada",
+      "city": "Cidade",
+      "submit": "Criar escola",
+      "saving": "A criar...",
+      "saved": "Escola criada."
+    },
+    "staff": {
+      "title": "Equipa",
+      "description": "Todos os membros da equipa têm as mesmas permissões (sem papéis).",
+      "joined": "entrou a",
+      "pending": "Convites pendentes",
+      "expires": "expira a",
+      "inviteLabel": "Convidar colega por email",
+      "invite": "Convidar",
+      "inviting": "A enviar convite...",
+      "invited": "Convite enviado. A pessoa fica ligada à escola ao criar conta com esse email."
+    }
   }
 }

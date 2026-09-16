@@ -15,6 +15,13 @@
       "when": 1789527340631,
       "tag": "0001_wandering_texas_twister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789588735483,
+      "tag": "0002_lowly_bill_hollister",
+      "breakpoints": true
     }
   ]
 }

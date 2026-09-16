@@ -122,6 +122,36 @@ export const schoolStaff = pgTable(
   ],
 );
 
+/**
+ * Epic 5 — staff invitations. Email + token; accepted automatically when
+ * the invited address signs up as school_staff and visits /school.
+ * 7-day expiry; one pending invite per (school, email).
+ */
+export const schoolInvitation = pgTable(
+  "school_invitation",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    schoolId: uuid("school_id")
+      .notNull()
+      .references(() => school.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    token: text("token").notNull().unique(),
+    invitedByUserId: text("invited_by_user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    acceptedAt: timestamp("accepted_at"),
+    acceptedByUserId: text("accepted_by_user_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt,
+  },
+  (table) => [
+    index("school_invitation_school_email_idx").on(table.schoolId, table.email),
+    index("school_invitation_email_pending_idx").on(table.email, table.acceptedAt),
+  ],
+);
+
 export const instructorProfile = pgTable(
   "instructor_profile",
   {
