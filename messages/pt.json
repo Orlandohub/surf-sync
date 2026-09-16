@@ -1,5 +1,39 @@
 {
   "HomePage": {
     "title": "SurfSync"
+  },
+  "SignUpPage": {
+    "title": "Criar conta",
+    "subtitle": "Escolha o tipo de conta para começar",
+    "accountType": {
+      "school_staff": {
+        "title": "Escola de Surf",
+        "description": "Procure e reserve instrutores verificados para as suas aulas"
+      },
+      "instructor": {
+        "title": "Instrutor",
+        "description": "Receba pedidos de trabalho de escolas de surf na sua zona"
+      }
+    },
+    "name": {
+      "label": "Nome",
+      "placeholder": "O seu nome"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "nome@exemplo.pt"
+    },
+    "password": {
+      "label": "Palavra-passe",
+      "placeholder": "Mínimo de 8 caracteres"
+    },
+    "submit": "Criar conta",
+    "submitting": "A criar conta...",
+    "success": "Conta criada com sucesso!",
+    "errors": {
+      "emailTaken": "Este email já tem uma conta. Tente iniciar sessão.",
+      "generic": "Não foi possível criar a conta. Verifique os dados e tente novamente.",
+      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres."
+    }
   }
 }

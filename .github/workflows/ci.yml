@@ -54,8 +54,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Push schema to Postgres
-        run: pnpm db:push
+      - name: Run migrations
+        run: pnpm db:migrate
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/surfsync_test
 
