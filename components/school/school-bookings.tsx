@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cancelBookingAction, markAllNotificationsReadAction } from "@/lib/actions/booking";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/brand/status-badge";
 import {
   Card,
   CardContent,
@@ -29,6 +30,13 @@ export function SchoolBookings({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
+  function statusTone(status: string): "success" | "warning" | "danger" | "info" {
+    if (status === "accepted" || status === "completed") return "success";
+    if (status === "requested") return "warning";
+    if (status === "declined") return "danger";
+    return "info";
+  }
+
   async function handleCancel(bookingId: string) {
     setError(null);
     const res = await cancelBookingAction(bookingId);
@@ -44,6 +52,7 @@ export function SchoolBookings({
   return (
     <main className="flex flex-1 flex-col items-center gap-6 px-4 py-10">
       <div className="flex w-full max-w-3xl flex-col gap-1">
+        <span className="eyebrow">{t("eyebrow")}</span>
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
@@ -87,16 +96,26 @@ export function SchoolBookings({
         {bookings.map((b) => (
           <Card key={b.id}>
             <CardHeader className="flex flex-row items-start justify-between">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1.5">
                 <CardTitle className="text-base">
                   {b.instructorName} · {b.bookingDate} ·{" "}
-                  {b.startTime.slice(0, 5)}–{b.endTime.slice(0, 5)}
+                  <span className="font-mono-label text-teal-300">
+                    {b.startTime.slice(0, 5)}–{b.endTime.slice(0, 5)}
+                  </span>
                 </CardTitle>
-                <CardDescription>
-                  {t(`status.${b.status}`)}
-                  {b.status === "requested" && ` · ${t("requestedBy", { name: b.requestedByName })}`}
-                  {b.declineReason && ` · ${b.declineReason}`}
-                </CardDescription>
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge tone={statusTone(b.status)}>
+                    {t(`status.${b.status}`)}
+                  </StatusBadge>
+                  {b.status === "requested" && (
+                    <span className="text-xs text-muted-foreground">
+                      {t("requestedBy", { name: b.requestedByName })}
+                    </span>
+                  )}
+                </div>
+                {b.declineReason && (
+                  <p className="text-sm text-muted-foreground italic">— {b.declineReason}</p>
+                )}
                 {b.notes && (
                   <p className="text-sm text-muted-foreground">{b.notes}</p>
                 )}

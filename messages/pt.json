@@ -13,7 +13,10 @@
     "forInstructors": {
       "title": "Para instrutores",
       "description": "Receba pedidos de trabalho de escolas de surf na sua zona e gestione a sua disponibilidade."
-    }
+    },
+    "heroTitle": "Staffing de instrutores para escolas de surf",
+    "heroTitleAccent": "da costa de Lisboa.",
+    "coastLine": "Conexão · Comunidade · Crescimento"
   },
   "SignUpPage": {
     "title": "Criar conta",
@@ -206,7 +209,8 @@
       "pause": "Pausar perfil",
       "reactivate": "Reativar perfil",
       "notAvailable": "Disponível após completar perfil e disponibilidade."
-    }
+    },
+    "eyebrow": "Instrutor"
   },
   "SchoolDashboardPage": {
     "title": "Escola",
@@ -235,7 +239,8 @@
       "invite": "Convidar",
       "inviting": "A enviar convite...",
       "invited": "Convite enviado. A pessoa fica ligada à escola ao criar conta com esse email."
-    }
+    },
+    "eyebrow": "Escola de surf"
   },
   "DiscoveryPage": {
     "title": "Encontrar instrutores",
@@ -273,7 +278,8 @@
       "fri": "Sexta",
       "sat": "Sábado",
       "sun": "Domingo"
-    }
+    },
+    "eyebrow": "Procurar"
   },
   "BookingRequestForm": {
     "title": "Pedir reserva",
@@ -309,7 +315,8 @@
       "booking_accepted": "{instructor} confirmou a aula de {date}",
       "booking_declined": "{instructor} recusou o pedido de {date}",
       "booking_cancelled": "Reserva de {date} cancelada"
-    }
+    },
+    "eyebrow": "Reservas"
   },
   "InstructorBookingsPage": {
     "title": "As suas aulas",
@@ -339,6 +346,7 @@
       "booking_accepted": "Confirmou a aula de {date}",
       "booking_declined": "Recusou a aula de {date}",
       "booking_cancelled": "Reserva de {date} cancelada"
-    }
+    },
+    "eyebrow": "Agenda"
   }
 }

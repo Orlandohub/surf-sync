@@ -53,6 +53,7 @@ export function DiscoverySearch({
   return (
     <main className="flex flex-1 flex-col items-center gap-6 px-4 py-10">
       <div className="flex w-full max-w-3xl flex-col gap-1">
+        <span className="eyebrow">{t("eyebrow")}</span>
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
