@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { TopNav } from "@/components/top-nav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <NextIntlClientProvider messages={messages}>
+          <TopNav />
           {children}
         </NextIntlClientProvider>
       </body>

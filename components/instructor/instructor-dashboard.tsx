@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   saveProfileAction,
   saveAvailabilityAction,
@@ -122,6 +123,9 @@ export function InstructorDashboard({
           {status === "inactive" && t("status.inactive")}
           {(status === "incomplete" || status === null) && t("status.incomplete")}
         </p>
+        <Link href="/instructor/bookings" className="text-sm text-muted-foreground underline underline-offset-4">
+          {t("viewBookings")} →
+        </Link>
       </div>
 
       {/* Onboarding steps */}

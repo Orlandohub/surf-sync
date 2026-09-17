@@ -156,6 +156,7 @@
       "inactive": "Perfil pausado — não aparece na pesquisa. Reative quando quiser voltar.",
       "incomplete": "Complete os passos abaixo para ativar o seu perfil."
     },
+    "viewBookings": "As suas aulas",
     "steps": {
       "1": "Passo 1",
       "2": "Passo 2",
@@ -210,6 +211,7 @@
   "SchoolDashboardPage": {
     "title": "Escola",
     "findInstructors": "Encontrar instrutores",
+    "viewBookings": "Reservas da escola",
     "create": {
       "title": "Criar a sua escola",
       "description": "Dados da escola para o perfil e contactos. Poderá convidar colegas depois.",
@@ -271,6 +273,72 @@
       "fri": "Sexta",
       "sat": "Sábado",
       "sun": "Domingo"
+    }
+  },
+  "BookingRequestForm": {
+    "title": "Pedir reserva",
+    "description": "Escolha data e horas dentro da disponibilidade semanal do instrutor.",
+    "date": "Data",
+    "start": "Início",
+    "end": "Fim",
+    "notes": "Notas (opcional)",
+    "submit": "Enviar pedido",
+    "submitting": "A enviar...",
+    "requested": "Pedido enviado. O instrutor foi notificado."
+  },
+  "SchoolBookingsPage": {
+    "title": "Reservas",
+    "subtitle": "Pedidos da sua escola e o seu estado.",
+    "cancel": "Cancelar",
+    "empty": "Ainda sem reservas. Procure instrutores e peça a primeira aula.",
+    "requestedBy": "pedido por {name}",
+    "status": {
+      "requested": "À espera de resposta",
+      "accepted": "Confirmada",
+      "declined": "Recusada",
+      "cancelled": "Cancelada",
+      "completed": "Concluída"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "unread": "{count, plural, =0 {Sem novidades} one {# não lida} other {# não lidas}}",
+      "markAll": "Marcar tudo como lido"
+    },
+    "notificationTypes": {
+      "booking_requested": "{school} pediu {instructor} para {date}",
+      "booking_accepted": "{instructor} confirmou a aula de {date}",
+      "booking_declined": "{instructor} recusou o pedido de {date}",
+      "booking_cancelled": "Reserva de {date} cancelada"
+    }
+  },
+  "InstructorBookingsPage": {
+    "title": "As suas aulas",
+    "subtitle": "Pedidos de escolas e reservas confirmadas.",
+    "accept": "Aceitar",
+    "decline": "Recusar",
+    "confirmDecline": "Confirmar recusa",
+    "declineReason": "Motivo (opcional, visível para a escola)",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "empty": "Ainda sem pedidos. Complete o perfil para ser encontrável pelas escolas.",
+    "requestedBy": "pedido por {name}",
+    "status": {
+      "requested": "Novo pedido",
+      "accepted": "Confirmada",
+      "declined": "Recusada",
+      "cancelled": "Cancelada",
+      "completed": "Concluída"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "unread": "{count, plural, =0 {Sem novidades} one {# não lida} other {# não lidas}}",
+      "markAll": "Marcar tudo como lido"
+    },
+    "notificationTypes": {
+      "booking_requested": "{school} pediu uma aula para {date}",
+      "booking_accepted": "Confirmou a aula de {date}",
+      "booking_declined": "Recusou a aula de {date}",
+      "booking_cancelled": "Reserva de {date} cancelada"
     }
   }
 }

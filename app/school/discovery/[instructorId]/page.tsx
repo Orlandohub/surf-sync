@@ -5,6 +5,7 @@ import { getInstructorForSchool } from "@/lib/services/discovery";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BookingRequestForm } from "@/components/school/booking-request-form";
 
 export async function generateMetadata() {
   const t = await getTranslations("DiscoveryPage");
@@ -71,6 +72,8 @@ export default async function InstructorProfilePage({
           </ul>
         </div>
       </div>
+
+      <BookingRequestForm instructorId={instructor.userId} />
     </main>
   );
 }

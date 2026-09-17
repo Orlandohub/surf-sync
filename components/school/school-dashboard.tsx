@@ -130,6 +130,9 @@ export function SchoolDashboard({ data }: { data: SchoolDashboardData }) {
         <Link href="/school/discovery" className="text-sm text-muted-foreground underline underline-offset-4">
           {t("findInstructors")} →
         </Link>
+        <Link href="/school/bookings" className="text-sm text-muted-foreground underline underline-offset-4">
+          {t("viewBookings")} →
+        </Link>
       </div>
 
       <Card className="w-full max-w-2xl">
