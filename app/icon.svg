@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- SurfSync monogram (DS §05.4): italic S· on navy seabed.
+       S in teal-500 (brand), dot in teal-300 (italic accent) per DS. -->
+  <rect width="64" height="64" rx="14" fill="#0B1320"/>
+  <text x="28" y="45" text-anchor="middle"
+        font-family="Georgia, 'Instrument Serif', serif"
+        font-style="italic" font-size="38" fill="#19D2C5">S</text>
+  <circle cx="43" cy="42" r="3.2" fill="#7EE6DF"/>
+</svg>
