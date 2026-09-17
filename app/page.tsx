@@ -1,8 +1,18 @@
 import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { WaveGlyph } from "@/components/brand/wave-glyph";
+import { auth } from "@/lib/auth/server";
 
 export default async function Home() {
+  // Authenticated users never see the marketing page — straight to
+  // their own dashboard.
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (session) {
+    redirect(session.user.type === "instructor" ? "/instructor" : "/school");
+  }
+
   const t = await getTranslations("HomePage");
 
   return (
