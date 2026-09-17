@@ -37,6 +37,7 @@ export type InstructorCard = {
   experienceLevel: (typeof EXPERIENCE_LEVELS)[number];
   locations: string[];
   availableDays: string[];
+  availabilitySlots: { day: string; startTime: string; endTime: string }[];
   bookmarked: boolean;
 };
 
@@ -89,6 +90,8 @@ export async function searchInstructors(
       .select({
         instructorId: instructorAvailability.instructorId,
         day: instructorAvailability.dayOfWeek,
+        startTime: instructorAvailability.startTime,
+        endTime: instructorAvailability.endTime,
       })
       .from(instructorAvailability)
       .where(inArray(instructorAvailability.instructorId, ids)),
@@ -112,6 +115,9 @@ export async function searchInstructors(
     experienceLevel: p.experienceLevel,
     locations: locRows.filter((l) => l.instructorId === p.userId).map((l) => l.name),
     availableDays: availRows.filter((a) => a.instructorId === p.userId).map((a) => a.day),
+    availabilitySlots: availRows
+      .filter((a) => a.instructorId === p.userId)
+      .map((a) => ({ day: a.day, startTime: a.startTime, endTime: a.endTime })),
     bookmarked: bookmarked.has(p.userId),
   }));
 }

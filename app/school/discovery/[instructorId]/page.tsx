@@ -62,13 +62,18 @@ export default async function InstructorProfilePage({
             {instructor.locations.length === 0 && <li>{t("profile.none")}</li>}
           </ul>
         </div>
-        <div className="rounded-lg border border-border p-6">
+        <div className="rounded-[var(--radius)] border border-border p-6">
           <h2 className="text-base font-medium">{t("profile.availability")}</h2>
-          <ul className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">
-            {instructor.availableDays.map((d) => (
-              <li key={d}>{t(`days.${d}`)}</li>
+          <ul className="mt-2 flex flex-col gap-1.5 text-sm text-muted-foreground">
+            {instructor.availabilitySlots.map((s) => (
+              <li key={s.day} className="flex items-center justify-between gap-4">
+                <span>{t(`days.${s.day}`)}</span>
+                <span className="font-mono-label text-teal-300">
+                  {s.startTime.slice(0, 5)}–{s.endTime.slice(0, 5)}
+                </span>
+              </li>
             ))}
-            {instructor.availableDays.length === 0 && <li>{t("profile.none")}</li>}
+            {instructor.availabilitySlots.length === 0 && <li>{t("profile.none")}</li>}
           </ul>
         </div>
       </div>
