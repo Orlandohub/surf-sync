@@ -1,6 +1,9 @@
 // SUR-15 contract verification against a running dev server + real DB.
 // Run: npx pnpm dev (port 3000, must match BETTER_AUTH_URL), then
-// npx tsx scripts/verify-sur15.ts
+// TEST_DATABASE_URL='postgresql://...' npx tsx scripts/verify-sur15.ts
+import { loadEnvConfig } from "@next/env";
+loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 const BASE = "http://localhost:3000";
 const API = `${BASE}/api/auth`;
 
@@ -87,9 +90,6 @@ async function main() {
   console.log("✓ 4. cross-type email reuse rejected:", dupCross.res.status);
 
   // 4. Type mutation blocked at DB level (trigger) — direct SQL, the harshest path
-  const { loadEnvConfig } = await import("@next/env");
-  loadEnvConfig(process.cwd());
-import { loadTestEnv } from "./lib/test-env";
   const { createRequire } = await import("node:module");
   const require = createRequire(process.cwd() + "/");
   const pg = require("pg");
