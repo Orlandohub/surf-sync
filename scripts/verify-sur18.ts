@@ -4,6 +4,7 @@
 // Run: npx tsx scripts/verify-sur18.ts
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import crypto from "node:crypto";
 
@@ -48,7 +49,7 @@ async function main() {
   const suffix = crypto.randomUUID().slice(0, 8);
   const email = `sur18-${suffix}@example.test`;
   const password = "password-123";
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
 
   try {
     // 0. Sign up (rate limiter irrelevant here — no emails requested).

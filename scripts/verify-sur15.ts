@@ -89,10 +89,11 @@ async function main() {
   // 4. Type mutation blocked at DB level (trigger) — direct SQL, the harshest path
   const { loadEnvConfig } = await import("@next/env");
   loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
   const { createRequire } = await import("node:module");
   const require = createRequire(process.cwd() + "/");
   const pg = require("pg");
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
   try {
     // allowed: update name (trigger must NOT fire)
     await pool.query('update "user" set full_name = $1 where email = $2', [

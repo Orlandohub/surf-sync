@@ -7,6 +7,7 @@
 // Run: npx tsx scripts/verify-sur17.ts
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -56,7 +57,7 @@ async function main() {
   const email = `sur17-${suffix}@example.test`;
   const password = "password-123";
   const newPassword = "password-456";
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
 
   try {
     // 1. Sign up (sends verification email, establishes baseline for the

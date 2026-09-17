@@ -4,6 +4,7 @@
 // Run: npx tsx scripts/verify-sur16.ts
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -41,7 +42,7 @@ async function main() {
   const suffix = crypto.randomUUID().slice(0, 8);
   const email = `sur16-${suffix}@example.test`;
   const password = "password-123";
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
 
   try {
     // 1. Signup → triggers verification email to outbox

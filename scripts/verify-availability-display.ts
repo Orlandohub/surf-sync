@@ -1,6 +1,7 @@
 // Verify availability slots (with times) reach the school-facing profile.
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import crypto from "node:crypto";
 
@@ -16,7 +17,7 @@ function fail(label: string, detail: unknown): never {
 
 async function main() {
   const suffix = crypto.randomUUID().slice(0, 8);
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
 
   try {
     // Seed: staff+school, instructor with sat 09:00–13:00.

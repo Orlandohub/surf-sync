@@ -2,6 +2,7 @@
 // (2) verify-email routes by session, (3) availability error in PT.
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import crypto from "node:crypto";
 
@@ -18,7 +19,7 @@ function fail(label: string, detail: unknown): never {
 async function main() {
   const suffix = crypto.randomUUID().slice(0, 8);
   const email = `uxfix-${suffix}@example.test`;
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
 
   try {
     // 1. Anonymous: sign-up + sign-in accessible; verify-email renders.

@@ -48,9 +48,11 @@ export function SignInForm() {
         return;
       }
 
-      // Signed in — instructors land on their dashboard, staff on home
-      // (school surfaces arrive with Epic 5).
-      window.location.href = "/";
+      // Route to the caller's own dashboard by account type.
+      const { data: session } = await authClient.getSession();
+      const type = session?.user?.type;
+      window.location.href =
+        type === "instructor" ? "/instructor" : type === "school_staff" ? "/school" : "/";
     } catch {
       setError(t("errors.generic"));
     } finally {

@@ -5,6 +5,7 @@
 // Run: npx tsx scripts/verify-sur20.ts
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import crypto from "node:crypto";
 
@@ -22,7 +23,7 @@ function fail(label: string, detail: unknown): never {
 async function main() {
   const suffix = crypto.randomUUID().slice(0, 8);
   const email = `sur20-${suffix}@example.test`;
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
 
   const { getInstructorOnboarding, saveInstructorProfile, saveInstructorAvailability, setInstructorPaused } =
     await import("../lib/services/instructor");

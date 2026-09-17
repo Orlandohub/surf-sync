@@ -5,6 +5,7 @@
 // Run: npx tsx scripts/verify-sur10.ts
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
+import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import crypto from "node:crypto";
 
@@ -30,7 +31,7 @@ async function signup(email: string, type: "school_staff" | "instructor") {
 
 async function main() {
   const suffix = crypto.randomUUID().slice(0, 8);
-  const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new pg.Pool({ connectionString: loadTestEnv() });
 
   const { searchInstructors, getInstructorForSchool, toggleBookmark, getBookmarkedInstructors } =
     await import("../lib/services/discovery");
