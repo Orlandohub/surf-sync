@@ -63,7 +63,8 @@
     "description": "O seu email foi confirmado com sucesso. Já pode iniciar sessão.",
     "failedTitle": "Link inválido ou expirado",
     "failedDescription": "Este link de verificação não é válido ou já expirou. Peça um novo email de verificação ao iniciar o processo de criação de conta novamente.",
-    "backToSignUp": "Voltar ao início"
+    "continue": "Continuar",
+    "backToSignIn": "Voltar ao início"
   },
   "SignInPage": {
     "title": "Iniciar sessão",
@@ -173,7 +174,7 @@
     "profile": {
       "title": "O seu perfil",
       "description": "Nome apresentado às escolas, bio, experiência e zonas onde dá aulas.",
-      "displayName": "Nome apresentado",
+      "displayName": "Nome apresentado às escolas",
       "bio": "Bio",
       "experience": "Nível de experiência",
       "locations": "Zonas",

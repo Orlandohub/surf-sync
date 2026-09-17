@@ -39,14 +39,20 @@ const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 export function InstructorDashboard({
   onboarding,
   data,
+  fallbackName,
 }: {
   onboarding: InstructorOnboarding;
   data: ProfileData;
+  fallbackName?: string;
 }) {
   const t = useTranslations("InstructorDashboardPage");
   const router = useRouter();
 
-  const [displayName, setDisplayName] = useState(data.profile?.displayName ?? "");
+  // Prefill from the saved profile; first visit falls back to the
+  // account name given at signup (asking for it twice would be silly).
+  const [displayName, setDisplayName] = useState(
+    data.profile?.displayName ?? fallbackName ?? "",
+  );
   const [bio, setBio] = useState(data.profile?.bio ?? "");
   const [experience, setExperience] = useState(data.profile?.experienceLevel ?? "beginner");
   const [selectedLocations, setSelectedLocations] = useState<string[]>(data.selectedLocationIds);

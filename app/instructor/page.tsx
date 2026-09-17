@@ -18,5 +18,11 @@ export default async function InstructorPage() {
   const onboarding = await getInstructorOnboarding(session.user.id);
   const data = await getInstructorProfileData(session.user.id);
 
-  return <InstructorDashboard onboarding={onboarding} data={data} />;
+  return (
+    <InstructorDashboard
+      onboarding={onboarding}
+      data={data}
+      fallbackName={session.user.name}
+    />
+  );
 }

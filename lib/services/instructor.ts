@@ -121,7 +121,7 @@ export async function saveInstructorProfile(
     .from(location)
     .where(inArray(location.id, input.locationIds));
   if (validLocations.length !== input.locationIds.length) {
-    throw new APIError("BAD_REQUEST", { message: "Unknown location selected." });
+    throw new APIError("BAD_REQUEST", { message: "Zona selecionada inválida." });
   }
 
   const existing = await db
@@ -197,7 +197,7 @@ export async function saveInstructorAvailability(
     .limit(1);
   if (!profile) {
     throw new APIError("BAD_REQUEST", {
-      message: "Complete your profile before setting availability.",
+      message: "Guarde primeiro o seu perfil antes de definir a disponibilidade.",
     });
   }
 
@@ -238,19 +238,19 @@ export async function setInstructorPaused(
     .limit(1);
   if (!profile) {
     throw new APIError("BAD_REQUEST", {
-      message: "Complete your profile first.",
+      message: "Complete primeiro o seu perfil.",
     });
   }
 
   if (paused && profile.status !== "active") {
     throw new APIError("BAD_REQUEST", {
-      message: "Only an active profile can be paused.",
+      message: "Apenas um perfil ativo pode ser pausado.",
     });
   }
   if (!paused) {
     if (profile.status !== "inactive") {
       throw new APIError("BAD_REQUEST", {
-        message: "Only a paused profile can be reactivated.",
+        message: "Apenas um perfil pausado pode ser reativado.",
       });
     }
     // Reactivation requires availability to still exist.
@@ -261,7 +261,7 @@ export async function setInstructorPaused(
       .limit(1);
     if (rows.length === 0) {
       throw new APIError("BAD_REQUEST", {
-        message: "Set your availability before reactivating.",
+        message: "Defina a sua disponibilidade antes de reativar.",
       });
     }
   }

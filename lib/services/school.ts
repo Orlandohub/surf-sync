@@ -62,9 +62,9 @@ export async function getSchoolDashboard(
     .from(user)
     .where(eq(user.id, userId))
     .limit(1);
-  if (!u) throw new APIError("UNAUTHORIZED", { message: "Not signed in." });
+  if (!u) throw new APIError("UNAUTHORIZED", { message: "Sessão expirada. Inicie sessão novamente." });
   if (u.type !== "school_staff") {
-    throw new APIError("FORBIDDEN", { message: "School surfaces are for school accounts." });
+    throw new APIError("FORBIDDEN", { message: "Esta área é reservada a contas de escola." });
   }
 
   const [link] = await db
@@ -138,7 +138,7 @@ export async function createSchool(
     .from(user)
     .where(eq(user.id, userId))
     .limit(1);
-  if (!u) throw new APIError("UNAUTHORIZED", { message: "Not signed in." });
+  if (!u) throw new APIError("UNAUTHORIZED", { message: "Sessão expirada. Inicie sessão novamente." });
   if (u.type !== "school_staff") {
     throw new APIError("FORBIDDEN", { message: "Only school accounts create schools." });
   }
@@ -149,7 +149,7 @@ export async function createSchool(
     .where(eq(schoolStaff.userId, userId))
     .limit(1);
   if (existing) {
-    throw new APIError("BAD_REQUEST", { message: "You already belong to a school." });
+    throw new APIError("BAD_REQUEST", { message: "Já pertence a uma escola." });
   }
 
   const [created] = await db
@@ -190,7 +190,7 @@ export async function inviteSchoolStaff(
       .limit(1);
     if (alreadyStaff) {
       throw new APIError("BAD_REQUEST", {
-        message: "That person already belongs to a school.",
+        message: "Essa pessoa já pertence a uma escola.",
       });
     }
   }
