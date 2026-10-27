@@ -30,20 +30,3 @@ export function refocusWhenRemoved(
 
 /** A refocusWhenRemoved fallback: the element with this id (give it tabIndex={-1}). */
 export const byId = (id: string) => () => document.getElementById(id);
-
-/**
- * onFocus for a form with a pinned CTA. Chrome reveals only a text
- * field's caret when it gets focus and ignores scroll-margin, so a field
- * can sit under the CTA with its caret "visible". Once focus lands, make
- * sure the whole input or textarea clears the bars (scrollIntoView does
- * honour scroll-margin; "nearest" is a no-op when it already fits).
- * Selects and buttons already scroll correctly, and moving the page
- * under an open native picker would misplace it, so they're left alone.
- */
-export function revealFocusedField(e: { target: EventTarget }): void {
-  const el = e.target;
-  if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement)) return;
-  requestAnimationFrame(() => {
-    if (document.activeElement === el) el.scrollIntoView({ block: "nearest" });
-  });
-}

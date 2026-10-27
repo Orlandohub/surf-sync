@@ -27,11 +27,11 @@ export async function Hero() {
       <Panel tone="ink">
         {/* Phones: top right, behind the headline (the photo covers the bottom).
             From md: bottom left, behind the text column. */}
-        <MarkBackdrop className="-top-24 -right-40 size-120 text-inverse-foreground/5 md:top-auto md:right-auto md:-bottom-64 md:-left-48 md:size-200" />
+        <MarkBackdrop className="-top-24 -right-40 size-120 text-brand-panel-foreground/5 md:top-auto md:right-auto md:-bottom-64 md:-left-48 md:size-200" />
 
         <div className={marketingColumn}>
           <div className="flex min-w-0 flex-col pt-8 pb-10 sm:pt-14 sm:pb-12 md:w-7/12 md:py-20 md:pr-10 lg:py-24 xl:w-2/3 xl:py-32">
-            <LogoLockup height={32} className="mb-12 self-start text-inverse-foreground sm:hidden" />
+            <LogoLockup height={32} className="mb-12 self-start text-brand-panel-foreground sm:hidden" />
             <h1
               id="hero-title"
               className={cn(
@@ -41,7 +41,7 @@ export async function Hero() {
             >
               {t("hero.title")}
             </h1>
-            <p className="mt-6 max-w-prose text-body-lg text-inverse-foreground/80 lg:mt-8">
+            <p className="mt-6 max-w-prose text-body-lg text-brand-panel-foreground/80 lg:mt-8">
               {t("hero.tagline")}
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -49,7 +49,7 @@ export async function Hero() {
                 href="/sign-up"
                 className={cn(
                   buttonVariants({ size: "lg" }),
-                  "focus-visible:ring-brand-water focus-visible:ring-offset-inverse sm:w-auto",
+                  "focus-visible:ring-brand-water focus-visible:ring-offset-brand-panel sm:w-auto",
                 )}
               >
                 {t("cta.signUp")}
@@ -59,7 +59,7 @@ export async function Hero() {
                 href="/sign-in"
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "lg" }),
-                  "border border-inverse-foreground/25 text-inverse-foreground hover:bg-inverse-foreground/10 focus-visible:ring-brand-water focus-visible:ring-offset-inverse sm:w-auto",
+                  "border border-brand-panel-foreground/25 text-brand-panel-foreground hover:bg-brand-panel-foreground/10 focus-visible:ring-brand-water focus-visible:ring-offset-brand-panel sm:w-auto",
                 )}
               >
                 {t("cta.signIn")}

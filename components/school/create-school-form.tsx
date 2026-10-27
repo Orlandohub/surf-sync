@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createSchoolAction } from "@/lib/actions/school";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { PinnedCta } from "@/components/ui/pinned-cta";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { isEmail } from "@/components/school/email";
-import { refocusWhenRemoved, revealFocusedField } from "@/components/school/focus";
+import { refocusWhenRemoved } from "@/components/shell/focus";
 
 type FieldName = "name" | "contactEmail" | "address" | "city";
 const ORDER: FieldName[] = ["name", "contactEmail", "address", "city"];
@@ -31,10 +32,10 @@ function validate(v: Record<string, string>): Partial<Record<FieldName, true>> {
 /**
  * "Cria a tua escola" — the whole Início for a school account with no
  * school yet. Three short groups (Escola · Contacto · Localização) in one
- * card; "Criar escola" pinned above the tab bar on phones, so there every
- * control keeps a bottom scroll margin of tab bar + CTA (WCAG 2.4.11).
- * On success the page refreshes into the school's Início, which then
- * opens at the top with focus on the school's name.
+ * card; "Criar escola" pinned above the tab bar on phones (PinnedCta),
+ * with a server error beside it. On success the page refreshes into the
+ * school's Início, which then opens at the top with focus on the
+ * school's name.
  */
 export function CreateSchoolForm() {
   const t = useTranslations("SchoolDashboardPage.create");
@@ -88,9 +89,7 @@ export function CreateSchoolForm() {
       ref={formRef}
       noValidate
       onSubmit={handleSubmit}
-      onFocus={revealFocusedField}
-      // Tab bar + pinned CTA (5rem) + 0.5rem, rounded up to the scale.
-      className="flex flex-col gap-section max-md:**:scroll-mb-48"
+      className="flex flex-col gap-section"
     >
       <div className="flex flex-col divide-y divide-border rounded-card border bg-card shadow-card">
         <section aria-labelledby="criar-escola" className="flex flex-col gap-4 p-card md:p-6">
@@ -144,9 +143,7 @@ export function CreateSchoolForm() {
         </section>
       </div>
 
-      {formError && <FieldError>{formError}</FieldError>}
-
-      <div className="sticky bottom-(--bottom-chrome) z-20 -mx-gutter -mt-3 bg-background px-gutter pt-3 pb-4 md:static md:m-0 md:flex md:justify-end md:bg-transparent md:p-0">
+      <PinnedCta error={formError}>
         <Button
           type="submit"
           size="lg"
@@ -156,7 +153,7 @@ export function CreateSchoolForm() {
         >
           {t("submit")}
         </Button>
-      </div>
+      </PinnedCta>
     </form>
   );
 }

@@ -37,11 +37,13 @@ export async function AuthLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Brand panel (lg+). Decorative: the photo has no alt, the lockup
-          repeats the app bar's logo. The display line is real text. */}
-      <div className="hidden flex-1 lg:sticky lg:top-(--top-chrome) lg:block lg:self-start lg:py-6">
+          repeats the app bar's logo. The display line is real text. The
+          frame is one screen below the app bar (at least 528 px); the
+          panel fills it inside its py-6. */}
+      <div className="hidden flex-1 lg:sticky lg:top-(--top-chrome) lg:block lg:h-(--viewport-below-chrome) lg:min-h-132 lg:self-start lg:py-6">
         <div
           data-slot="auth-brand"
-          className="relative h-[calc(100svh-var(--top-chrome)-3rem)] min-h-120 overflow-hidden rounded-panel bg-inverse"
+          className="relative h-full overflow-hidden rounded-panel bg-brand-panel"
         >
           {/* Above the fold: load eagerly. Portrait photo under
               object-cover in a tall panel: its rendered width is about
@@ -78,7 +80,7 @@ export async function AuthLayout({ children }: { children: React.ReactNode }) {
         <div
           aria-hidden
           data-slot="auth-band"
-          className="relative mt-auto h-24 w-full max-w-100 shrink-0 self-center overflow-hidden rounded-card bg-inverse lg:hidden"
+          className="relative mt-auto h-24 w-full max-w-100 shrink-0 self-center overflow-hidden rounded-card bg-brand-panel lg:hidden"
         >
           <Image
             src={whitewater}

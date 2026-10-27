@@ -7,7 +7,7 @@ import { cancelBookingAction } from "@/lib/actions/booking";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
-import { byId, refocusWhenRemoved } from "@/components/school/focus";
+import { byId, refocusWhenRemoved } from "@/components/shell/focus";
 import { formatTime, formatTimeRange } from "@/lib/format";
 
 /**

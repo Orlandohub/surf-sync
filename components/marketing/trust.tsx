@@ -31,19 +31,19 @@ export async function Trust() {
   return (
     <PanelFrame aria-labelledby="regras">
       <Panel tone="ink">
-        <MarkBackdrop className="-top-24 -right-40 size-120 text-inverse-foreground/5 md:-top-40 md:-right-56 md:size-200" />
+        <MarkBackdrop className="-top-24 -right-40 size-120 text-brand-panel-foreground/5 md:-top-40 md:-right-56 md:size-200" />
         <div className={cn(marketingColumn, marketingSection)}>
           <DisplayHeading id="regras" tone="ink" className="max-w-2xl">
             {t("title")}
           </DisplayHeading>
-          <p className="mt-4 max-w-prose text-body-lg text-inverse-foreground/80">{t("intro")}</p>
+          <p className="mt-4 max-w-prose text-body-lg text-brand-panel-foreground/80">{t("intro")}</p>
           <ul className="mt-12 grid grid-cols-1 gap-x-10 gap-y-8 md:mt-16 lg:grid-cols-3">
             {RULES.map(([key, Icon]) => (
               <FeatureItem
                 key={key}
                 tone="ink"
                 icon={
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-inverse-foreground/10 text-brand-water">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-panel-foreground/10 text-brand-water">
                     <Icon aria-hidden className="size-5" strokeWidth={1.75} />
                   </span>
                 }

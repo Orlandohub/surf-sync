@@ -9,12 +9,8 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ChipToggleGroup } from "@/components/ui/chip-toggle-group";
-import {
-  CLEARS_SAVE_BAR,
-  PinnedSaveBar,
-  toastAboveSaveBar,
-} from "@/components/instructor/pinned-save-bar";
-import { cn } from "@/lib/utils";
+import { PinnedCta } from "@/components/ui/pinned-cta";
+import { toast } from "@/components/ui/toast";
 
 const LEVELS = ["beginner", "intermediate", "advanced", "expert"] as const;
 export type Level = (typeof LEVELS)[number];
@@ -24,10 +20,10 @@ type Errors = Partial<Record<"displayName" | "level" | "zones", string>>;
 /**
  * Perfil form: name, bio, level (one of), zones (any of). Inline errors
  * say what to fix; the save button is the screen's one primary, pinned
- * above the tab bar on phones. `aside` (the Perfil menu) sits beside the
- * form on desktop and between the form and the pinned bar on phones, so
- * the bar stays pinned to the end of the screen. A first-time profile
- * says "Guardar perfil" and its toast goes straight to the next step.
+ * above the tab bar on phones and tablets (PinnedCta). `aside` (the
+ * Perfil menu) sits beside the form on desktop and after it on phones.
+ * A first-time profile says "Guardar perfil" and its toast goes straight
+ * to the next step.
  */
 export function ProfileForm({
   initial,
@@ -95,7 +91,7 @@ export function ProfileForm({
       setFormError(res.error);
       return;
     }
-    toastAboveSaveBar(
+    toast(
       isNew ? t("form.created") : t("form.saved"),
       hasAvailability
         ? undefined
@@ -116,7 +112,7 @@ export function ProfileForm({
         ref={formRef}
         onSubmit={handleSubmit}
         noValidate
-        className={cn("lg:col-span-2", CLEARS_SAVE_BAR)}
+        className="lg:col-span-2"
       >
         <section
           aria-labelledby="os-teus-dados"
@@ -187,22 +183,22 @@ export function ProfileForm({
       </form>
 
       {aside && (
-        <div className={cn("lg:col-start-3 lg:row-start-1", CLEARS_SAVE_BAR)}>{aside}</div>
+        <div className="lg:col-start-3 lg:row-start-1">{aside}</div>
       )}
 
-      {/* The screen's one primary, pinned above the tab bar on phones. */}
-      <PinnedSaveBar error={formError} className="lg:col-span-2">
+      {/* The screen's one primary, pinned above the tab bar on phones and tablets. */}
+      <PinnedCta until="lg" error={formError} className="lg:col-span-2">
         <Button
           type="submit"
           form={formId}
           size="lg"
           pending={saving || refreshing}
           pendingLabel={t("form.saving")}
-          className="md:h-11 md:w-auto"
+          className="md:w-auto lg:h-11"
         >
           {isNew ? t("form.create") : t("form.save")}
         </Button>
-      </PinnedSaveBar>
+      </PinnedCta>
     </div>
   );
 }
