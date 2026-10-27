@@ -1,230 +1,311 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
+import Link from "next/link";
+import { MailCheck, School, UserRound } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { RadioGroup } from "@base-ui/react/radio-group";
+import { Radio } from "@base-ui/react/radio";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PageHeader } from "@/components/ui/page-header";
+import { PasswordInput } from "@/components/auth/password-input";
+import { ResendVerification } from "@/components/auth/resend-verification";
+import { AuthAltLink, AuthStateIcon, authTextLinkClass } from "@/components/auth/auth-parts";
+import { AuthStateScreen } from "@/components/auth/auth-state";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useTranslations } from "next-intl";
+  ACCOUNT_TYPES,
+  emailProblem,
+  homeFor,
+  newPasswordProblem,
+  signUpErrorKey,
+  type AccountType,
+} from "@/components/auth/auth-helpers";
+import type { IconComponent } from "@/components/brand/icons";
 
-type AccountType = "school_staff" | "instructor";
+type Errors = { name?: string; email?: React.ReactNode; password?: string; form?: string };
 
-export function SignUpForm() {
+const TYPE_ICON: Record<AccountType, IconComponent> = {
+  school_staff: School,
+  instructor: UserRound,
+};
+
+/**
+ * Sign-up: choose the account type (two radio cards — a real choice, no
+ * default unless the URL brings one: /sign-up?type=instructor), then the
+ * form appears below it. The type is immutable after sign-up.
+ *
+ * Staff invitations: the invitation email links to plain /sign-up; the
+ * invite is accepted automatically when the invited address signs up as
+ * "Escola de surf" and opens /school (lib/services/school.ts). The email
+ * field says so when that type is chosen.
+ */
+export function SignUpForm({ defaultType = null }: { defaultType?: AccountType | null }) {
   const t = useTranslations("SignUpPage");
-  const [step, setStep] = useState<"type" | "form">("type");
-  const [accountType, setAccountType] = useState<AccountType>("school_staff");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-  const [done, setDone] = useState(false);
-  const [resending, setResending] = useState(false);
-  const [resendState, setResendState] = useState<"idle" | "sent" | "error">(
-    "idle",
-  );
+  const tv = useTranslations("Auth.validation");
+  const ta = useTranslations("Auth");
+  const tp = useTranslations("Auth.password");
+  const [accountType, setAccountType] = React.useState<AccountType | null>(defaultType);
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [errors, setErrors] = React.useState<Errors>({});
+  const [pending, setPending] = React.useState(false);
+  const [sent, setSent] = React.useState<{ email: string; at: number; type: AccountType } | null>(null);
+  const nameRef = React.useRef<HTMLInputElement>(null);
+  const emailRef = React.useRef<HTMLInputElement>(null);
+  const passwordRef = React.useRef<HTMLInputElement>(null);
+  const typeLabelId = React.useId();
+
+  function clear(key: keyof Errors) {
+    if (errors[key]) setErrors((s) => ({ ...s, [key]: undefined }));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    if (!accountType) return;
 
-    if (password.length < 8) {
-      setError(t("errors.passwordTooShort"));
+    const emailIssue = emailProblem(email);
+    const passwordIssue = newPasswordProblem(password);
+    const next: Errors = {
+      name: name.trim() ? undefined : tv("nameRequired"),
+      email: emailIssue ? tv(emailIssue) : undefined,
+      password: passwordIssue ? tv(passwordIssue) : undefined,
+    };
+    if (next.name || next.email || next.password) {
+      setErrors(next);
+      (next.name ? nameRef : next.email ? emailRef : passwordRef).current?.focus();
       return;
     }
 
+    setErrors({});
     setPending(true);
     try {
       const { error } = await authClient.signUp.email({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         password,
         type: accountType,
         callbackURL: "/verify-email",
       });
 
       if (error) {
-        // better-auth@1.6 returns USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL (422)
-        // for duplicate emails on the sign-up endpoint.
-        if (
-          error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL" ||
-          error.status === 422
-        ) {
-          setError(t("errors.emailTaken"));
+        const key = signUpErrorKey(error);
+        if (key === "emailTaken") {
+          setErrors({
+            email: t.rich("errors.emailTaken", {
+              link: (chunks) => (
+                <Link href="/sign-in" className={authTextLinkClass}>
+                  {chunks}
+                </Link>
+              ),
+            }),
+          });
+          emailRef.current?.focus();
+        } else if (key === "emailInvalid") {
+          setErrors({ email: tv("emailInvalid") });
+          emailRef.current?.focus();
+        } else if (key === "passwordTooShort" || key === "passwordTooLong") {
+          setErrors({ password: tv(key) });
+          passwordRef.current?.focus();
         } else {
-          setError(t("errors.generic"));
+          setErrors({ form: key === "rateLimited" ? ta("rateLimited") : t("errors.generic") });
         }
         return;
       }
 
-      setDone(true);
-    } catch {
+      // Better Auth sends the confirmation email on sign-up (sendOnSignUp)
+      // and signs the person in (autoSignIn; no sign-in wall).
+      setSent({ email: email.trim(), at: Date.now(), type: accountType });
+    } catch (err) {
       // Network-level failure: better-fetch only converts HTTP errors into
       // { error }; transport errors reject the promise.
-      setError(t("errors.generic"));
+      console.error(err);
+      setErrors({ form: t("errors.generic") });
     } finally {
       setPending(false);
     }
   }
 
-  async function handleResend() {
-    setResendState("idle");
-    setResending(true);
-    try {
-      const { error } = await authClient.sendVerificationEmail({
-        email,
-        callbackURL: "/verify-email",
-      });
-      setResendState(error ? "error" : "sent");
-    } catch {
-      setResendState("error");
-    } finally {
-      setResending(false);
-    }
-  }
-
-  if (done) {
+  if (sent) {
+    // The person is signed in already; "Continuar" reloads into the app so
+    // the server-rendered app bar shows the session (a client transition
+    // would keep the signed-out bar, and refreshing /sign-up redirects).
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <p className="text-meta text-muted-foreground">{t("checkEmail")}</p>
-          <div className="flex flex-col gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleResend}
-              disabled={resending}
-            >
-              {resending ? t("resending") : t("resend")}
-            </Button>
-            {resendState === "sent" && (
-              <p className="text-meta text-muted-foreground" role="status">
-                {t("resent")}
-              </p>
-            )}
-            {resendState === "error" && (
-              <p className="text-body text-destructive" role="alert">
-                {t("resendError")}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (step === "type") {
-    return (
-      <div className="flex w-full max-w-2xl flex-col gap-6">
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-headline">
-            {t("title")}
-          </h1>
-          <p className="text-meta text-muted-foreground">{t("subtitle")}</p>
+      <AuthStateScreen focusOnMount>
+        <div className="flex flex-col gap-5">
+          <AuthStateIcon icon={MailCheck} />
+          <PageHeader
+            title={t("done.title")}
+            description={t.rich("done.description", {
+              email: sent.email,
+              strong: (chunks) => <strong className="font-semibold text-foreground">{chunks}</strong>,
+            })}
+          />
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {(
-            [
-              "school_staff",
-              "instructor",
-            ] as const
-          ).map((type) => (
-            <button
-              key={type}
-              type="button"
-              onClick={() => {
-                setAccountType(type);
-                setStep("form");
-              }}
-              className="group flex flex-col items-start gap-2 rounded-lg border border-border p-6 text-left transition-colors hover:border-primary hover:bg-accent"
-            >
-              <span className="text-body-lg font-medium">
-                {t(`accountType.${type}.title`)}
-              </span>
-              <span className="text-meta text-muted-foreground">
-                {t(`accountType.${type}.description`)}
-              </span>
-            </button>
-          ))}
+        <div className="flex flex-col gap-4">
+          <p className="text-meta text-muted-foreground">{t("done.spam")}</p>
+          <ResendVerification email={sent.email} start={{ sentAt: sent.at, sentCount: 1 }} />
         </div>
-      </div>
+        <AuthAltLink lead={t("done.later")} href={homeFor(sent.type)} reload>
+          {t("done.continue")}
+        </AuthAltLink>
+      </AuthStateScreen>
     );
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>
-          {t(`accountType.${accountType}.title`)} —{" "}
-          {t(`accountType.${accountType}.description`)}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="name">{t("name.label")}</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder={t("name.placeholder")}
-              required
-              autoComplete="name"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="email">{t("email.label")}</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("email.placeholder")}
-              required
-              autoComplete="email"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="password">{t("password.label")}</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t("password.placeholder")}
-              required
-              minLength={8}
-              autoComplete="new-password"
-            />
-          </div>
-          {error && (
-            <p className="text-body text-destructive" role="alert">
-              {error}
-            </p>
-          )}
-          <Button type="submit" disabled={pending}>
-            {pending ? t("submitting") : t("submit")}
-          </Button>
-          <button
-            type="button"
-            onClick={() => setStep("type")}
-            className="text-meta text-muted-foreground underline-offset-4 hover:underline"
+    <div className="flex flex-col gap-8">
+      <PageHeader title={t("title")} description={t("subtitle")} />
+
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
+          <Label id={typeLabelId}>{t("accountType.label")}</Label>
+          <RadioGroup
+            aria-labelledby={typeLabelId}
+            value={accountType}
+            onValueChange={(value) => setAccountType(value as AccountType)}
+            className="flex flex-col gap-3"
           >
-            ← {t("back")}
-          </button>
-        </form>
-      </CardContent>
-    </Card>
+            {ACCOUNT_TYPES.map((type) => (
+              <AccountTypeCard
+                key={type}
+                value={type}
+                icon={TYPE_ICON[type]}
+                title={t(`accountType.${type}.title`)}
+                description={t(`accountType.${type}.description`)}
+                onSelect={setAccountType}
+              />
+            ))}
+          </RadioGroup>
+        </div>
+
+        {accountType && (
+          <div className="flex animate-rise flex-col gap-5">
+            <Field id="name" label={t("name.label")} error={errors.name}>
+              <Input
+                ref={nameRef}
+                autoComplete="name"
+                placeholder={t("name.placeholder")}
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  clear("name");
+                }}
+              />
+            </Field>
+
+            <Field
+              id="email"
+              label={t("email.label")}
+              helper={accountType === "school_staff" ? t("email.inviteHelper") : undefined}
+              error={errors.email}
+            >
+              <Input
+                ref={emailRef}
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                spellCheck={false}
+                placeholder={t("email.placeholder")}
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  clear("email");
+                }}
+              />
+            </Field>
+
+            <Field id="password" label={t("password.label")} helper={tp("requirements")} error={errors.password}>
+              <PasswordInput
+                ref={passwordRef}
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  clear("password");
+                }}
+              />
+            </Field>
+
+            {errors.form && <FieldError>{errors.form}</FieldError>}
+
+            <Button type="submit" size="lg" className="mt-1" pending={pending} pendingLabel={t("submitting")}>
+              {t("submit")}
+            </Button>
+          </div>
+        )}
+      </form>
+
+      <AuthAltLink lead={t("haveAccount")} href="/sign-in">
+        {t("signIn")}
+      </AuthAltLink>
+    </div>
+  );
+}
+
+/**
+ * One account-type choice: a large card that is a radio (Base UI renders
+ * role="radio" + aria-checked, and the group handles arrow keys / roving
+ * focus). Selected: teal border, tonal fill, filled icon and radio dot.
+ */
+function AccountTypeCard({
+  value,
+  icon: Icon,
+  title,
+  description,
+  onSelect,
+}: {
+  value: AccountType;
+  icon: IconComponent;
+  title: string;
+  description: string;
+  onSelect: (value: AccountType) => void;
+}) {
+  const id = React.useId();
+  return (
+    <Radio.Root
+      value={value}
+      // Base UI 1.4.1 bug: inside a RadioGroup, Space prevents the event
+      // before the radio's own click handler, which then bails out — so
+      // Space never checks the focused radio. Check it here (this handler
+      // runs first). Arrow keys already work.
+      onKeyDown={(event) => {
+        if (event.key === " ") onSelect(value);
+      }}
+      aria-labelledby={`${id}-title`}
+      aria-describedby={`${id}-description`}
+      className={
+        "group flex cursor-pointer items-center gap-4 rounded-card border bg-card p-card text-left shadow-card outline-none select-none " +
+        "transition-[background-color,border-color,transform] duration-(--duration-fast) ease-move hover:border-input active:scale-99 " +
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background " +
+        "data-checked:border-primary data-checked:bg-secondary data-checked:hover:border-primary"
+      }
+    >
+      <span
+        aria-hidden
+        className="flex size-12 shrink-0 items-center justify-center rounded-full bg-tint text-tint-foreground transition-colors duration-(--duration-fast) group-data-checked:bg-primary group-data-checked:text-primary-foreground"
+      >
+        <Icon className="size-6" strokeWidth={1.75} />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span id={`${id}-title`} className="text-label text-foreground">
+          {title}
+        </span>
+        <span id={`${id}-description`} className="text-meta text-muted-foreground">
+          {description}
+        </span>
+      </span>
+      <span
+        aria-hidden
+        className="flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-input bg-card transition-colors duration-(--duration-fast) group-data-checked:border-primary"
+      >
+        <span className="size-2.5 scale-0 rounded-full bg-primary transition-transform duration-(--duration-instant) ease-move group-data-checked:scale-100" />
+      </span>
+    </Radio.Root>
   );
 }

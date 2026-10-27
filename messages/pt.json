@@ -175,17 +175,48 @@
       "copyright": "© {year} surfsync"
     }
   },
+  "Auth": {
+    "layout": {
+      "tagline": "a conexão que impulsiona o surf"
+    },
+    "password": {
+      "show": "Mostrar palavra-passe",
+      "requirements": "Pelo menos 8 caracteres."
+    },
+    "validation": {
+      "nameRequired": "Indica o teu nome.",
+      "emailRequired": "Indica o teu email.",
+      "emailInvalid": "Indica um email válido, como nome@exemplo.pt.",
+      "passwordRequired": "Indica a palavra-passe.",
+      "passwordTooShort": "A palavra-passe precisa de pelo menos 8 caracteres.",
+      "passwordTooLong": "A palavra-passe pode ter no máximo 128 caracteres."
+    },
+    "rateLimited": "Demasiadas tentativas. Espera um minuto e tenta novamente.",
+    "resend": {
+      "submit": "Reenviar email",
+      "pending": "A reenviar…",
+      "sent": "Email reenviado.",
+      "cooldown": "Podes pedir outro email daqui a {seconds} s.",
+      "errors": {
+        "wait": "Espera um minuto antes de pedires outro email.",
+        "daily": "Atingiste o limite de emails por hoje. Tenta novamente amanhã.",
+        "alreadyVerified": "O teu email já está confirmado.",
+        "generic": "Não foi possível enviar o email. Verifica a ligação e tenta novamente."
+      }
+    }
+  },
   "SignUpPage": {
     "title": "Criar conta",
-    "subtitle": "Escolhe o tipo de conta para começar",
+    "subtitle": "Escolhe como vais usar o surfsync.",
     "accountType": {
+      "label": "Tipo de conta",
       "school_staff": {
-        "title": "Escola de Surf",
-        "description": "Procura e reserva instrutores verificados para as tuas aulas"
+        "title": "Escola de surf",
+        "description": "Reserva instrutores verificados."
       },
       "instructor": {
         "title": "Instrutor",
-        "description": "Recebe pedidos de trabalho de escolas de surf na tua zona"
+        "description": "Recebe pedidos de escolas na tua zona."
       }
     },
     "name": {
@@ -194,38 +225,53 @@
     },
     "email": {
       "label": "Email",
-      "placeholder": "nome@exemplo.pt"
+      "placeholder": "nome@exemplo.pt",
+      "inviteHelper": "Recebeste um convite de uma escola? Usa o email desse convite."
     },
     "password": {
-      "label": "Palavra-passe",
-      "placeholder": "Mínimo de 8 caracteres"
+      "label": "Palavra-passe"
     },
     "submit": "Criar conta",
-    "submitting": "A criar conta...",
-    "back": "Voltar",
-    "success": "Conta criada com sucesso!",
-    "checkEmail": "Enviamos um link de verificação para o teu email. Verifica a tua caixa de entrada (e o spam) para continuar.",
-    "resend": "Reenviar email de verificação",
-    "resending": "A reenviar...",
-    "resent": "Email reenviado. Verifica a tua caixa de entrada.",
-    "resendError": "Não foi possível reenviar o email. Espera um minuto e tenta novamente.",
+    "submitting": "A criar conta…",
+    "haveAccount": "Já tens conta?",
+    "signIn": "Entrar",
+    "done": {
+      "title": "Confirma o teu email",
+      "description": "Enviámos um link para <strong>{email}</strong>. Abre-o para confirmares o teu email.",
+      "spam": "Não encontras o email? Vê na pasta de spam ou pede outro.",
+      "later": "Podes confirmar mais tarde.",
+      "continue": "Continuar"
+    },
     "errors": {
-      "emailTaken": "Este email já tem uma conta. Tenta iniciar sessão.",
-      "generic": "Não foi possível criar a conta. Verifica os dados e tenta novamente.",
-      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres."
+      "emailTaken": "Este email já tem uma conta. <link>Entrar</link>",
+      "generic": "Não foi possível criar a conta. Verifica a ligação e tenta novamente."
     }
   },
   "VerifyEmailPage": {
-    "title": "Email verificado!",
-    "description": "O teu email foi confirmado com sucesso. Já podes iniciar sessão.",
-    "failedTitle": "Link inválido ou expirado",
-    "failedDescription": "Este link de verificação não é válido ou já expirou. Pede um novo email de verificação ao recomeçar a criação de conta.",
+    "metaTitle": "Confirmar email",
+    "title": "Email confirmado",
+    "description": {
+      "signedIn": "A tua conta está pronta a usar.",
+      "signedOut": "A tua conta está pronta. Entra para continuares."
+    },
     "continue": "Continuar",
-    "backToSignIn": "Voltar ao início"
+    "back": "Voltar ao início",
+    "pending": {
+      "title": "Confirma o teu email",
+      "description": "Abre o link que enviámos para <strong>{email}</strong>. Se não o encontras ou já passaram 24 horas, pede outro."
+    },
+    "failedTitle": "Este link já não é válido",
+    "failedDescription": "Os links de confirmação são válidos durante 24 horas e só podem ser usados uma vez.",
+    "failed": {
+      "signInHint": "Entra na tua conta para pedires um novo email de confirmação.",
+      "signIn": "Entrar",
+      "alreadyVerified": "O teu email já está confirmado. Podes continuar.",
+      "resendHint": "Pede um novo email de confirmação para <strong>{email}</strong>."
+    }
   },
   "SignInPage": {
     "title": "Entrar",
-    "subtitle": "Que bom ter-te de volta ao SurfSync",
+    "subtitle": "Entra com o email e a palavra-passe da tua conta.",
     "email": {
       "label": "Email",
       "placeholder": "nome@exemplo.pt"
@@ -235,79 +281,126 @@
     },
     "forgotPassword": "Esqueceste-te da palavra-passe?",
     "submit": "Entrar",
-    "submitting": "A entrar...",
-    "signUpInstead": "Não tens conta? Criar conta",
-    "resetSuccess": "Palavra-passe redefinida com sucesso. Inicia sessão com a tua nova palavra-passe.",
+    "submitting": "A entrar…",
+    "noAccount": "Ainda não tens conta?",
+    "signUp": "Criar conta",
+    "resetSuccess": "Palavra-passe alterada. Entra com a nova palavra-passe.",
     "errors": {
-      "invalidCredentials": "Email ou palavra-passe incorretos.",
-      "generic": "Não foi possível iniciar sessão. Tenta novamente."
+      "invalidCredentials": "Email ou palavra-passe incorretos. Verifica os dados e tenta novamente.",
+      "generic": "Não foi possível entrar. Verifica a ligação e tenta novamente."
     }
   },
   "ForgotPasswordPage": {
     "title": "Recuperar palavra-passe",
-    "subtitle": "Indica o teu email e enviamos um link para redefinir a palavra-passe.",
+    "subtitle": "Indica o email da tua conta. Enviamos-te um link para definires uma nova palavra-passe.",
     "email": {
       "label": "Email",
       "placeholder": "nome@exemplo.pt"
     },
     "submit": "Enviar link",
-    "submitting": "A enviar...",
-    "checkEmail": "Se este email existe na nossa base, enviamos um link de redefinição. Verifica a tua caixa de entrada (e o spam). O link é válido durante 1 hora.",
-    "useAnotherEmail": "Usar outro email",
+    "submitting": "A enviar…",
+    "remembered": "Já te lembraste?",
+    "signIn": "Entrar",
+    "done": {
+      "title": "Verifica o teu email",
+      "description": "Se existir uma conta com <strong>{email}</strong>, enviámos um link para redefinires a palavra-passe. O link é válido durante 1 hora.",
+      "spam": "Não encontras o email? Vê na pasta de spam.",
+      "useAnotherEmail": "Usar outro email"
+    },
     "errors": {
-      "generic": "Não foi possível enviar o email. Tenta novamente."
+      "generic": "Não foi possível enviar o email. Verifica a ligação e tenta novamente."
     }
   },
   "ResetPasswordPage": {
-    "title": "Redefinir palavra-passe",
-    "subtitle": "Escolhe uma nova palavra-passe para a tua conta.",
+    "title": "Nova palavra-passe",
+    "subtitle": "Escolhe a nova palavra-passe da tua conta. Por segurança, terminamos a sessão em todos os dispositivos.",
     "newPassword": {
       "label": "Nova palavra-passe"
     },
     "confirmPassword": {
-      "label": "Confirmar nova palavra-passe"
+      "label": "Confirmar palavra-passe"
     },
-    "submit": "Redefinir palavra-passe",
-    "submitting": "A redefinir...",
+    "submit": "Guardar palavra-passe",
+    "submitting": "A guardar…",
     "invalid": {
-      "title": "Link inválido ou expirado",
-      "description": "Este link de redefinição não é válido ou já expirou (validade de 1 hora, utilização única).",
-      "requestNew": "Pedir novo link"
+      "title": "Este link já não é válido",
+      "description": "Os links para redefinir a palavra-passe são válidos durante 1 hora e só podem ser usados uma vez.",
+      "requestNew": "Pedir novo link",
+      "remembered": "Já te lembraste da palavra-passe?",
+      "signIn": "Entrar"
     },
     "errors": {
-      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres.",
       "passwordMismatch": "As palavras-passe não coincidem.",
-      "invalidToken": "Este link já foi utilizado ou expirou. Peça um novo link de redefinição.",
-      "generic": "Não foi possível redefinir a palavra-passe. Tenta novamente."
+      "generic": "Não foi possível guardar a palavra-passe. Verifica a ligação e tenta novamente."
     }
   },
   "AccountSettingsPage": {
-    "title": "Definições de conta",
-    "sessions": {
-      "title": "Sessões ativas",
-      "description": "Dispositivos com sessão iniciada na tua conta. Terminar uma sessão faz logout nesse dispositivo.",
-      "loading": "A carregar sessões...",
-      "current": "esta sessão",
-      "expires": "expira a",
-      "revoke": "Terminar",
-      "revoking": "A terminar...",
-      "revokeOthers": "Terminar outras sessões",
-      "signOutEverywhere": "Terminar sessão em todos os dispositivos"
+    "title": "Conta",
+    "account": {
+      "heading": "Dados da conta",
+      "name": "Nome",
+      "email": "Email",
+      "type": "Tipo de conta",
+      "types": {
+        "instructor": "Instrutor",
+        "school_staff": "Escola de surf"
+      },
+      "resend": "Reenviar email de confirmação",
+      "unverified": "Por confirmar"
+    },
+    "security": {
+      "heading": "Segurança",
+      "changePassword": "Alterar palavra-passe"
     },
     "password": {
       "title": "Alterar palavra-passe",
-      "description": "Ao alterar, todas as outras sessões serão terminadas.",
+      "description": "Ao alterares, terminamos a sessão nos outros dispositivos. Neste continuas com sessão iniciada.",
       "current": "Palavra-passe atual",
       "new": "Nova palavra-passe",
+      "cancel": "Cancelar",
       "submit": "Alterar palavra-passe",
-      "submitting": "A alterar..."
+      "submitting": "A alterar…",
+      "changed": "Palavra-passe alterada. As outras sessões foram terminadas."
     },
-    "passwordChanged": "Palavra-passe alterada. As outras sessões foram terminadas.",
+    "sessions": {
+      "heading": "Sessões ativas",
+      "description": "Dispositivos com sessão iniciada na tua conta.",
+      "loading": "A carregar sessões…",
+      "loadFailed": "Não foi possível carregar as sessões. Verifica a ligação e tenta novamente.",
+      "retry": "Tentar novamente",
+      "current": "Este dispositivo",
+      "started": "Iniciada {when}",
+      "startedAt": "{day, select, today {hoje} yesterday {ontem} other {a {date}}} {hour, plural, =1 {à} other {às}} {time}",
+      "expires": "expira a {date}",
+      "unknownDevice": "Dispositivo desconhecido",
+      "unknownBrowser": "Navegador",
+      "revoke": "Terminar",
+      "revokeLabel": "Terminar a sessão em {device}, iniciada {when}",
+      "revoking": "A terminar…",
+      "revoked": "Sessão terminada.",
+      "actionsLabel": "Terminar sessões",
+      "revokeOthers": "Terminar outras sessões",
+      "othersRevoked": "Outras sessões terminadas.",
+      "othersConfirm": {
+        "title": "Terminar as outras sessões?",
+        "description": "Os outros dispositivos ficam sem sessão iniciada. Neste continuas com sessão iniciada.",
+        "confirm": "Terminar sessões",
+        "cancel": "Manter sessões"
+      },
+      "signOutEverywhere": "Terminar todas as sessões",
+      "allConfirm": {
+        "title": "Terminar todas as sessões?",
+        "description": "Sais da tua conta neste e em todos os outros dispositivos. Para voltar, entra outra vez.",
+        "confirm": "Terminar todas",
+        "cancel": "Manter sessões"
+      }
+    },
+    "signOut": "Terminar sessão",
     "errors": {
-      "revokeFailed": "Não foi possível terminar a sessão. Tente novamente.",
-      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres.",
+      "revokeFailed": "Não foi possível terminar a sessão. Verifica a ligação e tenta novamente.",
+      "signOutFailed": "Não foi possível terminar sessão. Verifica a ligação e tenta novamente.",
       "invalidPassword": "A palavra-passe atual está incorreta.",
-      "generic": "Não foi possível alterar a palavra-passe. Tente novamente."
+      "generic": "Não foi possível alterar a palavra-passe. Verifica a ligação e tenta novamente."
     }
   },
   "InstructorDashboardPage": {
