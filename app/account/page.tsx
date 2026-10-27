@@ -21,13 +21,20 @@ export default async function AccountSettingsPage() {
   const emailVerified = session.user.emailVerified;
   const resendStart = emailVerified ? undefined : await resendStartFor(session.user.email);
 
+  // Instructors reach Conta from Perfil (it stays the active tab), so it's
+  // a pushed screen with a way back; for schools Conta is a tab of its own.
+  const isInstructor = session.user.type === "instructor";
+
   return (
     <PageContainer width="narrow">
-      <PageHeader title={t("title")} />
+      <PageHeader
+        title={t("title")}
+        back={isInstructor ? { href: "/instructor/profile", label: t("backToProfile") } : undefined}
+      />
       <AccountSettings
         userName={session.user.name}
         userEmail={session.user.email}
-        userType={session.user.type === "instructor" ? "instructor" : "school_staff"}
+        userType={isInstructor ? "instructor" : "school_staff"}
         emailVerified={emailVerified}
         resendStart={resendStart}
       />

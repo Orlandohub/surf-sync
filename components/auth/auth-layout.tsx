@@ -16,11 +16,12 @@ import whitewater from "@/public/brand/whitewater-aerial.jpg";
  *   so errors and notices grow downwards instead of shifting the heading.
  *   The panel is sticky and one viewport tall, so a long form (sign-up)
  *   scrolls past it without pushing the line away.
- * < lg: the form comes first; a compact photo band with the lockup closes
- *   the page, pushed to the bottom of the viewport on short screens. It is
- *   there for signed-out visitors, whose mobile app bar shows only the mark;
- *   signed-in visitors already see the lockup in the app bar, so they don't
- *   get it.
+ * < lg: the form comes first; a compact photo band closes the page, pushed
+ *   to the bottom of the viewport on short screens, for signed-out
+ *   visitors only. Below md it carries the lockup, because the phone app
+ *   bar shows only the mark; from md the app bar has the lockup, so the
+ *   band doesn't repeat it. Signed-in visitors already see the lockup in
+ *   the app bar and get no band.
  *
  * The global app bar stays above it with one quiet link.
  */
@@ -90,9 +91,14 @@ export async function AuthLayout({ children }: { children: React.ReactNode }) {
             sizes="(min-width: 64rem) 1px, 25rem"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/15" />
+          {/* Below md the lockup sits on near-white foam: a heavier veil
+              and a doubled bottom scrim keep white above 4:1 on every
+              pixel behind it (measured at 390 px). From md, with no
+              lockup, the photo stays light. */}
+          <div className="absolute inset-0 bg-black/30 md:bg-black/15" />
           <div className="absolute inset-0 scrim" />
-          <div className="relative flex h-full items-end p-card text-white">
+          <div className="absolute inset-0 scrim md:hidden" />
+          <div className="relative flex h-full items-end p-card text-white md:hidden">
             <LogoLockup height={22} />
           </div>
         </div>

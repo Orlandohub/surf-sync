@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Bookmark, SearchX, UsersRound } from "lucide-react";
+import { ArrowRight, Bookmark, SearchX, UsersRound } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { listLocations, searchInstructors, searchSchema } from "@/lib/services/discovery";
 import {
@@ -78,10 +78,12 @@ export default async function DiscoveryPage({
               value: "saved",
               href: discoveryHref({ ...query, view: "saved" }),
               label: t("views.saved"),
+              // The number is read with its noun: "Guardados, 1 instrutor".
               badge:
                 savedCount > 0 ? (
                   <Badge variant="neutral" className="tabular-nums">
-                    {savedCount}
+                    <span aria-hidden>{savedCount}</span>
+                    <span className="sr-only">{t("views.savedCount", { count: savedCount })}</span>
                   </Badge>
                 ) : undefined,
             },
@@ -130,6 +132,7 @@ export default async function DiscoveryPage({
                 // The screen's only action, so primary (COMPONENTS.md "Empty state").
                 <Link href={discoveryHref({})} className={buttonVariants()}>
                   {t("emptySaved.action")}
+                  <ArrowRight aria-hidden strokeWidth={1.75} />
                 </Link>
               }
             />

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Bell, CalendarCheck, Clock3, History } from "lucide-react";
+import { ArrowRight, Bell, CalendarCheck, Clock3, History } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { listSchoolBookings } from "@/lib/services/booking";
 import { listNotifications, unreadCount } from "@/lib/services/notifications";
@@ -14,7 +14,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { BookingRow } from "@/components/school/booking-row";
 import { SchoolNotifications } from "@/components/school/school-notifications";
-import { groupBookings, type BookingTab } from "@/components/school/booking-groups";
+import { bookingTab, groupBookings, type BookingTab } from "@/components/school/booking-groups";
+import { lisbonToday } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
@@ -50,13 +51,18 @@ export default async function SchoolBookingsPage({
     unreadCount(session.user.id),
     getTranslations("SchoolBookingsPage"),
   ]);
-  const groups = groupBookings(bookings);
+  const today = lisbonToday();
+  const groups = groupBookings(bookings, today);
   const shown = groups[tab];
+  // Each notification opens the tab its booking is in now.
+  const notificationTabs = Object.fromEntries(bookings.map((b) => [b.id, bookingTab(b, today)]));
 
+  // The number is read with its noun: "Pendentes, 2 pedidos".
   const count = (n: number) =>
     n > 0 ? (
       <Badge variant="neutral" className="tabular-nums">
-        {n}
+        <span aria-hidden>{n}</span>
+        <span className="sr-only">{t("tabs.pendingCount", { count: n })}</span>
       </Badge>
     ) : undefined;
 
@@ -104,6 +110,7 @@ export default async function SchoolBookingsPage({
                 <BookingRow
                   key={b.id}
                   booking={b}
+                  today={today}
                   cancellable
                   // Only name the requester when it was a colleague.
                   showRequester={b.requestedByName !== session.user.name}
@@ -121,6 +128,7 @@ export default async function SchoolBookingsPage({
                   // The screen's only action, so primary (COMPONENTS.md "Empty state").
                   <Link href="/school/discovery" className={buttonVariants()}>
                     {t("empty.action")}
+                    <ArrowRight aria-hidden strokeWidth={1.75} />
                   </Link>
                 )
               }
@@ -131,6 +139,8 @@ export default async function SchoolBookingsPage({
         <SchoolNotifications
           notifications={notifications}
           unread={unread}
+          tabs={notificationTabs}
+          tabHref={TAB_HREF}
           className="lg:col-start-3 lg:row-start-1"
         />
       </div>

@@ -18,6 +18,20 @@ export function bookingTab(b: Pick<BookingView, "status" | "bookingDate">, today
   return "history";
 }
 
+/**
+ * What a row's status badge says: the DB status, plus "expired" for a
+ * request nobody answered whose day has passed (still `requested` in the
+ * DB) — "Sem resposta", as the instructor sees it too.
+ */
+export type BookingDisplayStatus = BookingView["status"] | "expired";
+
+export function displayStatus(
+  b: Pick<BookingView, "status" | "bookingDate">,
+  today: IsoDate,
+): BookingDisplayStatus {
+  return b.status === "requested" && b.bookingDate < today ? "expired" : b.status;
+}
+
 const byStart = (a: BookingView, b: BookingView) =>
   a.bookingDate.localeCompare(b.bookingDate) || a.startTime.localeCompare(b.startTime);
 

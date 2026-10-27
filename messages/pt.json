@@ -351,6 +351,7 @@
   },
   "AccountSettingsPage": {
     "title": "Conta",
+    "backToProfile": "Perfil",
     "account": {
       "heading": "Dados da conta",
       "name": "Nome",
@@ -641,7 +642,8 @@
     "views": {
       "label": "Instrutores",
       "all": "Todos",
-      "saved": "Guardados"
+      "saved": "Guardados",
+      "savedCount": "{count, plural, one {# instrutor} other {# instrutores}}"
     },
     "filters": {
       "label": "Filtrar instrutores",
@@ -727,22 +729,24 @@
       "label": "Reservas",
       "pending": "Pendentes",
       "upcoming": "Próximas",
-      "history": "Histórico"
+      "history": "Histórico",
+      "pendingCount": "{count, plural, one {# pedido} other {# pedidos}}"
     },
     "status": {
       "requested": "Pendente",
       "accepted": "Confirmada",
       "declined": "Recusada",
       "cancelled": "Cancelada",
-      "completed": "Concluída"
+      "completed": "Concluída",
+      "expired": "Sem resposta"
     },
     "requestedBy": "Pedido por {name}",
     "declineReason": "Motivo: {reason}",
     "cancel": {
       "lesson": "Cancelar aula",
       "request": "Cancelar pedido",
-      "lessonAria": "Cancelar aula de {instructor} ({day}, {time})",
-      "requestAria": "Cancelar pedido a {instructor} ({day}, {time})",
+      "lessonAria": "Cancelar aula com {instructor}, {when}",
+      "requestAria": "Cancelar pedido a {instructor}, {when}",
       "lessonTitle": "Cancelar a aula de {day}?",
       "requestTitle": "Cancelar o pedido de {day}?",
       "description": "Das {start} às {end}, com {instructor}. Enviamos-lhe um aviso do cancelamento. Esta ação não pode ser anulada.",

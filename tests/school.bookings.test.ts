@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { bookingStats, bookingTab, groupBookings, weekBounds } from "@/components/school/booking-groups";
+import {
+  bookingStats,
+  bookingTab,
+  displayStatus,
+  groupBookings,
+  weekBounds,
+} from "@/components/school/booking-groups";
 import { z } from "zod";
 import { isEmail } from "@/components/school/email";
 import {
@@ -49,6 +55,13 @@ describe("booking tabs", () => {
     expect(bookingTab(booking({ status: "completed", bookingDate: "2026-10-22" }), TODAY)).toBe("history");
     expect(bookingTab(booking({ status: "accepted", bookingDate: "2026-10-26" }), TODAY)).toBe("history");
     expect(bookingTab(booking({ status: "requested", bookingDate: "2026-10-26" }), TODAY)).toBe("history");
+  });
+
+  it("calls an unanswered request whose day has passed 'expired' (Sem resposta)", () => {
+    expect(displayStatus(booking({ status: "requested", bookingDate: "2026-10-26" }), TODAY)).toBe("expired");
+    expect(displayStatus(booking({ status: "requested", bookingDate: TODAY }), TODAY)).toBe("requested");
+    expect(displayStatus(booking({ status: "accepted", bookingDate: "2026-10-26" }), TODAY)).toBe("accepted");
+    expect(displayStatus(booking({ status: "declined", bookingDate: "2026-10-26" }), TODAY)).toBe("declined");
   });
 
   it("sorts pending and upcoming soonest first, history latest first", () => {
