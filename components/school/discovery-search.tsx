@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Star } from "lucide-react";
 import { toggleBookmarkAction } from "@/lib/actions/discovery";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,15 +54,15 @@ export function DiscoverySearch({
   return (
     <main className="flex flex-1 flex-col items-center gap-6 px-4 py-10">
       <div className="flex w-full max-w-3xl flex-col gap-1">
-        <span className="eyebrow">{t("eyebrow")}</span>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        <span className="text-meta text-muted-foreground">{t("eyebrow")}</span>
+        <h1 className="text-headline">{t("title")}</h1>
+        <p className="text-meta text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card className="w-full max-w-3xl">
         <CardContent className="flex flex-col gap-3 pt-6 sm:flex-row sm:items-end">
           <div className="flex flex-1 flex-col gap-2">
-            <label className="text-sm font-medium" htmlFor="filter-location">{t("filters.location")}</label>
+            <label className="text-meta font-medium" htmlFor="filter-location">{t("filters.location")}</label>
             <select
               id="filter-location"
               value={locationId}
@@ -69,7 +70,7 @@ export function DiscoverySearch({
                 setLocationId(e.target.value);
                 applyFilters({ location: e.target.value });
               }}
-              className="h-9 rounded-lg border border-input bg-transparent px-3 text-sm"
+              className="h-12 rounded-control border border-input bg-card px-4 text-body-lg text-foreground"
             >
               <option value="">{t("filters.anyLocation")}</option>
               {locations.map((l) => (
@@ -78,7 +79,7 @@ export function DiscoverySearch({
             </select>
           </div>
           <div className="flex flex-1 flex-col gap-2">
-            <label className="text-sm font-medium" htmlFor="filter-experience">{t("filters.experience")}</label>
+            <label className="text-meta font-medium" htmlFor="filter-experience">{t("filters.experience")}</label>
             <select
               id="filter-experience"
               value={experience}
@@ -86,7 +87,7 @@ export function DiscoverySearch({
                 setExperience(e.target.value);
                 applyFilters({ experience: e.target.value });
               }}
-              className="h-9 rounded-lg border border-input bg-transparent px-3 text-sm"
+              className="h-12 rounded-control border border-input bg-card px-4 text-body-lg text-foreground"
             >
               <option value="">{t("filters.anyExperience")}</option>
               {LEVELS.map((lvl) => (
@@ -95,7 +96,7 @@ export function DiscoverySearch({
             </select>
           </div>
           <div className="flex flex-1 flex-col gap-2">
-            <label className="text-sm font-medium" htmlFor="filter-day">{t("filters.day")}</label>
+            <label className="text-meta font-medium" htmlFor="filter-day">{t("filters.day")}</label>
             <select
               id="filter-day"
               value={day}
@@ -103,7 +104,7 @@ export function DiscoverySearch({
                 setDay(e.target.value);
                 applyFilters({ day: e.target.value });
               }}
-              className="h-9 rounded-lg border border-input bg-transparent px-3 text-sm"
+              className="h-12 rounded-control border border-input bg-card px-4 text-body-lg text-foreground"
             >
               <option value="">{t("filters.anyDay")}</option>
               {DAYS.map((d) => (
@@ -114,7 +115,7 @@ export function DiscoverySearch({
         </CardContent>
       </Card>
 
-      <p className="w-full max-w-3xl text-sm text-muted-foreground">
+      <p className="w-full max-w-3xl text-meta text-muted-foreground">
         {t("resultsCount", { count: results.length })}
       </p>
 
@@ -123,7 +124,7 @@ export function DiscoverySearch({
           <Card key={instructor.userId}>
             <CardHeader className="flex flex-row items-start justify-between">
               <div className="flex flex-col gap-1">
-                <CardTitle className="text-base">
+                <CardTitle className="text-label">
                   <Link href={`/school/discovery/${instructor.userId}`} className="hover:underline">
                     {instructor.displayName}
                   </Link>
@@ -134,25 +135,29 @@ export function DiscoverySearch({
                 </CardDescription>
               </div>
               <Button
-                variant={instructor.bookmarked ? "default" : "outline"}
+                variant={instructor.bookmarked ? "secondary" : "outline"}
                 size="sm"
                 disabled={pending}
                 onClick={() => handleBookmark(instructor.userId)}
                 aria-pressed={instructor.bookmarked}
               >
-                {instructor.bookmarked ? "★" : "☆"} {t("bookmark")}
+                <Star
+                  className={instructor.bookmarked ? "text-primary" : undefined}
+                  strokeWidth={1.75}
+                />
+                {t("bookmark")}
               </Button>
             </CardHeader>
             {instructor.bio && (
               <CardContent>
-                <p className="line-clamp-2 text-sm text-muted-foreground">{instructor.bio}</p>
+                <p className="line-clamp-2 text-meta text-muted-foreground">{instructor.bio}</p>
               </CardContent>
             )}
           </Card>
         ))}
         {results.length === 0 && (
           <Card>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
+            <CardContent className="py-10 text-center text-meta text-muted-foreground">
               {t("noResults")}
             </CardContent>
           </Card>

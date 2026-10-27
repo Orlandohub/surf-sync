@@ -1,27 +1,23 @@
+import { Badge } from "@/components/ui/badge";
+
 /**
- * DS §07.3 Badge — dot + label, outline-on-tint, never solid fills.
- * Semantic statuses map to booking/profile states:
- * success = accepted/active · warning = requested/pending ·
- * danger = declined · info = confirmed/brand.
+ * surfsync DS — status badge on the new Badge variants (COMPONENTS.md).
+ * Tone kept for callers; maps onto soft badge variants. Status always
+ * pairs with an explicit word — colour never carries meaning alone.
  */
-const COLORS = {
-  success: "var(--ss-success)",
-  warning: "var(--ss-warning)",
-  danger: "var(--ss-danger)",
-  info: "var(--ss-teal-500)",
+const TONE_TO_VARIANT = {
+  success: "success",
+  warning: "warning",
+  danger: "destructive",
+  info: "default",
 } as const;
 
 export function StatusBadge({
   tone,
   children,
 }: {
-  tone: keyof typeof COLORS;
+  tone: keyof typeof TONE_TO_VARIANT;
   children: React.ReactNode;
 }) {
-  return (
-    <span className="status-badge" style={{ ["--badge-color" as string]: COLORS[tone] }}>
-      <span className="status-dot" />
-      {children}
-    </span>
-  );
+  return <Badge variant={TONE_TO_VARIANT[tone]}>{children}</Badge>;
 }

@@ -106,7 +106,7 @@ export function SchoolDashboard({ data }: { data: SchoolDashboardData }) {
                 <Input id="school-city" value={city} onChange={(e) => setCity(e.target.value)} required minLength={2} />
               </div>
               {schoolMsg && (
-                <p className={`text-sm ${schoolMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
+                <p className={`text-body ${schoolMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
                   {schoolMsg.text}
                 </p>
               )}
@@ -123,15 +123,15 @@ export function SchoolDashboard({ data }: { data: SchoolDashboardData }) {
   return (
     <main className="flex flex-1 flex-col items-center gap-6 px-4 py-10">
       <div className="flex w-full max-w-2xl flex-col gap-1">
-        <span className="eyebrow">{t("eyebrow")}</span>
-        <h1 className="text-2xl font-semibold tracking-tight">{data.school.name}</h1>
-        <p className="text-sm text-muted-foreground">
+        <span className="text-meta text-muted-foreground">{t("eyebrow")}</span>
+        <h1 className="text-headline">{data.school.name}</h1>
+        <p className="text-meta text-muted-foreground">
           {data.school.address}, {data.school.city}
         </p>
-        <Link href="/school/discovery" className="text-sm text-muted-foreground underline underline-offset-4">
+        <Link href="/school/discovery" className="text-meta text-muted-foreground underline underline-offset-4">
           {t("findInstructors")} →
         </Link>
-        <Link href="/school/bookings" className="text-sm text-muted-foreground underline underline-offset-4">
+        <Link href="/school/bookings" className="text-meta text-muted-foreground underline underline-offset-4">
           {t("viewBookings")} →
         </Link>
       </div>
@@ -144,13 +144,14 @@ export function SchoolDashboard({ data }: { data: SchoolDashboardData }) {
         <CardContent className="flex flex-col gap-4">
           <ul className="flex flex-col gap-2">
             {data.staff.map((member) => (
-              <li key={member.userId} className="flex items-center justify-between rounded-lg border border-border p-3">
+              <li key={member.userId} className="flex items-center justify-between rounded-control border border-border p-3">
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium">{member.name}</span>
-                  <span className="text-xs text-muted-foreground">{member.email}</span>
+                  <span className="text-label">{member.name}</span>
+                  <span className="text-caption text-muted-foreground">{member.email}</span>
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {t("staff.joined")} {new Date(member.joinedAt).toLocaleDateString("pt-PT")}
+                <span className="text-caption tabular-nums text-muted-foreground">
+                  {t("staff.joined")}{" "}
+                  {new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "long" }).format(new Date(member.joinedAt))}
                 </span>
               </li>
             ))}
@@ -158,12 +159,13 @@ export function SchoolDashboard({ data }: { data: SchoolDashboardData }) {
 
           {data.pendingInvites.length > 0 && (
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium">{t("staff.pending")}</p>
+              <p className="text-body font-medium">{t("staff.pending")}</p>
               {data.pendingInvites.map((inv) => (
-                <div key={inv.email} className="flex items-center justify-between rounded-lg border border-dashed border-border p-3">
-                  <span className="text-sm">{inv.email}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {t("staff.expires")} {new Date(inv.expiresAt).toLocaleDateString("pt-PT")}
+                <div key={inv.email} className="flex items-center justify-between rounded-control border border-dashed border-border p-3">
+                  <span className="text-body">{inv.email}</span>
+                  <span className="text-caption tabular-nums text-muted-foreground">
+                    {t("staff.expires")}{" "}
+                    {new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "long" }).format(new Date(inv.expiresAt))}
                   </span>
                 </div>
               ))}
@@ -187,7 +189,7 @@ export function SchoolDashboard({ data }: { data: SchoolDashboardData }) {
             </Button>
           </form>
           {inviteMsg && (
-            <p className={`text-sm ${inviteMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
+            <p className={`text-body ${inviteMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
               {inviteMsg.text}
             </p>
           )}

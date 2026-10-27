@@ -4,15 +4,15 @@
     "tagline": "Staffing de instrutores verificados para escolas de surf na zona de Lisboa.",
     "cta": {
       "signUp": "Criar conta",
-      "signIn": "Iniciar sessão"
+      "signIn": "Entrar"
     },
     "forSchools": {
       "title": "Para escolas de surf",
-      "description": "Encontre e reserve instrutores verificados para as suas aulas, com disponibilidade semanal."
+      "description": "Encontra e reserva instrutores verificados para as tuas aulas, com disponibilidade semanal."
     },
     "forInstructors": {
       "title": "Para instrutores",
-      "description": "Receba pedidos de trabalho de escolas de surf na sua zona e gestione a sua disponibilidade."
+      "description": "Recebe pedidos de trabalho de escolas de surf na tua zona e gere a tua disponibilidade."
     },
     "heroTitle": "Staffing de instrutores para escolas de surf",
     "heroTitleAccent": "da costa de Lisboa.",
@@ -20,20 +20,20 @@
   },
   "SignUpPage": {
     "title": "Criar conta",
-    "subtitle": "Escolha o tipo de conta para começar",
+    "subtitle": "Escolhe o tipo de conta para começar",
     "accountType": {
       "school_staff": {
         "title": "Escola de Surf",
-        "description": "Procure e reserve instrutores verificados para as suas aulas"
+        "description": "Procura e reserva instrutores verificados para as tuas aulas"
       },
       "instructor": {
         "title": "Instrutor",
-        "description": "Receba pedidos de trabalho de escolas de surf na sua zona"
+        "description": "Recebe pedidos de trabalho de escolas de surf na tua zona"
       }
     },
     "name": {
       "label": "Nome",
-      "placeholder": "O seu nome"
+      "placeholder": "O teu nome"
     },
     "email": {
       "label": "Email",
@@ -47,28 +47,28 @@
     "submitting": "A criar conta...",
     "back": "Voltar",
     "success": "Conta criada com sucesso!",
-    "checkEmail": "Enviamos um link de verificação para o seu email. Verifique a sua caixa de entrada (e o spam) para continuar.",
+    "checkEmail": "Enviamos um link de verificação para o teu email. Verifica a tua caixa de entrada (e o spam) para continuar.",
     "resend": "Reenviar email de verificação",
     "resending": "A reenviar...",
-    "resent": "Email reenviado. Verifique a sua caixa de entrada.",
-    "resendError": "Não foi possível reenviar o email. Aguarde um minuto e tente novamente.",
+    "resent": "Email reenviado. Verifica a tua caixa de entrada.",
+    "resendError": "Não foi possível reenviar o email. Espera um minuto e tenta novamente.",
     "errors": {
-      "emailTaken": "Este email já tem uma conta. Tente iniciar sessão.",
-      "generic": "Não foi possível criar a conta. Verifique os dados e tente novamente.",
+      "emailTaken": "Este email já tem uma conta. Tenta iniciar sessão.",
+      "generic": "Não foi possível criar a conta. Verifica os dados e tenta novamente.",
       "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres."
     }
   },
   "VerifyEmailPage": {
     "title": "Email verificado!",
-    "description": "O seu email foi confirmado com sucesso. Já pode iniciar sessão.",
+    "description": "O teu email foi confirmado com sucesso. Já podes iniciar sessão.",
     "failedTitle": "Link inválido ou expirado",
-    "failedDescription": "Este link de verificação não é válido ou já expirou. Peça um novo email de verificação ao iniciar o processo de criação de conta novamente.",
+    "failedDescription": "Este link de verificação não é válido ou já expirou. Pede um novo email de verificação ao recomeçar a criação de conta.",
     "continue": "Continuar",
     "backToSignIn": "Voltar ao início"
   },
   "SignInPage": {
-    "title": "Iniciar sessão",
-    "subtitle": "Bem-vindo de volta ao SurfSync",
+    "title": "Entrar",
+    "subtitle": "Que bom ter-te de volta ao SurfSync",
     "email": {
       "label": "Email",
       "placeholder": "nome@exemplo.pt"
@@ -76,34 +76,34 @@
     "password": {
       "label": "Palavra-passe"
     },
-    "forgotPassword": "Esqueceu-se da palavra-passe?",
+    "forgotPassword": "Esqueceste-te da palavra-passe?",
     "submit": "Entrar",
     "submitting": "A entrar...",
-    "signUpInstead": "Não tem conta? Criar conta",
-    "resetSuccess": "Palavra-passe redefinida com sucesso. Inicie sessão com a sua nova palavra-passe.",
+    "signUpInstead": "Não tens conta? Criar conta",
+    "resetSuccess": "Palavra-passe redefinida com sucesso. Inicia sessão com a tua nova palavra-passe.",
     "errors": {
       "invalidCredentials": "Email ou palavra-passe incorretos.",
-      "generic": "Não foi possível iniciar sessão. Tente novamente."
+      "generic": "Não foi possível iniciar sessão. Tenta novamente."
     }
   },
   "ForgotPasswordPage": {
     "title": "Recuperar palavra-passe",
-    "subtitle": "Indique o seu email e enviaremos um link para redefinir a palavra-passe.",
+    "subtitle": "Indica o teu email e enviamos um link para redefinir a palavra-passe.",
     "email": {
       "label": "Email",
       "placeholder": "nome@exemplo.pt"
     },
     "submit": "Enviar link",
     "submitting": "A enviar...",
-    "checkEmail": "Se este email existe na nossa base, enviámos um link de redefinição. Verifique a sua caixa de entrada (e o spam). O link é válido durante 1 hora.",
+    "checkEmail": "Se este email existe na nossa base, enviamos um link de redefinição. Verifica a tua caixa de entrada (e o spam). O link é válido durante 1 hora.",
     "useAnotherEmail": "Usar outro email",
     "errors": {
-      "generic": "Não foi possível enviar o email. Tente novamente."
+      "generic": "Não foi possível enviar o email. Tenta novamente."
     }
   },
   "ResetPasswordPage": {
     "title": "Redefinir palavra-passe",
-    "subtitle": "Escolha uma nova palavra-passe para a sua conta.",
+    "subtitle": "Escolhe uma nova palavra-passe para a tua conta.",
     "newPassword": {
       "label": "Nova palavra-passe"
     },
@@ -121,14 +121,14 @@
       "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres.",
       "passwordMismatch": "As palavras-passe não coincidem.",
       "invalidToken": "Este link já foi utilizado ou expirou. Peça um novo link de redefinição.",
-      "generic": "Não foi possível redefinir a palavra-passe. Tente novamente."
+      "generic": "Não foi possível redefinir a palavra-passe. Tenta novamente."
     }
   },
   "AccountSettingsPage": {
     "title": "Definições de conta",
     "sessions": {
       "title": "Sessões ativas",
-      "description": "Dispositivos com sessão iniciada na sua conta. Terminar uma sessão faz logout nesse dispositivo.",
+      "description": "Dispositivos com sessão iniciada na tua conta. Terminar uma sessão faz logout nesse dispositivo.",
       "loading": "A carregar sessões...",
       "current": "esta sessão",
       "expires": "expira a",
@@ -157,10 +157,10 @@
     "title": "Painel do instrutor",
     "status": {
       "active": "Perfil ativo — visível para escolas na pesquisa.",
-      "inactive": "Perfil pausado — não aparece na pesquisa. Reative quando quiser voltar.",
-      "incomplete": "Complete os passos abaixo para ativar o seu perfil."
+      "inactive": "Perfil pausado — não aparece na pesquisa. Reativa quando quiseres voltar.",
+      "incomplete": "Completa os passos abaixo para ativar o teu perfil."
     },
-    "viewBookings": "As suas aulas",
+    "viewBookings": "As tuas aulas",
     "steps": {
       "1": "Passo 1",
       "2": "Passo 2",
@@ -172,7 +172,7 @@
       "set_availability": "Definir disponibilidade"
     },
     "profile": {
-      "title": "O seu perfil",
+      "title": "O teu perfil",
       "description": "Nome apresentado às escolas, bio, experiência e zonas onde dá aulas.",
       "displayName": "Nome apresentado às escolas",
       "bio": "Bio",
@@ -218,7 +218,7 @@
     "findInstructors": "Encontrar instrutores",
     "viewBookings": "Reservas da escola",
     "create": {
-      "title": "Criar a sua escola",
+      "title": "Criar a tua escola",
       "description": "Dados da escola para o perfil e contactos. Poderá convidar colegas depois.",
       "name": "Nome da escola",
       "descriptionField": "Descrição",
@@ -245,7 +245,7 @@
   },
   "DiscoveryPage": {
     "title": "Encontrar instrutores",
-    "subtitle": "Pesquise instrutores ativos por zona, experiência e disponibilidade.",
+    "subtitle": "Pesquisa instrutores ativos por zona, experiência e disponibilidade.",
     "filters": {
       "location": "Zona",
       "anyLocation": "Qualquer zona",
@@ -255,7 +255,7 @@
       "anyDay": "Qualquer dia"
     },
     "resultsCount": "{count, plural, =0 {Nenhum instrutor encontrado} one {# instrutor encontrado} other {# instrutores encontrados}}",
-    "noResults": "Nenhum instrutor corresponde aos filtros. Experimente alargar a pesquisa.",
+    "noResults": "Nenhum instrutor corresponde aos filtros. Experimenta alargar a pesquisa.",
     "bookmark": "Guardar",
     "backToSearch": "Voltar à pesquisa",
     "profile": {
@@ -284,7 +284,7 @@
   },
   "BookingRequestForm": {
     "title": "Pedir reserva",
-    "description": "Escolha data e horas dentro da disponibilidade semanal do instrutor.",
+    "description": "Escolhe data e horas dentro da disponibilidade semanal do instrutor.",
     "date": "Data",
     "start": "Início",
     "end": "Fim",
@@ -295,9 +295,9 @@
   },
   "SchoolBookingsPage": {
     "title": "Reservas",
-    "subtitle": "Pedidos da sua escola e o seu estado.",
+    "subtitle": "Pedidos da tua escola e o seu estado.",
     "cancel": "Cancelar",
-    "empty": "Ainda sem reservas. Procure instrutores e peça a primeira aula.",
+    "empty": "Ainda sem reservas. Pesquisa instrutores e pede a primeira aula.",
     "requestedBy": "pedido por {name}",
     "status": {
       "requested": "À espera de resposta",
@@ -320,7 +320,7 @@
     "eyebrow": "Reservas"
   },
   "InstructorBookingsPage": {
-    "title": "As suas aulas",
+    "title": "As tuas aulas",
     "subtitle": "Pedidos de escolas e reservas confirmadas.",
     "accept": "Aceitar",
     "decline": "Recusar",
@@ -328,7 +328,7 @@
     "declineReason": "Motivo (opcional, visível para a escola)",
     "back": "Voltar",
     "cancel": "Cancelar",
-    "empty": "Ainda sem pedidos. Complete o perfil para ser encontrável pelas escolas.",
+    "empty": "Ainda sem pedidos. Completa o perfil para as escolas te encontrarem.",
     "requestedBy": "pedido por {name}",
     "status": {
       "requested": "Novo pedido",

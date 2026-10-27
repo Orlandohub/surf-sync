@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:design": "node scripts/design-lint.mjs --product \"app/instructor,app/school,app/account\" app components lib/services",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

@@ -52,7 +52,7 @@ export function ForgotPasswordForm() {
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <p className="text-sm text-muted-foreground">{t("checkEmail")}</p>
+          <p className="text-meta text-muted-foreground">{t("checkEmail")}</p>
           <Button variant="outline" type="button" onClick={() => setDone(false)}>
             {t("useAnotherEmail")}
           </Button>
@@ -82,7 +82,7 @@ export function ForgotPasswordForm() {
             />
           </div>
           {error && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-body text-destructive" role="alert">
               {error}
             </p>
           )}

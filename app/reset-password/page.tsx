@@ -29,10 +29,10 @@ export default async function ResetPasswordPage({
           <h1 className="text-xl font-semibold tracking-tight">
             {t("invalid.title")}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-meta text-muted-foreground">
             {t("invalid.description")}
           </p>
-          <a href="/forgot-password" className="text-sm underline underline-offset-4">
+          <a href="/forgot-password" className="text-body underline underline-offset-4">
             {t("invalid.requestNew")}
           </a>
         </div>

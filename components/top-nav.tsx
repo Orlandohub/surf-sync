@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
-import { Wordmark } from "@/components/brand/wordmark";
+import { LogoLockup } from "@/components/brand/logo";
+import { Button } from "@/components/ui/button";
 
 /**
- * Minimal top-nav with per-type links (DS: connect quietly — the rope,
- * not the show).
+ * Top navigation — glass bar (content scrolls under it), mark + wordmark
+ * lockup, per-type links. Links stay quiet: muted until hovered.
  */
 export function TopNav() {
   const [session, setSession] = useState<
@@ -32,41 +33,43 @@ export function TopNav() {
     window.location.href = "/";
   }
 
+  const link =
+    "text-meta text-muted-foreground transition-colors duration-(--duration-fast) hover:text-foreground";
+
   return (
-    <header className="border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <nav className="mx-auto flex w-full max-w-5xl items-center gap-5 px-6 py-4 text-sm">
-        <Link href="/" aria-label="SurfSync — início">
-          <Wordmark height={22} />
+    <header className="sticky top-0 z-40 glass">
+      <nav className="mx-auto flex w-full max-w-5xl items-center gap-5 px-gutter py-3">
+        <Link href="/" aria-label="surfsync — início">
+          <LogoLockup height={26} className="text-foreground" />
         </Link>
         <div className="flex-1" />
         {session?.type === "instructor" && (
           <>
-            <Link href="/instructor" className="text-muted-foreground transition-colors duration-[220ms] hover:text-teal-400">Painel</Link>
-            <Link href="/instructor/bookings" className="text-muted-foreground transition-colors duration-[220ms] hover:text-teal-400">Aulas</Link>
+            <Link href="/instructor" className={link}>Painel</Link>
+            <Link href="/instructor/bookings" className={link}>Aulas</Link>
           </>
         )}
         {session?.type === "school_staff" && (
           <>
-            <Link href="/school" className="text-muted-foreground transition-colors duration-[220ms] hover:text-teal-400">Escola</Link>
-            <Link href="/school/discovery" className="text-muted-foreground transition-colors duration-[220ms] hover:text-teal-400">Instrutores</Link>
-            <Link href="/school/bookings" className="text-muted-foreground transition-colors duration-[220ms] hover:text-teal-400">Reservas</Link>
+            <Link href="/school" className={link}>Escola</Link>
+            <Link href="/school/discovery" className={link}>Instrutores</Link>
+            <Link href="/school/bookings" className={link}>Reservas</Link>
           </>
         )}
         {session ? (
           <>
-            <Link href="/account" className="text-muted-foreground transition-colors duration-[220ms] hover:text-teal-400">Conta</Link>
-            <button onClick={signOut} className="text-muted-foreground transition-colors duration-[220ms] hover:text-[var(--ss-danger)]">Sair</button>
+            <Link href="/account" className={link}>Conta</Link>
+            <Button variant="ghost" size="sm" onClick={signOut}>
+              Sair
+            </Button>
           </>
         ) : (
           session === null && (
             <>
-              <Link href="/sign-in" className="text-muted-foreground transition-colors duration-[220ms] hover:text-teal-400">Entrar</Link>
-              <Link
-                href="/sign-up"
-                className="rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground transition-all duration-[140ms] hover:bg-teal-400 hover:shadow-[var(--ss-shadow-glow)] active:translate-y-px"
-              >
+              <Link href="/sign-in" className={link}>Entrar</Link>
+              <Button size="sm" onClick={() => { window.location.href = "/sign-up"; }}>
                 Criar conta
-              </Link>
+              </Button>
             </>
           )
         )}

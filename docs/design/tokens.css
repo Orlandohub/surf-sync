@@ -1,0 +1,567 @@
+/* ==========================================================================
+   surfsync — design tokens  v1.0
+   Ocean Operational UI · Tailwind CSS v4 + shadcn/ui
+
+   Drop-in replacement for the token section of app/globals.css.
+   Keep the three lines below at the top of that file.
+
+   Layers
+     1. Primitives   @theme            ocean-*, atlantic-*, sand-*, status scales
+     2. Semantics    :root / .dark     shadcn roles + surfsync roles
+     3. Bridge       @theme inline     exposes semantics as Tailwind utilities
+     4. Utilities    @utility          glass, scrim, tap
+     5. Base         @layer base       body, focus, reduced motion
+
+   Rule: components use layer 2/3 names only (bg-primary, text-muted-foreground,
+   rounded-card …). Primitives are for this file, charts and illustration.
+   ========================================================================== */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* --------------------------------------------------------------------------
+   1. PRIMITIVES
+   Brand anchors from the identity deck are pinned and marked ◆.
+   Scales generated in OKLCH; every semantic pairing is contrast-checked
+   (see DESIGN.md §8).
+   -------------------------------------------------------------------------- */
+@theme {
+  /* STRICT MODE — uncomment to delete Tailwind's default palette so the
+     stock blue/gray/teal… utilities stop compiling. Recommended once the
+     codebase is migrated. Must stay the first line of this block. */
+  /* --color-*: initial; */
+
+  --color-white: #FFFFFF;
+  --color-black: #0D1B2A; /* product black is Azul Atlântico, never #000 */
+
+  /* Teal Oceânico — the one accent hue */
+  --color-ocean-50: #EAFBF9;
+  --color-ocean-100: #D4F5F1;
+  --color-ocean-200: #B0EAE2;
+  --color-ocean-300: #7EE0CF; /* ◆ Azul Água */
+  --color-ocean-400: #3DC4B7;
+  --color-ocean-500: #0EA5A0; /* ◆ Teal Oceânico (brand graphic teal) */
+  --color-ocean-600: #048B88;
+  --color-ocean-700: #017473; /* interactive teal — AA with white */
+  --color-ocean-800: #045C5D;
+  --color-ocean-900: #034648;
+  --color-ocean-950: #012D2F;
+
+  /* Atlantic — neutrals tinted toward Azul Atlântico */
+  --color-atlantic-50: #F3F6F8; /* ◆ Off White Oceânico */
+  --color-atlantic-100: #E7ECEF;
+  --color-atlantic-200: #D6DDE3;
+  --color-atlantic-300: #BFC9D1;
+  --color-atlantic-400: #94A0AC;
+  --color-atlantic-500: #6F7C8A;
+  --color-atlantic-600: #525F6D;
+  --color-atlantic-700: #3C4958;
+  --color-atlantic-800: #273443;
+  --color-atlantic-900: #1A2837;
+  --color-atlantic-950: #0D1B2A; /* ◆ Azul Atlântico */
+
+  /* Sand — warmth, used sparingly */
+  --color-sand-50: #FFF8EB;
+  --color-sand-100: #FCEED6;
+  --color-sand-200: #F8E2BC;
+  --color-sand-300: #F2D6A7; /* ◆ Sand Tone */
+  --color-sand-400: #DFB67B;
+  --color-sand-500: #C59455;
+  --color-sand-600: #A6753D;
+  --color-sand-700: #885B2D;
+  --color-sand-800: #6C4625;
+  --color-sand-900: #53361F;
+  --color-sand-950: #382315;
+
+  /* Status — carry state only, never decoration */
+  --color-success-50: #E9FAEC;
+  --color-success-100: #D5F3DA;
+  --color-success-200: #B7E5BF;
+  --color-success-300: #8CD19A;
+  --color-success-400: #64B778;
+  --color-success-500: #459F5D;
+  --color-success-600: #33884C;
+  --color-success-700: #27713D;
+  --color-success-800: #215B31;
+  --color-success-900: #1A4526;
+  --color-success-950: #112D18;
+
+  --color-warning-50: #FFF3E8;
+  --color-warning-100: #FEE4CC;
+  --color-warning-200: #FCCEA2;
+  --color-warning-300: #F0AE6D;
+  --color-warning-400: #DA8E3B;
+  --color-warning-500: #C27405;
+  --color-warning-600: #A56202;
+  --color-warning-700: #8A5102;
+  --color-warning-800: #6F4000;
+  --color-warning-900: #553102;
+  --color-warning-950: #392003;
+
+  --color-danger-50: #FFF2F0;
+  --color-danger-100: #FEE2DF;
+  --color-danger-200: #FFC8C3;
+  --color-danger-300: #FFA098;
+  --color-danger-400: #F6736D;
+  --color-danger-500: #DD5652;
+  --color-danger-600: #C14441;
+  --color-danger-700: #A23534;
+  --color-danger-800: #822C2A;
+  --color-danger-900: #622220;
+  --color-danger-950: #421615;
+
+  /* ---------------- Typography ---------------- */
+  /* BD Sans is the deck/wordmark face (embedded in the identity PDF).
+     Load it with @font-face or next/font/local once the web licence is
+     confirmed. Lexend Zetta is the closest free wide fallback. */
+  --font-display: "BD Sans", "Lexend Zetta", "Lexend", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+
+  /* UI scale (Inter). Names are roles; use these instead of text-sm/base/lg. */
+  --text-caption: 0.75rem;           /* 12 — tab labels, badge, helper */
+  --text-caption--line-height: 1rem;
+  --text-caption--font-weight: 500;
+
+  --text-meta: 0.8125rem;            /* 13 — date · time, secondary lines */
+  --text-meta--line-height: 1.125rem;
+
+  --text-body: 0.9375rem;            /* 15 — default reading text */
+  --text-body--line-height: 1.375rem;
+
+  --text-body-lg: 1rem;              /* 16 — inputs (prevents iOS zoom) */
+  --text-body-lg--line-height: 1.5rem;
+
+  --text-label: 0.9375rem;           /* 15 — buttons, list-item titles */
+  --text-label--line-height: 1.25rem;
+  --text-label--font-weight: 600;
+
+  --text-title-sm: 1.0625rem;        /* 17 — app-bar titles, section heads */
+  --text-title-sm--line-height: 1.5rem;
+  --text-title-sm--font-weight: 600;
+
+  --text-title: 1.25rem;             /* 20 — detail titles ("Praia de Carcavelos") */
+  --text-title--line-height: 1.75rem;
+  --text-title--font-weight: 600;
+  --text-title--letter-spacing: -0.01em;
+
+  --text-headline: 1.5rem;           /* 24 — greeting, top-level screen titles, stats */
+  --text-headline--line-height: 2rem;
+  --text-headline--font-weight: 600;
+  --text-headline--letter-spacing: -0.015em;
+
+  /* Display scale (BD Sans) — brand surfaces only, lowercase, weight 400 */
+  --text-display-sm: 2rem;           /* 32 */
+  --text-display-sm--line-height: 1.15;
+  --text-display-sm--font-weight: 400;
+  --text-display: 3rem;              /* 48 */
+  --text-display--line-height: 1.05;
+  --text-display--font-weight: 400;
+  --text-display-lg: 4.5rem;         /* 72 */
+  --text-display-lg--line-height: 1;
+  --text-display-lg--font-weight: 400;
+  --text-display-xl: 7rem;           /* 112 — marketing hero, "a experiência" */
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--font-weight: 400;
+
+  /* ---------------- Spacing ---------------- */
+  --spacing: 0.25rem;                /* 4px grid (Tailwind default, restated) */
+  --spacing-gutter: 1.25rem;         /* 20 — screen side padding (px-gutter) */
+  --spacing-card: 1rem;              /* 16 — card inner padding (p-card) */
+  --spacing-stack: 0.75rem;          /* 12 — gap between cards in a list */
+  --spacing-section: 1.75rem;        /* 28 — gap between screen sections */
+  --spacing-tap: 2.75rem;            /* 44 — minimum touch target (size-tap) */
+
+  /* ---------------- Radius ----------------
+     Hierarchy: chip < thumb < control < card < sheet < panel.
+     Prefer the semantic names. The t-shirt sizes are tuned so unmodified
+     shadcn components land close to spec (Button/Input rounded-md = 12,
+     Card rounded-xl = 16, Dialog rounded-lg = 16). */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+
+  --radius-chip: 6px;                /* badges, level tags */
+  --radius-thumb: 10px;              /* lesson thumbnails, small media */
+  --radius-control: 12px;            /* buttons, inputs, slots, tiles */
+  --radius-card: 16px;               /* cards, list groups */
+  --radius-sheet: 24px;              /* bottom sheets, detail panel over hero */
+  --radius-panel: 32px;              /* marketing panels only */
+
+  /* ---------------- Motion ---------------- */
+  --ease-enter: cubic-bezier(0.22, 1, 0.36, 1);  /* "swell": fast in, long settle */
+  --ease-move: cubic-bezier(0.2, 0, 0, 1);       /* position/size changes */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);       /* leave quickly */
+
+  --animate-rise: rise 360ms var(--ease-enter) both;
+  --animate-fade: fade 240ms var(--ease-enter) both;
+  --animate-orbit: orbit 40s linear infinite;    /* Matching screen only */
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes orbit {
+    to { transform: rotate(360deg); }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. SEMANTICS — light (default)
+   -------------------------------------------------------------------------- */
+:root {
+  --radius: 0.75rem; /* kept for shadcn components that calc() from it */
+
+  /* Surfaces */
+  --background: var(--color-atlantic-50);          /* app canvas */
+  --foreground: var(--color-atlantic-950);
+  --card: var(--color-white);
+  --card-foreground: var(--color-atlantic-950);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-atlantic-950);
+
+  /* Action — the single primary */
+  --primary: var(--color-ocean-700);
+  --primary-foreground: var(--color-white);
+  --primary-hover: var(--color-ocean-800);
+  --primary-active: var(--color-ocean-900);
+
+  --secondary: var(--color-ocean-50);              /* tonal surface */
+  --secondary-foreground: var(--color-ocean-800);
+
+  --muted: var(--color-atlantic-100);
+  --muted-foreground: var(--color-atlantic-600);   /* 6.0:1 on canvas */
+  --placeholder: var(--color-atlantic-500);
+
+  --accent: var(--color-atlantic-100);             /* hover/selected rows */
+  --accent-foreground: var(--color-atlantic-950);
+
+  --destructive: var(--color-danger-600);
+  --destructive-foreground: var(--color-white);
+
+  --border: var(--color-atlantic-200);
+  --input: var(--color-atlantic-300);
+  --ring: var(--color-ocean-600);                  /* 3.8:1 on canvas */
+
+  /* surfsync roles */
+  --brand: var(--color-ocean-500);                 /* logo, illustration, ≥24px display */
+  --brand-water: var(--color-ocean-300);           /* Azul Água — fills only on light */
+  --tint: var(--color-ocean-100);                  /* soft badge / selected chip bg */
+  --tint-foreground: var(--color-ocean-800);
+  --sand: var(--color-sand-300);
+  --sand-foreground: var(--color-sand-900);
+  --sand-soft: var(--color-sand-100);
+  --sand-soft-foreground: var(--color-sand-800);
+  --inverse: var(--color-atlantic-950);            /* dark panels in light UI */
+  --inverse-foreground: var(--color-atlantic-50);
+
+  --success: var(--color-success-700);
+  --success-foreground: var(--color-white);
+  --success-soft: var(--color-success-100);
+  --success-soft-foreground: var(--color-success-800);
+  --warning: var(--color-warning-700);
+  --warning-foreground: var(--color-white);
+  --warning-soft: var(--color-warning-100);
+  --warning-soft-foreground: var(--color-warning-800);
+  --danger-soft: var(--color-danger-100);
+  --danger-soft-foreground: var(--color-danger-800);
+  --rating: var(--color-warning-500);              /* star glyph only */
+
+  /* Data viz — water first, shore last */
+  --chart-1: var(--color-ocean-700);
+  --chart-2: var(--color-ocean-400);
+  --chart-3: var(--color-atlantic-700);
+  --chart-4: var(--color-atlantic-400);
+  --chart-5: var(--color-sand-500);
+
+  /* shadcn sidebar (web/back-office) */
+  --sidebar: var(--color-white);
+  --sidebar-foreground: var(--color-atlantic-950);
+  --sidebar-primary: var(--color-ocean-700);
+  --sidebar-primary-foreground: var(--color-white);
+  --sidebar-accent: var(--color-atlantic-100);
+  --sidebar-accent-foreground: var(--color-atlantic-950);
+  --sidebar-border: var(--color-atlantic-200);
+  --sidebar-ring: var(--color-ocean-600);
+
+  /* Elevation — cool-tinted, low; borders do most of the work */
+  --elev-card: 0 1px 2px 0 rgb(13 27 42 / 0.04), 0 1px 1px 0 rgb(13 27 42 / 0.02);
+  --elev-float: 0 6px 16px -4px rgb(13 27 42 / 0.10), 0 2px 4px -2px rgb(13 27 42 / 0.05);
+  --elev-overlay: 0 20px 48px -12px rgb(13 27 42 / 0.20), 0 4px 12px -4px rgb(13 27 42 / 0.08);
+  --scrim-color: rgb(13 27 42 / 0.55);
+  --overlay: rgb(13 27 42 / 0.40);                 /* dialog/sheet backdrop */
+
+  /* Glass — subtle, functional (see DESIGN.md §5) */
+  --glass-bg: rgb(255 255 255 / 0.72);
+  --glass-border: rgb(255 255 255 / 0.60);
+  --glass-hairline: rgb(13 27 42 / 0.06);
+  --glass-highlight: rgb(255 255 255 / 0.50);
+  --glass-blur: 12px;                              /* max 16px, ever */
+  --glass-saturate: 1.6;
+
+  /* Durations — use as duration-(--duration-base) */
+  --duration-instant: 100ms;   /* press, toggle thumb */
+  --duration-fast: 160ms;      /* hover, colour, small fades */
+  --duration-base: 240ms;      /* tabs, accordions, popovers */
+  --duration-slow: 360ms;      /* sheets, page enter */
+}
+
+/* --------------------------------------------------------------------------
+   2b. SEMANTICS — dark ("deep water")
+   -------------------------------------------------------------------------- */
+.dark {
+  --background: var(--color-atlantic-950);
+  --foreground: var(--color-atlantic-50);
+  --card: var(--color-atlantic-900);
+  --card-foreground: var(--color-atlantic-50);
+  --popover: var(--color-atlantic-900);
+  --popover-foreground: var(--color-atlantic-50);
+
+  --primary: var(--color-ocean-300);               /* Azul Água becomes the action */
+  --primary-foreground: var(--color-ocean-950);
+  --primary-hover: var(--color-ocean-200);
+  --primary-active: var(--color-ocean-100);
+
+  --secondary: var(--color-ocean-950);
+  --secondary-foreground: var(--color-ocean-200);
+
+  --muted: var(--color-atlantic-800);
+  --muted-foreground: var(--color-atlantic-400);
+  --placeholder: var(--color-atlantic-500);
+
+  --accent: var(--color-atlantic-800);
+  --accent-foreground: var(--color-atlantic-50);
+
+  --destructive: var(--color-danger-400);
+  --destructive-foreground: var(--color-danger-950);
+
+  --border: var(--color-atlantic-800);
+  --input: var(--color-atlantic-700);
+  --ring: var(--color-ocean-400);
+
+  --brand: var(--color-ocean-500);
+  --brand-water: var(--color-ocean-300);
+  --tint: var(--color-ocean-900);
+  --tint-foreground: var(--color-ocean-200);
+  --sand: var(--color-sand-300);
+  --sand-foreground: var(--color-sand-900);
+  --sand-soft: var(--color-sand-950);
+  --sand-soft-foreground: var(--color-sand-200);
+  --inverse: var(--color-atlantic-50);
+  --inverse-foreground: var(--color-atlantic-950);
+
+  --success: var(--color-success-300);
+  --success-foreground: var(--color-success-950);
+  --success-soft: var(--color-success-950);
+  --success-soft-foreground: var(--color-success-200);
+  --warning: var(--color-warning-300);
+  --warning-foreground: var(--color-warning-950);
+  --warning-soft: var(--color-warning-950);
+  --warning-soft-foreground: var(--color-warning-200);
+  --danger-soft: var(--color-danger-950);
+  --danger-soft-foreground: var(--color-danger-200);
+  --rating: var(--color-warning-300);
+
+  --chart-1: var(--color-ocean-300);
+  --chart-2: var(--color-ocean-500);
+  --chart-3: var(--color-atlantic-300);
+  --chart-4: var(--color-atlantic-500);
+  --chart-5: var(--color-sand-400);
+
+  --sidebar: var(--color-atlantic-900);
+  --sidebar-foreground: var(--color-atlantic-50);
+  --sidebar-primary: var(--color-ocean-300);
+  --sidebar-primary-foreground: var(--color-ocean-950);
+  --sidebar-accent: var(--color-atlantic-800);
+  --sidebar-accent-foreground: var(--color-atlantic-50);
+  --sidebar-border: var(--color-atlantic-800);
+  --sidebar-ring: var(--color-ocean-400);
+
+  --elev-card: 0 0 0 0 transparent;                /* dark: borders only */
+  --elev-float: 0 8px 20px -6px rgb(0 0 0 / 0.45);
+  --elev-overlay: 0 24px 56px -12px rgb(0 0 0 / 0.60);
+  --scrim-color: rgb(13 27 42 / 0.70);
+  --overlay: rgb(5 12 20 / 0.60);
+
+  --glass-bg: rgb(13 27 42 / 0.68);
+  --glass-border: rgb(255 255 255 / 0.08);
+  --glass-hairline: rgb(0 0 0 / 0.30);
+  --glass-highlight: rgb(255 255 255 / 0.06);
+}
+
+/* --------------------------------------------------------------------------
+   3. BRIDGE — semantic tokens → Tailwind utilities
+   -------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-placeholder: var(--placeholder);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-water: var(--brand-water);
+  --color-tint: var(--tint);
+  --color-tint-foreground: var(--tint-foreground);
+  --color-sand: var(--sand);
+  --color-sand-foreground: var(--sand-foreground);
+  --color-sand-soft: var(--sand-soft);
+  --color-sand-soft-foreground: var(--sand-soft-foreground);
+  --color-inverse: var(--inverse);
+  --color-inverse-foreground: var(--inverse-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-foreground: var(--success-soft-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-foreground: var(--danger-soft-foreground);
+  --color-rating: var(--rating);
+  --color-overlay: var(--overlay);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* shadow-card / shadow-float / shadow-overlay — and retune the defaults
+     shadcn uses (Button outline: shadow-xs, Card: shadow-sm) */
+  --shadow-card: var(--elev-card);
+  --shadow-float: var(--elev-float);
+  --shadow-overlay: var(--elev-overlay);
+  --shadow-xs: var(--elev-card);
+  --shadow-sm: var(--elev-card);
+  --shadow-md: var(--elev-float);
+  --shadow-lg: var(--elev-overlay);
+}
+
+/* --------------------------------------------------------------------------
+   4. UTILITIES
+   -------------------------------------------------------------------------- */
+
+/* The only sanctioned way to get backdrop blur. Never hand-roll it. */
+@utility glass {
+  background-color: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 0 var(--glass-highlight), 0 0 0 1px var(--glass-hairline);
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--card);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Legibility gradient for text/controls over photography — the one
+   permitted gradient in product UI. */
+@utility scrim {
+  background-image: linear-gradient(to top, var(--scrim-color) 0%, transparent 60%);
+}
+@utility scrim-top {
+  background-image: linear-gradient(to bottom, var(--scrim-color) 0%, transparent 45%);
+}
+
+/* Guarantees a 44×44 hit area without changing the visual size. */
+@utility tap {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: max(100%, var(--spacing-tap));
+    height: max(100%, var(--spacing-tap));
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. BASE
+   -------------------------------------------------------------------------- */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-body antialiased;
+  }
+  ::placeholder {
+    color: var(--placeholder);
+    opacity: 1;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--tint);
+    color: var(--tint-foreground);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-instant: 0ms;
+      --duration-fast: 0ms;
+      --duration-base: 0ms;
+      --duration-slow: 0ms;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

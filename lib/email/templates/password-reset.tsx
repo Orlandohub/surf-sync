@@ -14,6 +14,23 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
+// surfsync email brand — Atlantic palette (docs/design/DESIGN.md).
+const ink = "#0D1B2A";
+const muted = "#525F6D";
+const faint = "#6F7C8A";
+const hairline = "#E7ECEF";
+const teal = "#017473";
+const canvas = "#F3F6F8";
+
+function Lockup() {
+  return (
+    <Text style={{ margin: "0 0 24px", fontSize: 18, lineHeight: "24px", color: ink, fontFamily: "system-ui, sans-serif" }}>
+      <span style={{ fontWeight: 400 }}>surf</span>
+      <span style={{ fontWeight: 700 }}>sync</span>
+    </Text>
+  );
+}
+
 export function PasswordResetEmail({
   url,
 }: {
@@ -22,34 +39,35 @@ export function PasswordResetEmail({
   return (
     <Html lang="pt">
       <Head />
-      <Preview>Redefina a sua palavra-passe do SurfSync</Preview>
-      <Body style={{ fontFamily: "system-ui, sans-serif", margin: 0, padding: "24px 0", backgroundColor: "#f4f4f5" }}>
-        <Container style={{ maxWidth: 480, margin: "0 auto", backgroundColor: "#ffffff", borderRadius: 12, padding: 32 }}>
-          <Heading as="h1" style={{ fontSize: 20, marginTop: 0 }}>
+      <Preview>Redefine a tua palavra-passe do SurfSync</Preview>
+      <Body style={{ fontFamily: "system-ui, sans-serif", margin: 0, padding: "24px 0", backgroundColor: canvas }}>
+        <Container style={{ maxWidth: 480, margin: "0 auto", backgroundColor: "#ffffff", borderRadius: 16, padding: 32 }}>
+          <Lockup />
+          <Heading as="h1" style={{ fontSize: 20, lineHeight: "28px", marginTop: 0, color: ink }}>
             Redefinir palavra-passe
           </Heading>
-          <Text style={{ fontSize: 14, color: "#3f3f46", lineHeight: "20px" }}>
-            Recebemos um pedido para redefinir a palavra-passe da sua conta
+          <Text style={{ fontSize: 15, lineHeight: "22px", color: muted }}>
+            Recebemos um pedido para redefinir a palavra-passe da tua conta
             SurfSync. O link é válido durante 1 hora e pode ser utilizado uma
             única vez.
           </Text>
           <Section style={{ margin: "24px 0" }}>
             <Button
               href={url}
-              style={{ backgroundColor: "#0f172a", borderRadius: 8, color: "#ffffff", fontSize: 14, fontWeight: 600, padding: "12px 20px" }}
+              style={{ backgroundColor: teal, borderRadius: 12, color: "#ffffff", fontSize: 15, fontWeight: 600, padding: "12px 20px" }}
             >
               Redefinir palavra-passe
             </Button>
           </Section>
-          <Text style={{ fontSize: 12, color: "#71717a", lineHeight: "18px" }}>
-            Se o botão não funcionar, copie e cole este link no seu browser:
+          <Text style={{ fontSize: 13, lineHeight: "18px", color: muted }}>
+            Se o botão não funcionar, copia e cola este link no teu browser:
           </Text>
-          <Link href={url} style={{ fontSize: 12, color: "#18181b", wordBreak: "break-all" }}>
+          <Link href={url} style={{ fontSize: 13, color: teal, wordBreak: "break-all" }}>
             {url}
           </Link>
-          <Hr style={{ borderColor: "#e4e4e7", margin: "24px 0" }} />
-          <Text style={{ fontSize: 12, color: "#71717a", lineHeight: "18px" }}>
-            Se não pediu a redefinição, ignore este email — a sua palavra-passe
+          <Hr style={{ borderColor: hairline, margin: "24px 0" }} />
+          <Text style={{ fontSize: 12, lineHeight: "16px", color: faint }}>
+            Se não pediste a redefinição, ignora este email — a tua palavra-passe
             permanece inalterada. Por segurança, todas as sessões serão
             terminadas quando a palavra-passe for redefinida.
           </Text>

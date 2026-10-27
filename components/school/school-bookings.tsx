@@ -52,16 +52,16 @@ export function SchoolBookings({
   return (
     <main className="flex flex-1 flex-col items-center gap-6 px-4 py-10">
       <div className="flex w-full max-w-3xl flex-col gap-1">
-        <span className="eyebrow">{t("eyebrow")}</span>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        <span className="text-meta text-muted-foreground">{t("eyebrow")}</span>
+        <h1 className="text-headline">{t("title")}</h1>
+        <p className="text-meta text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       {notifications.length > 0 && (
         <Card className="w-full max-w-3xl">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-base">{t("notifications.title")}</CardTitle>
+              <CardTitle className="text-body-lg">{t("notifications.title")}</CardTitle>
               <CardDescription>
                 {t("notifications.unread", { count: unreadCount })}
               </CardDescription>
@@ -76,14 +76,17 @@ export function SchoolBookings({
             {notifications.slice(0, 8).map((n) => (
               <div
                 key={n.id}
-                className={`rounded-lg border p-3 text-sm ${n.readAt ? "border-border text-muted-foreground" : "border-primary/40 bg-primary/5"}`}
+                className="flex items-baseline gap-2 rounded-control border p-3 text-body"
               >
-                {t(`notificationTypes.${n.type}`, {
-                  instructor: String((n.payload as Record<string, unknown>).instructorName ?? ""),
-                  school: String((n.payload as Record<string, unknown>).schoolName ?? ""),
-                  date: String((n.payload as Record<string, unknown>).bookingDate ?? ""),
-                })}
-                <span className="ml-2 text-xs text-muted-foreground">
+                {!n.readAt && <span className="size-1.5 shrink-0 rounded-full bg-primary" />}
+                <p className={n.readAt ? "text-muted-foreground" : "text-foreground"}>
+                  {t(`notificationTypes.${n.type}`, {
+                    instructor: String((n.payload as Record<string, unknown>).instructorName ?? ""),
+                    school: String((n.payload as Record<string, unknown>).schoolName ?? ""),
+                    date: String((n.payload as Record<string, unknown>).bookingDate ?? ""),
+                  })}
+                </p>
+                <span className="ml-auto shrink-0 text-caption tabular-nums text-muted-foreground">
                   {new Date(n.createdAt).toLocaleString("pt-PT")}
                 </span>
               </div>
@@ -97,9 +100,9 @@ export function SchoolBookings({
           <Card key={b.id}>
             <CardHeader className="flex flex-row items-start justify-between">
               <div className="flex flex-col gap-1.5">
-                <CardTitle className="text-base">
+                <CardTitle className="text-label">
                   {b.instructorName} · {b.bookingDate} ·{" "}
-                  <span className="font-mono-label text-teal-300">
+                  <span className="tabular-nums">
                     {b.startTime.slice(0, 5)}–{b.endTime.slice(0, 5)}
                   </span>
                 </CardTitle>
@@ -108,16 +111,16 @@ export function SchoolBookings({
                     {t(`status.${b.status}`)}
                   </StatusBadge>
                   {b.status === "requested" && (
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-caption text-muted-foreground">
                       {t("requestedBy", { name: b.requestedByName })}
                     </span>
                   )}
                 </div>
                 {b.declineReason && (
-                  <p className="text-sm text-muted-foreground italic">— {b.declineReason}</p>
+                  <p className="text-meta font-medium text-muted-foreground">— {b.declineReason}</p>
                 )}
                 {b.notes && (
-                  <p className="text-sm text-muted-foreground">{b.notes}</p>
+                  <p className="text-meta text-muted-foreground">{b.notes}</p>
                 )}
               </div>
               {(b.status === "requested" || b.status === "accepted") && (
@@ -135,13 +138,13 @@ export function SchoolBookings({
         ))}
         {bookings.length === 0 && (
           <Card>
-            <CardContent className="py-10 text-center text-sm text-muted-foreground">
+            <CardContent className="py-10 text-center text-meta text-muted-foreground">
               {t("empty")}
             </CardContent>
           </Card>
         )}
         {error && (
-          <p className="text-sm text-destructive" role="alert">{error}</p>
+          <p className="text-body text-destructive" role="alert">{error}</p>
         )}
       </div>
     </main>

@@ -93,7 +93,7 @@ export function ResetPasswordForm({
             />
           </div>
           {error && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-body text-destructive" role="alert">
               {error}
             </p>
           )}

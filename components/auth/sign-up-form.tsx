@@ -97,7 +97,7 @@ export function SignUpForm() {
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <p className="text-sm text-muted-foreground">{t("checkEmail")}</p>
+          <p className="text-meta text-muted-foreground">{t("checkEmail")}</p>
           <div className="flex flex-col gap-2">
             <Button
               type="button"
@@ -108,12 +108,12 @@ export function SignUpForm() {
               {resending ? t("resending") : t("resend")}
             </Button>
             {resendState === "sent" && (
-              <p className="text-sm text-muted-foreground" role="status">
+              <p className="text-meta text-muted-foreground" role="status">
                 {t("resent")}
               </p>
             )}
             {resendState === "error" && (
-              <p className="text-sm text-destructive" role="alert">
+              <p className="text-body text-destructive" role="alert">
                 {t("resendError")}
               </p>
             )}
@@ -127,10 +127,10 @@ export function SignUpForm() {
     return (
       <div className="flex w-full max-w-2xl flex-col gap-6">
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-headline">
             {t("title")}
           </h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+          <p className="text-meta text-muted-foreground">{t("subtitle")}</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {(
@@ -148,10 +148,10 @@ export function SignUpForm() {
               }}
               className="group flex flex-col items-start gap-2 rounded-lg border border-border p-6 text-left transition-colors hover:border-primary hover:bg-accent"
             >
-              <span className="text-base font-medium">
+              <span className="text-body-lg font-medium">
                 {t(`accountType.${type}.title`)}
               </span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-meta text-muted-foreground">
                 {t(`accountType.${type}.description`)}
               </span>
             </button>
@@ -209,7 +209,7 @@ export function SignUpForm() {
             />
           </div>
           {error && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-body text-destructive" role="alert">
               {error}
             </p>
           )}
@@ -219,7 +219,7 @@ export function SignUpForm() {
           <button
             type="button"
             onClick={() => setStep("type")}
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="text-meta text-muted-foreground underline-offset-4 hover:underline"
           >
             ← {t("back")}
           </button>

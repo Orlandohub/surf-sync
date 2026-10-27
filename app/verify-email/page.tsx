@@ -17,7 +17,7 @@ export default async function VerifyEmailPage({
 
   // Better Auth redirects to the BARE callbackURL on success (token stripped)
   // and appends `?error=CODE` on failure — so ANY error param means failure
-  // and no error param means success. Codes are uppercase in 1.6
+  // and no error param means success. Codes are all-caps in 1.6
   // (INVALID_TOKEN, TOKEN_EXPIRED, ...); match any of them.
   const failed = Boolean(params.error);
 
@@ -31,11 +31,11 @@ export default async function VerifyEmailPage({
 
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-16">
-      <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-[var(--radius)] border border-border bg-card p-8 text-center shadow-[var(--ss-shadow-md)]">
-        <h1 className="text-xl font-semibold tracking-tight">
+      <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-card border bg-card p-card text-center shadow-card">
+        <h1 className="text-title">
           {failed ? t("failedTitle") : t("title")}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-meta text-muted-foreground">
           {failed ? t("failedDescription") : t("description")}
         </p>
         <ContinueLink

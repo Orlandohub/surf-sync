@@ -5,6 +5,10 @@ loadEnvConfig(process.cwd());
 import { loadTestEnv } from "./lib/test-env";
 import { createRequire } from "node:module";
 import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+
+const OUTBOX_DIR = path.join(process.cwd(), ".email-outbox");
 
 const require = createRequire(process.cwd() + "/");
 const pg = require("pg");
@@ -41,20 +45,44 @@ async function main() {
     if (signup.status !== 200) fail("signup", signup.status);
     const cookie = signup.headers.get("set-cookie")?.split(";")[0] ?? "";
 
-    // Mark verified + fetch the verification link (Resend API — the key is
-    // set locally, so no outbox file), then click it (signs in).
+    // Mark verified + fetch the verification link, then click it (signs in).
+    // Link source: Resend API when the key is live, else the dev outbox file
+    // (transport seam writes .email-outbox/<ts>-<email>.json when the key is
+    // unset/empty — see lib/email/transport.ts).
+    let link: string | undefined;
     const key = process.env.RESEND_API_KEY;
-    const listRes = await fetch(`https://api.resend.com/emails?to=${email}`, {
-      headers: { Authorization: `Bearer ${key}` },
-    });
-    const list = (await listRes.json()) as { data?: { id: string }[] };
-    const emailId = list.data?.[0]?.id;
-    if (!emailId) fail("resend email", "not found");
-    const emailRes = await fetch(`https://api.resend.com/emails/${emailId}`, {
-      headers: { Authorization: `Bearer ${key}` },
-    });
-    const emailDoc = (await emailRes.json()) as { html?: string };
-    const link = String(emailDoc.html).match(/https?:\/\/[^"'\s<]+verify-email[^"'\s<]*/)?.[0];
+    if (key) {
+      try {
+        const listRes = await fetch(`https://api.resend.com/emails?to=${email}`, {
+          headers: { Authorization: `Bearer ${key}` },
+        });
+        const list = (await listRes.json()) as { data?: { id: string }[] };
+        const emailId = list.data?.[0]?.id;
+        if (emailId) {
+          const emailRes = await fetch(`https://api.resend.com/emails/${emailId}`, {
+            headers: { Authorization: `Bearer ${key}` },
+          });
+          const emailDoc = (await emailRes.json()) as { html?: string };
+          link = String(emailDoc.html).match(/https?:\/\/[^"'\s<]+verify-email[^"'\s<]*/)?.[0];
+        }
+      } catch {
+        // fall through to the outbox
+      }
+    }
+    if (!link && fs.existsSync(OUTBOX_DIR)) {
+      // The server may write the email slightly after signup — poll briefly.
+      for (let i = 0; i < 10 && !link; i++) {
+        const outbox = fs.readdirSync(OUTBOX_DIR)
+          .filter((f) => f.endsWith(`${email}.json`))
+          .sort()
+          .pop();
+        if (outbox) {
+          const doc = JSON.parse(fs.readFileSync(path.join(OUTBOX_DIR, outbox), "utf8")) as { html?: string };
+          link = String(doc.html).match(/https?:\/\/[^"'\s<]+verify-email[^"'\s<]*/)?.[0];
+        }
+        if (!link) await new Promise((r) => setTimeout(r, 500));
+      }
+    }
     if (!link) fail("verification link", "not found");
     await fetch(link, { redirect: "manual" });
 
@@ -80,7 +108,7 @@ async function main() {
     } catch (e) {
       msg = String((e as { body?: { message?: string } }).body?.message ?? "");
     }
-    if (msg !== "Guarde primeiro o seu perfil antes de definir a disponibilidade.") {
+    if (msg !== "Guarda primeiro o teu perfil antes de definires a disponibilidade.") {
       fail("PT error message", msg || "(no throw)");
     }
     console.log("✓ 4. availability error now in Portuguese");

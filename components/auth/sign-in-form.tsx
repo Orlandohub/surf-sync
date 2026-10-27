@@ -69,7 +69,7 @@ export function SignInForm() {
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {resetSuccess && (
-            <p className="text-sm text-muted-foreground" role="status">
+            <p className="text-meta text-muted-foreground" role="status">
               {t("resetSuccess")}
             </p>
           )}
@@ -90,7 +90,7 @@ export function SignInForm() {
               <Label htmlFor="password">{t("password.label")}</Label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+                className="text-meta text-muted-foreground underline-offset-4 hover:underline"
               >
                 {t("forgotPassword")}
               </Link>
@@ -105,7 +105,7 @@ export function SignInForm() {
             />
           </div>
           {error && (
-            <p className="text-sm text-destructive" role="alert">
+            <p className="text-body text-destructive" role="alert">
               {error}
             </p>
           )}
@@ -114,7 +114,7 @@ export function SignInForm() {
           </Button>
           <Link
             href="/sign-up"
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="text-meta text-muted-foreground underline-offset-4 hover:underline"
           >
             {t("signUpInstead")}
           </Link>

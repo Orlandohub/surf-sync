@@ -162,8 +162,8 @@ export function AccountSettings({
   return (
     <div className="flex w-full max-w-xl flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-headline">{t("title")}</h1>
+        <p className="text-meta text-muted-foreground">
           {userName} · {userEmail}
         </p>
       </div>
@@ -175,7 +175,7 @@ export function AccountSettings({
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {sessions === null ? (
-            <p className="text-sm text-muted-foreground">{t("sessions.loading")}</p>
+            <p className="text-meta text-muted-foreground">{t("sessions.loading")}</p>
           ) : (
             <>
               <ul className="flex flex-col gap-3">
@@ -184,17 +184,17 @@ export function AccountSettings({
                   return (
                     <li
                       key={s.id}
-                      className="flex items-center justify-between gap-4 rounded-lg border border-border p-4"
+                      className="flex items-center justify-between gap-4 rounded-control border border-border p-card"
                     >
                       <div className="flex flex-col gap-0.5">
-                        <span className="text-sm font-medium">
+                        <span className="text-label">
                           {describeDevice(s.userAgent)}
                           {isCurrent ? ` · ${t("sessions.current")}` : ""}
                         </span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(s.createdAt).toLocaleString("pt-PT")} ·{" "}
+                        <span className="text-caption tabular-nums text-muted-foreground">
+                          {new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "long" }).format(new Date(s.createdAt))} ·{" "}
                           {t("sessions.expires")}{" "}
-                          {new Date(s.expiresAt).toLocaleDateString("pt-PT")}
+                          {new Intl.DateTimeFormat("pt-PT", { day: "numeric", month: "long" }).format(new Date(s.expiresAt))}
                         </span>
                       </div>
                       {!isCurrent && (
@@ -212,7 +212,7 @@ export function AccountSettings({
                 })}
               </ul>
               {error && (
-                <p className="text-sm text-destructive" role="alert">{error}</p>
+                <p className="text-body text-destructive" role="alert">{error}</p>
               )}
               <div className="flex flex-col gap-2 sm:flex-row">
                 <Button
@@ -266,10 +266,10 @@ export function AccountSettings({
               />
             </div>
             {pwError && (
-              <p className="text-sm text-destructive" role="alert">{pwError}</p>
+              <p className="text-body text-destructive" role="alert">{pwError}</p>
             )}
             {pwMessage && (
-              <p className="text-sm text-muted-foreground" role="status">{pwMessage}</p>
+              <p className="text-meta text-muted-foreground" role="status">{pwMessage}</p>
             )}
             <Button type="submit" disabled={pwBusy} className="self-start">
               {pwBusy ? t("password.submitting") : t("password.submit")}

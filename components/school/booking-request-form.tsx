@@ -98,7 +98,7 @@ export function BookingRequestForm({ instructorId }: { instructorId: string }) {
             />
           </div>
           {msg && (
-            <p className={`text-sm ${msg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
+            <p className={`text-body ${msg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
               {msg.text}
             </p>
           )}

@@ -197,7 +197,7 @@ export async function saveInstructorAvailability(
     .limit(1);
   if (!profile) {
     throw new APIError("BAD_REQUEST", {
-      message: "Guarde primeiro o seu perfil antes de definir a disponibilidade.",
+      message: "Guarda primeiro o teu perfil antes de definires a disponibilidade.",
     });
   }
 
@@ -238,7 +238,7 @@ export async function setInstructorPaused(
     .limit(1);
   if (!profile) {
     throw new APIError("BAD_REQUEST", {
-      message: "Complete primeiro o seu perfil.",
+      message: "Completa primeiro o teu perfil.",
     });
   }
 

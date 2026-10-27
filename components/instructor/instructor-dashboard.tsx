@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Check } from "lucide-react";
 import {
   saveProfileAction,
   saveAvailabilityAction,
@@ -123,31 +124,34 @@ export function InstructorDashboard({
   return (
     <main className="flex flex-1 flex-col items-center gap-6 px-4 py-10">
       <div className="flex w-full max-w-2xl flex-col gap-1">
-        <span className="eyebrow">{t("eyebrow")}</span>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">
+        <span className="text-meta text-muted-foreground">{t("eyebrow")}</span>
+        <h1 className="text-headline">{t("title")}</h1>
+        <p className="text-meta text-muted-foreground">
           {status === "active" && t("status.active")}
           {status === "inactive" && t("status.inactive")}
           {(status === "incomplete" || status === null) && t("status.incomplete")}
         </p>
-        <Link href="/instructor/bookings" className="text-sm text-muted-foreground underline underline-offset-4">
+        <Link href="/instructor/bookings" className="text-meta text-muted-foreground underline underline-offset-4">
           {t("viewBookings")} →
         </Link>
       </div>
 
       {/* Onboarding steps */}
-      <div className="grid w-full max-w-2xl gap-3 sm:grid-cols-3">
+      <div className="grid w-full max-w-2xl gap-stack sm:grid-cols-3">
         {onboarding.steps.map((step, i) => (
           <div
             key={step.key}
-            className={`rounded-lg border p-4 ${step.done ? "border-primary/40 bg-primary/5" : "border-border"}`}
+            className={`flex items-center justify-between gap-2 rounded-control border p-3 ${
+              step.done ? "border-ring/40 bg-tint" : "border-border"
+            }`}
           >
-            <span className="text-xs text-muted-foreground">
-              {t(`steps.${i + 1}`)}
-            </span>
-            <p className="mt-1 text-sm font-medium">
-              {t(`stepLabels.${step.key}`)} {step.done ? "✓" : "•"}
-            </p>
+            <div className="flex flex-col">
+              <span className="text-caption text-muted-foreground">
+                {t(`steps.${i + 1}`)}
+              </span>
+              <p className="text-label">{t(`stepLabels.${step.key}`)}</p>
+            </div>
+            {step.done && <Check className="size-5 text-primary" strokeWidth={1.75} />}
           </div>
         ))}
       </div>
@@ -189,10 +193,10 @@ export function InstructorDashboard({
                     key={lvl}
                     type="button"
                     onClick={() => setExperience(lvl)}
-                    className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+                    className={`h-9 rounded-full px-4 text-caption transition-colors duration-(--duration-fast) ${
                       experience === lvl
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:bg-accent"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground hover:bg-accent"
                     }`}
                   >
                     {t(`experience.${lvl}`)}
@@ -214,10 +218,10 @@ export function InstructorDashboard({
                           on ? prev.filter((id) => id !== loc.id) : [...prev, loc.id],
                         )
                       }
-                      className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+                      className={`h-9 rounded-full px-4 text-caption transition-colors duration-(--duration-fast) ${
                         on
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border hover:bg-accent"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground hover:bg-accent"
                       }`}
                     >
                       {loc.name}
@@ -227,7 +231,7 @@ export function InstructorDashboard({
               </div>
             </div>
             {profileMsg && (
-              <p className={`text-sm ${profileMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
+              <p className={`text-body ${profileMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
                 {profileMsg.text}
               </p>
             )}
@@ -248,7 +252,7 @@ export function InstructorDashboard({
           <form onSubmit={handleSaveAvailability} className="flex flex-col gap-3">
             {DAYS.map((d) => (
               <div key={d} className="flex items-center gap-3">
-                <label className="flex w-28 items-center gap-2 text-sm">
+                <label className="flex w-28 items-center gap-2 text-body">
                   <input
                     type="checkbox"
                     checked={slots[d].on}
@@ -268,7 +272,7 @@ export function InstructorDashboard({
                   className="w-32"
                   aria-label={t(`days.${d}`) + " start"}
                 />
-                <span className="text-sm text-muted-foreground">–</span>
+                <span className="text-meta text-muted-foreground">–</span>
                 <Input
                   type="time"
                   value={slots[d].end}
@@ -282,7 +286,7 @@ export function InstructorDashboard({
               </div>
             ))}
             {availMsg && (
-              <p className={`text-sm ${availMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
+              <p className={`text-body ${availMsg.ok ? "text-muted-foreground" : "text-destructive"}`} role="status">
                 {availMsg.text}
               </p>
             )}
@@ -310,7 +314,7 @@ export function InstructorDashboard({
                 {t("pause.reactivate")}
               </Button>
             ) : (
-              <p className="text-sm text-muted-foreground">{t("pause.notAvailable")}</p>
+              <p className="text-meta text-muted-foreground">{t("pause.notAvailable")}</p>
             )}
           </CardContent>
         </Card>
