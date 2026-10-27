@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth/session";
-import { AccountSettings } from "@/components/auth/account-settings";
 import { getTranslations } from "next-intl/server";
+import { getSession } from "@/lib/auth/session";
+import { PageContainer } from "@/components/shell/page-container";
+import { PageHeader } from "@/components/ui/page-header";
+import { AccountSettings } from "@/components/auth/account-settings";
 
 export async function generateMetadata() {
   const t = await getTranslations("AccountSettingsPage");
@@ -11,13 +13,17 @@ export async function generateMetadata() {
 export default async function AccountSettingsPage() {
   const session = await getSession();
   if (!session) redirect("/sign-in");
+  const t = await getTranslations("AccountSettingsPage");
 
   return (
-    <main className="flex flex-1 items-start justify-center px-4 py-16">
+    <PageContainer width="narrow">
+      <PageHeader title={t("title")} />
       <AccountSettings
         userName={session.user.name}
         userEmail={session.user.email}
+        userType={session.user.type === "instructor" ? "instructor" : "school_staff"}
+        emailVerified={session.user.emailVerified}
       />
-    </main>
+    </PageContainer>
   );
 }

@@ -1,5 +1,6 @@
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 import { getTranslations } from "next-intl/server";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export async function generateMetadata() {
   const t = await getTranslations("ForgotPasswordPage");
@@ -8,8 +9,8 @@ export async function generateMetadata() {
 
 export default function ForgotPasswordPage() {
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-16">
+    <AuthLayout>
       <ForgotPasswordForm />
-    </main>
+    </AuthLayout>
   );
 }
