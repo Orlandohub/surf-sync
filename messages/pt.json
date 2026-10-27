@@ -44,23 +44,136 @@
     "backHome": "Voltar ao início"
   },
   "HomePage": {
-    "title": "SurfSync",
-    "tagline": "Staffing de instrutores verificados para escolas de surf na zona de Lisboa.",
+    "meta": {
+      "description": "Escolas de surf encontram instrutores por zona, nível e dia da semana e pedem aulas. Os instrutores decidem que aulas aceitam."
+    },
+    "hero": {
+      "title": "escolas e instrutores, em sincronia.",
+      "tagline": "Escolas de surf encontram instrutores por zona, nível e dia da semana e pedem aulas. Os instrutores escolhem quando dão aulas e respondem a cada pedido.",
+      "photoAlt": "Espuma de ondas no Atlântico, vista de cima."
+    },
     "cta": {
       "signUp": "Criar conta",
       "signIn": "Entrar"
     },
-    "forSchools": {
-      "title": "Para escolas de surf",
-      "description": "Encontra e reserva instrutores verificados para as tuas aulas, com disponibilidade semanal."
+    "audiences": {
+      "schools": {
+        "title": "para escolas",
+        "intro": "Encontra instrutores para as aulas da tua escola e acompanha cada pedido até à aula.",
+        "items": {
+          "profiles": {
+            "title": "Perfis com o essencial",
+            "description": "Cada instrutor mostra o nível, as zonas onde dá aulas e o horário de cada dia da semana."
+          },
+          "bookings": {
+            "title": "Reservas num só sítio",
+            "description": "Pedidos, aulas marcadas e histórico, cada um com o seu estado."
+          },
+          "saved": {
+            "title": "Instrutores guardados",
+            "description": "Guarda os instrutores com quem queres voltar a trabalhar. Ficam guardados para toda a equipa."
+          },
+          "team": {
+            "title": "A tua equipa na mesma escola",
+            "description": "Convida colegas por email. Cada um entra com a sua conta e todos gerem as reservas da escola."
+          }
+        }
+      },
+      "instructors": {
+        "title": "para instrutores",
+        "intro": "Diz onde e quando dás aulas. As escolas encontram-te e enviam-te pedidos.",
+        "items": {
+          "zones": {
+            "title": "Visível nas tuas zonas",
+            "description": "Escolhe as praias onde dás aulas e indica o teu nível."
+          },
+          "availability": {
+            "title": "O teu horário",
+            "description": "Define um horário para cada dia da semana em que dás aulas. Muda-o sempre que precisares."
+          },
+          "lessons": {
+            "title": "Pedidos e aulas num só sítio",
+            "description": "Cada pedido e cada aula com a escola, o dia e o horário."
+          },
+          "pause": {
+            "title": "Pausa quando quiseres",
+            "description": "Pausa o perfil e sais da pesquisa. Reativa-o quando voltares."
+          }
+        }
+      }
     },
-    "forInstructors": {
-      "title": "Para instrutores",
-      "description": "Recebe pedidos de trabalho de escolas de surf na tua zona e gere a tua disponibilidade."
+    "steps": {
+      "title": "como funciona",
+      "intro": "Três passos de cada lado, da conta criada ao primeiro pedido.",
+      "schools": {
+        "label": "Escolas",
+        "account": {
+          "title": "Cria a conta e a escola",
+          "description": "Regista-te e preenche os dados da escola."
+        },
+        "search": {
+          "title": "Encontra instrutores",
+          "description": "Usa os filtros e abre os perfis que te interessam."
+        },
+        "request": {
+          "title": "Envia o pedido",
+          "description": "Escolhe o dia e o horário. A resposta aparece em Reservas."
+        }
+      },
+      "instructors": {
+        "label": "Instrutores",
+        "account": {
+          "title": "Cria a conta",
+          "description": "Regista-te como instrutor e confirma o email."
+        },
+        "profile": {
+          "title": "Completa o perfil",
+          "description": "Indica o nível, as zonas e o horário. O perfil fica ativo."
+        },
+        "respond": {
+          "title": "Responde aos pedidos",
+          "description": "Aceita ou recusa cada pedido em Aulas."
+        }
+      }
     },
-    "heroTitle": "Staffing de instrutores para escolas de surf",
-    "heroTitleAccent": "da costa de Lisboa.",
-    "coastLine": "Conexão · Comunidade · Crescimento"
+    "trust": {
+      "title": "regras claras, dos dois lados",
+      "intro": "Cada pedido segue as mesmas regras, para escolas e instrutores saberem sempre com o que contam.",
+      "items": {
+        "overlap": {
+          "title": "Sem sobreposições",
+          "description": "Um pedido tem de caber no horário do instrutor e não pode coincidir com outra aula pedida ou marcada."
+        },
+        "decision": {
+          "title": "O instrutor confirma",
+          "description": "Nenhuma aula fica marcada sem o instrutor aceitar. Qualquer das partes pode cancelar um pedido ou uma aula marcada."
+        },
+        "notify": {
+          "title": "Tudo notificado",
+          "description": "Pedidos, respostas e cancelamentos chegam à outra parte, na app e por email."
+        }
+      }
+    },
+    "zones": {
+      "title": "as zonas no surfsync",
+      "intro": "Os instrutores escolhem, entre estas, as zonas onde dão aulas.",
+      "regions": {
+        "leiria": "Leiria",
+        "lisboa": "Lisboa",
+        "setubal": "Setúbal",
+        "other": "Outras zonas"
+      }
+    },
+    "closing": {
+      "title": "a próxima aula começa aqui.",
+      "description": "Cria a conta como escola ou como instrutor. Os primeiros passos aparecem logo no Início.",
+      "haveAccount": "Já tens conta?"
+    },
+    "footer": {
+      "line": "A plataforma que liga escolas de surf e instrutores.",
+      "nav": "Ligações do rodapé",
+      "copyright": "© {year} surfsync"
+    }
   },
   "SignUpPage": {
     "title": "Criar conta",
