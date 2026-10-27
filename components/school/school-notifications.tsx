@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { MarkAllReadButton } from "@/components/school/mark-all-read-button";
 import { formatRelativeDay, groupNotifications } from "@/lib/format";
 import type { NotificationItem } from "@/lib/services/notifications";
+import type { BookingTab } from "@/components/school/booking-groups";
 import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, IconComponent> = {
@@ -15,7 +16,8 @@ const ICONS: Record<string, IconComponent> = {
   booking_cancelled: CalendarX,
 };
 
-const MAX = 12;
+/** How many recent notifications the section lists (as on Aulas). */
+const MAX = 15;
 
 /** The payload's lesson day, mid-sentence: "amanhã", "sábado", "29 de outubro". */
 function lessonDay(payload: Record<string, unknown>): string | null {
@@ -34,14 +36,23 @@ const str = (v: unknown) => (typeof v === "string" ? v : "");
  * Notificações on Reservas (deck 10): grouped Hoje · Ontem · Esta semana ·
  * Anteriores, actor in semibold, unread dot, "Marcar tudo como lido".
  * The section takes focus (tabIndex -1) when that button disappears.
+ *
+ * Each notification about a booking opens the tab that booking is in now
+ * (`tabs`: booking id → tab), not the one its type suggests: an answered
+ * request is no longer under Pendentes.
  */
 export async function SchoolNotifications({
   notifications,
   unread,
+  tabs,
+  tabHref,
   className,
 }: {
   notifications: NotificationItem[];
   unread: number;
+  /** Booking id → the Reservas tab it is in today. */
+  tabs: Record<string, BookingTab>;
+  tabHref: Record<BookingTab, string>;
   className?: string;
 }) {
   const t = await getTranslations("SchoolBookingsPage.notifications");
@@ -72,6 +83,12 @@ export async function SchoolNotifications({
     }
   }
 
+  function href(n: NotificationItem): string | undefined {
+    const id = n.payload?.bookingId;
+    const tab = typeof id === "string" ? tabs[id] : undefined;
+    return tab ? tabHref[tab] : undefined;
+  }
+
   const items = notifications.slice(0, MAX);
   return (
     <section
@@ -98,6 +115,7 @@ export async function SchoolNotifications({
                 <NotificationRow
                   key={n.id}
                   icon={ICONS[n.type] ?? Bell}
+                  href={href(n)}
                   at={n.createdAt}
                   unread={!n.readAt}
                 >

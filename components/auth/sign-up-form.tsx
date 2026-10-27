@@ -37,10 +37,11 @@ const TYPE_ICON: Record<AccountType, IconComponent> = {
  * default unless the URL brings one: /sign-up?type=instructor), then the
  * form appears below it. The type is immutable after sign-up.
  *
- * Staff invitations: the invitation email links to plain /sign-up; the
- * invite is accepted automatically when the invited address signs up as
- * "Escola de surf" and opens /school (lib/services/school.ts). The email
- * field says so when that type is chosen.
+ * Staff invitations: the invitation email links to /sign-up (built in
+ * lib/actions/school.ts; ?type=school_staff preselects "Escola de surf");
+ * the invite is accepted automatically when the invited address signs up
+ * as "Escola de surf" and opens /school (lib/services/school.ts). The
+ * email field says so when that type is chosen.
  */
 export function SignUpForm({ defaultType = null }: { defaultType?: AccountType | null }) {
   const t = useTranslations("SignUpPage");
@@ -251,6 +252,11 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
  * aria-checked; the group handles arrow keys / roving focus, and Space
  * checks the focused card). Selected: teal border, tonal fill, filled icon
  * and radio dot.
+ *
+ * A size container: below 16rem (a phone at 125% text and more) the
+ * decorative icon goes and the radio dot moves to the top-right corner,
+ * beside the title, so the text keeps the card's width and nothing sits
+ * on top of it.
  */
 function AccountTypeCard({
   value,
@@ -270,7 +276,7 @@ function AccountTypeCard({
       aria-labelledby={`${id}-title`}
       aria-describedby={`${id}-description`}
       className={
-        "group flex cursor-pointer items-center gap-4 rounded-card border bg-card p-card text-left shadow-card outline-none select-none " +
+        "group @container relative flex cursor-pointer items-center gap-4 rounded-card border bg-card p-card text-left shadow-card outline-none select-none " +
         "transition-[background-color,border-color,transform] duration-(--duration-fast) ease-move hover:border-input active:scale-99 " +
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background " +
         "data-checked:border-primary data-checked:bg-secondary data-checked:hover:border-primary"
@@ -278,21 +284,21 @@ function AccountTypeCard({
     >
       <span
         aria-hidden
-        className="flex size-12 shrink-0 items-center justify-center rounded-full bg-tint text-tint-foreground transition-colors duration-(--duration-fast) group-data-checked:bg-primary group-data-checked:text-primary-foreground"
+        className="flex size-12 shrink-0 items-center justify-center rounded-full bg-tint text-tint-foreground transition-colors duration-(--duration-fast) group-data-checked:bg-primary group-data-checked:text-primary-foreground @max-3xs:hidden"
       >
         <Icon className="size-6" strokeWidth={1.75} />
       </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span id={`${id}-title`} className="text-label text-foreground">
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5 hyphens-auto">
+        <span id={`${id}-title`} className="text-label break-words text-foreground @max-3xs:pr-8">
           {title}
         </span>
-        <span id={`${id}-description`} className="text-meta text-muted-foreground">
+        <span id={`${id}-description`} className="text-meta break-words text-muted-foreground">
           {description}
         </span>
       </span>
       <span
         aria-hidden
-        className="flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-input bg-card transition-colors duration-(--duration-fast) group-data-checked:border-primary"
+        className="flex size-5 shrink-0 items-center justify-center rounded-full border-2 border-input bg-card transition-colors duration-(--duration-fast) group-data-checked:border-primary @max-3xs:absolute @max-3xs:top-card @max-3xs:right-card"
       >
         <span className="size-2.5 scale-0 rounded-full bg-primary transition-transform duration-(--duration-instant) ease-move group-data-checked:scale-100" />
       </span>

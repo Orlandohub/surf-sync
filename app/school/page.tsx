@@ -95,12 +95,15 @@ export default async function SchoolPage() {
       />
 
       {showStats && (
-        <section aria-labelledby="resumo">
+        <section aria-labelledby="resumo" className="@container">
           <h2 id="resumo" className="sr-only">
             {t("stats.heading")}
           </h2>
-          {/* justify-start: values stay level when a label wraps on phones. */}
-          <div className="grid grid-cols-2 gap-stack md:grid-cols-4">
+          {/* justify-start: values stay level when a label wraps on phones.
+              By the section's width in rem (larger text counts): 4-up from
+              42rem, 2-up from 18rem, one per row below that, so a label is
+              never squeezed out of its tile. */}
+          <div className="grid grid-cols-1 gap-stack @2xs:grid-cols-2 @2xl:grid-cols-4">
             <StatTile
               value={stats.pending}
               label={linked(t("stats.pending"))}
@@ -133,7 +136,14 @@ export default async function SchoolPage() {
           {upcoming.length > 0 ? (
             <ul role="list" className="flex flex-col gap-stack">
               {upcoming.slice(0, UPCOMING_MAX).map((b) => (
-                <BookingRow key={b.id} booking={b} showStatus={false} showRequester={false} />
+                <BookingRow
+                  key={b.id}
+                  booking={b}
+                  today={today}
+                  showStatus={false}
+                  showRequester={false}
+                  clampNote
+                />
               ))}
             </ul>
           ) : (
@@ -148,6 +158,7 @@ export default async function SchoolPage() {
                 stats.pending > 0 ? (
                   <Link href="/school/bookings" className={buttonVariants({ variant: "outline" })}>
                     {t("upcoming.viewPending")}
+                    <ArrowRight aria-hidden strokeWidth={1.75} />
                   </Link>
                 ) : undefined
               }

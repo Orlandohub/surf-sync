@@ -6,28 +6,13 @@ import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { resendErrorKey, type AuthClientError, type ResendErrorKey } from "@/components/auth/auth-helpers";
-import type { VerificationEmailLimitCode } from "@/lib/services/verification";
 import { cn } from "@/lib/utils";
 
 /** Matches the server's limiter (lib/services/verification.ts). */
 const COOLDOWN_MS = 60_000;
 const DAILY_MAX = 5;
 
-// The limiter's 429 codes. Typed against the server's constant (a
-// type-only import, nothing server-side is bundled), so renaming a code
-// there breaks the typecheck here.
-const COOLDOWN_CODE: VerificationEmailLimitCode = "VERIFICATION_EMAIL_COOLDOWN";
-const DAILY_CODE: VerificationEmailLimitCode = "VERIFICATION_EMAIL_DAILY_LIMIT";
-
 type ResendClientError = AuthClientError & { retryAfter?: unknown };
-
-/** Our limiter's refusals by code; anything else (Better Auth's own
- *  endpoint limiter, "already verified"…) by status and message. */
-function resendKey(error: ResendClientError): ResendErrorKey {
-  if (error?.code === DAILY_CODE) return "daily";
-  if (error?.code === COOLDOWN_CODE) return "wait";
-  return resendErrorKey(error);
-}
 
 /** How long the server says to wait (cooldown 429s carry `retryAfter`, in s). */
 function retryAfterMs(error: ResendClientError): number {
@@ -95,7 +80,7 @@ export function useResendVerification(email: string, start: ResendStart = {}) {
         callbackURL: "/verify-email",
       });
       if (error) {
-        const key = resendKey(error);
+        const key = resendErrorKey(error);
         setStatus({ kind: "error", key });
         if (key === "wait") {
           const at = Date.now();

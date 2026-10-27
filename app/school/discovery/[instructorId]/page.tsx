@@ -73,8 +73,10 @@ export default async function InstructorProfilePage({
           </>
         }
         title={
-          <span className="flex items-center gap-2">
-            <span className="min-w-0">{instructor.displayName}</span>
+          // The name wraps (and the mark drops after it) rather than
+          // running under the bookmark at large text.
+          <span className="flex flex-wrap items-center gap-x-2">
+            <span className="min-w-0 break-words">{instructor.displayName}</span>
             {verified && <VerifiedMark className="size-5" />}
           </span>
         }

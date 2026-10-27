@@ -16,7 +16,8 @@ const divider =
 /**
  * Equipa on Início: members (avatar, name, email, "Desde 27 de outubro"),
  * pending invitations, and the invite-by-email field — one card, inset
- * dividers, the form under a full-width divider.
+ * dividers, the form under a full-width divider. Names and emails wrap
+ * (an email anywhere, it has no spaces) instead of being cut short.
  */
 export function TeamSection({
   staff,
@@ -36,14 +37,15 @@ export function TeamSection({
       <div className="overflow-hidden rounded-card border bg-card shadow-card">
         <ul role="list" aria-label={t("members")}>
           {staff.map((m) => (
-            <li key={m.userId} className={cn("flex items-center gap-3 px-card py-3", divider)}>
+            <li key={m.userId} className={cn("flex flex-wrap items-center gap-3 px-card py-3", divider)}>
               <Avatar name={m.name} />
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="flex min-w-0 items-center gap-2">
-                  <span className="truncate text-label text-foreground">{m.name}</span>
+              {/* Drops under the avatar when it can't have 11rem beside it. */}
+              <div className="flex min-w-0 grow basis-44 flex-col">
+                <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="min-w-0 text-label break-words text-foreground">{m.name}</span>
                   {m.userId === currentUserId && <Badge variant="neutral">{t("you")}</Badge>}
                 </span>
-                <span className="truncate text-meta text-muted-foreground">{m.email}</span>
+                <span className="text-meta break-words text-muted-foreground">{m.email}</span>
                 <span className="text-meta text-muted-foreground tabular-nums">
                   {t("joined", { date: formatDate(lisbonDate(m.joinedAt)) })}
                 </span>
@@ -51,10 +53,10 @@ export function TeamSection({
             </li>
           ))}
           {pendingInvites.map((inv) => (
-            <li key={inv.email} className={cn("flex items-center gap-3 px-card py-3", divider)}>
+            <li key={inv.email} className={cn("flex flex-wrap items-center gap-3 px-card py-3", divider)}>
               <RowIcon icon={Mail} />
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-label text-foreground">{inv.email}</span>
+              <div className="flex min-w-0 grow basis-44 flex-col">
+                <span className="text-label break-words text-foreground">{inv.email}</span>
                 <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                   <StatusBadge tone="warning" icon={Clock3}>
                     {t("pendingBadge")}

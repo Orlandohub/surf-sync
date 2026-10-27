@@ -33,11 +33,12 @@ const DEFAULT_MINUTES = 120;
  * can take: upcoming dates on their available weekdays, then start and end
  * times inside that day's range (24 h TimeSelects, 30 min steps). Today
  * only counts while a start time is still ahead, and then only from the
- * next half hour (booking-slots.ts). It's a native Select with
- * DateSelect's labels, since DateSelect can't drop today. `now` comes from
- * the server render so the server and client lists match. The server
- * still checks everything (requestBooking: inside the weekly availability,
- * no overlap, not in the past) and its message shows inline.
+ * next half hour (booking-slots.ts). It's a native Select of
+ * bookableDates() labelled with formatDayDate ("Sexta · 30 de outubro");
+ * `now` comes from the server render so the server and client lists
+ * match. The server still checks everything (requestBooking: inside the
+ * weekly availability, no overlap, not in the past) and its message shows
+ * inline.
  *
  * Layout: a card in the right column from lg. Below lg the fields are a
  * card at the end of the page and the CTA (PinnedCta) stays pinned above
@@ -185,8 +186,10 @@ export function BookingRequestForm({
             </Select>
           </Field>
           <div className="flex flex-col gap-2">
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={t("start")}>
+            {/* Side by side while each has 8rem (rem: larger text counts),
+                stacked below that, so a time is never cut to "09:…". */}
+            <div className="flex flex-wrap gap-3">
+              <Field label={t("start")} className="min-w-0 flex-1 basis-32">
                 <TimeSelect
                   ref={startRef}
                   name="startTime"
@@ -199,7 +202,7 @@ export function BookingRequestForm({
                   onChange={(e) => pickStart(e.target.value)}
                 />
               </Field>
-              <Field label={t("end")}>
+              <Field label={t("end")} className="min-w-0 flex-1 basis-32">
                 <TimeSelect
                   name="endTime"
                   disabled={!slot}

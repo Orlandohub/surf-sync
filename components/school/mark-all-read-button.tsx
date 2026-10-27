@@ -9,10 +9,11 @@ import { toast } from "@/components/ui/toast";
 import { byId, refocusWhenRemoved } from "@/components/shell/focus";
 
 /**
- * "Marcar tudo como lido" — then router.refresh() so the unread dots and
- * the tab-bar count clear (FOUNDATION: the layout re-reads the count).
- * The button only exists while something is unread, so once the refresh
- * removes it, focus moves to `focusAfter` (the notifications section).
+ * "Marcar tudo como lido" — a quiet text action in the Notificações
+ * heading (as on Aulas), then router.refresh() so the unread dots and the
+ * nav's dot clear (the layout re-reads the count). The button only exists
+ * while something is unread, so once the refresh removes it, focus moves
+ * to `focusAfter` (the notifications section).
  */
 export function MarkAllReadButton({ focusAfter }: { focusAfter: string }) {
   const t = useTranslations("SchoolBookingsPage.notifications");
@@ -37,9 +38,8 @@ export function MarkAllReadButton({ focusAfter }: { focusAfter: string }) {
   return (
     <Button
       ref={ref}
-      variant="ghost"
+      variant="link"
       size="sm"
-      className="text-primary hover:text-primary"
       pending={busy || refreshing}
       pendingLabel={t("markingAll")}
       onClick={markAll}

@@ -101,7 +101,8 @@ export default async function VerifyEmailPage({
         {!session ? (
           <div className="flex flex-col gap-4">
             <p className="text-body text-muted-foreground">{t("failed.signInHint")}</p>
-            <Link href="/sign-in" className={buttonVariants({ size: "lg" })}>
+            {/* Back here after signing in, where the new email is sent. */}
+            <Link href="/sign-in?next=/verify-email" className={buttonVariants({ size: "lg" })}>
               {t("failed.signIn")}
               <ArrowRight aria-hidden strokeWidth={1.75} />
             </Link>

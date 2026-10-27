@@ -12,8 +12,12 @@ import { isEmail } from "@/components/school/email";
 
 /**
  * Invite a colleague by email (Equipa). Outline "Convidar" — the screen's
- * filled primary is "Encontrar instrutores". The server's refusal ("Essa
- * pessoa já pertence a uma escola.") shows inline on the field.
+ * filled primary is "Encontrar instrutores". The server's refusal ("Esta
+ * pessoa já faz parte de uma escola.") shows inline on the field.
+ *
+ * The field and "Convidar" share a line while the card is at least 18rem
+ * wide (a container query, so larger text counts); narrower, the button
+ * goes under the field at full width.
  */
 export function InviteStaffForm() {
   const t = useTranslations("SchoolDashboardPage.team");
@@ -47,9 +51,9 @@ export function InviteStaffForm() {
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-2">
+    <form noValidate onSubmit={handleSubmit} className="@container flex flex-col gap-2">
       <Field label={t("inviteLabel")} helper={t("inviteHelper")} error={error} id="invite-email">
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 @2xs:flex-row">
           <Input
             ref={inputRef}
             type="email"

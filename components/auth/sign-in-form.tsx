@@ -15,7 +15,14 @@ import { emailProblem, homeFor, signInErrorKey } from "@/components/auth/auth-he
 
 type Errors = { email?: string; password?: string; form?: string };
 
-export function SignInForm({ resetSuccess = false }: { resetSuccess?: boolean }) {
+export function SignInForm({
+  resetSuccess = false,
+  next: nextPath = null,
+}: {
+  resetSuccess?: boolean;
+  /** A checked same-site path to open after signing in (safeNextPath). */
+  next?: string | null;
+}) {
   const t = useTranslations("SignInPage");
   const tv = useTranslations("Auth.validation");
   const ta = useTranslations("Auth");
@@ -50,8 +57,13 @@ export function SignInForm({ resetSuccess = false }: { resetSuccess?: boolean })
         setPending(false);
         return;
       }
-      // Route to the caller's own dashboard by account type. Full
-      // navigation so the server-rendered shell picks up the session.
+      // Back to where the person was sent from (`next`), else their own
+      // dashboard by account type. Full navigation so the server-rendered
+      // shell picks up the session.
+      if (nextPath) {
+        window.location.href = nextPath;
+        return;
+      }
       const { data: session } = await authClient.getSession();
       window.location.href = homeFor(session?.user?.type);
     } catch (err) {

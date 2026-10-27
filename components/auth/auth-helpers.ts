@@ -1,4 +1,5 @@
 import { TIME_ZONE } from "@/lib/format";
+import type { VerificationEmailLimitCode } from "@/lib/services/verification";
 
 /**
  * Pure helpers for the auth screens: client-side validation and mapping
@@ -7,9 +8,10 @@ import { TIME_ZONE } from "@/lib/format";
  *
  * Better Auth (1.6) client calls resolve to `{ data, error }`; `error`
  * carries the HTTP `status`, an upper-snake `code` (BASE_ERROR_CODES) and
- * an English `message`. Our own email limiter (lib/services/verification.ts)
- * throws 429 with "Please wait a minute…" (1 per minute) or "Daily …
- * limit reached" (5 per 24 h), shared by verification and reset emails.
+ * a `message`. Our own email limiter (lib/services/verification.ts) answers
+ * a signed-in resend with a 429 whose `code` says which limit it hit:
+ * VERIFICATION_EMAIL_COOLDOWN (1 per minute) or
+ * VERIFICATION_EMAIL_DAILY_LIMIT (5 per 24 h, shared with reset emails).
  */
 
 export type AuthClientError =
@@ -32,6 +34,21 @@ export function isAccountType(value: unknown): value is AccountType {
 /** Where a signed-in person lands, by account type. */
 export function homeFor(type: unknown): string {
   return type === "instructor" ? "/instructor" : type === "school_staff" ? "/school" : "/";
+}
+
+/**
+ * A `?next=` destination after sign-in, only if it is a path on this site
+ * ("/verify-email"): never another origin ("//evil.pt", "https://…"), a
+ * backslash ("/\evil.pt", which browsers read as "//") or control
+ * characters. Else null, and the caller falls back to homeFor(type).
+ */
+export function safeNextPath(next: unknown): string | null {
+  if (typeof next !== "string" || !next.startsWith("/") || next.startsWith("//")) return null;
+  for (const ch of next) {
+    const code = ch.charCodeAt(0);
+    if (ch === "\\" || code < 0x20 || code === 0x7f) return null;
+  }
+  return next;
 }
 
 // Deliberately loose: the server validates for real; this only catches
@@ -92,9 +109,18 @@ export function signUpErrorKey(error: AuthClientError): SignUpErrorKey {
   return passwordLengthKey(error) ?? "generic";
 }
 
+// The limiter's 429 codes. Typed against the server's constant (a
+// type-only import: nothing server-side is bundled), so renaming a code
+// there breaks the typecheck here.
+const RESEND_COOLDOWN: VerificationEmailLimitCode = "VERIFICATION_EMAIL_COOLDOWN";
+const RESEND_DAILY_LIMIT: VerificationEmailLimitCode = "VERIFICATION_EMAIL_DAILY_LIMIT";
+
 export type ResendErrorKey = "wait" | "daily" | "alreadyVerified" | "generic";
+/** Our limiter's refusals by code; any other 429 (Better Auth's own
+ *  endpoint limiter) means "wait a little". */
 export function resendErrorKey(error: AuthClientError): ResendErrorKey {
-  if (isRateLimited(error)) return /daily/i.test(error?.message ?? "") ? "daily" : "wait";
+  if (error?.code === RESEND_DAILY_LIMIT) return "daily";
+  if (error?.code === RESEND_COOLDOWN || isRateLimited(error)) return "wait";
   if (error?.code === "EMAIL_ALREADY_VERIFIED" || /already verified/i.test(error?.message ?? "")) {
     return "alreadyVerified";
   }

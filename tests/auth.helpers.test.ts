@@ -9,6 +9,7 @@ import {
   newPasswordProblem,
   resendErrorKey,
   resetPasswordErrorKey,
+  safeNextPath,
   signInErrorKey,
   signUpErrorKey,
 } from "@/components/auth/auth-helpers";
@@ -44,6 +45,24 @@ describe("auth validation", () => {
   });
 });
 
+describe("safeNextPath", () => {
+  it("keeps a path on this site", () => {
+    expect(safeNextPath("/verify-email")).toBe("/verify-email");
+    expect(safeNextPath("/school/bookings?tab=history")).toBe("/school/bookings?tab=history");
+  });
+
+  it("refuses other origins, backslashes, control characters and non-strings", () => {
+    expect(safeNextPath("//evil.example")).toBeNull();
+    expect(safeNextPath("/\\evil.example")).toBeNull();
+    expect(safeNextPath("https://evil.example")).toBeNull();
+    expect(safeNextPath("verify-email")).toBeNull();
+    expect(safeNextPath("/ok\nLocation: x")).toBeNull();
+    expect(safeNextPath("")).toBeNull();
+    expect(safeNextPath(undefined)).toBeNull();
+    expect(safeNextPath(["/verify-email"])).toBeNull();
+  });
+});
+
 describe("Better Auth error mapping", () => {
   it("sign-in stays generic about credentials", () => {
     expect(signInErrorKey(err(401, "INVALID_EMAIL_OR_PASSWORD"))).toBe("invalidCredentials");
@@ -62,9 +81,18 @@ describe("Better Auth error mapping", () => {
     expect(signUpErrorKey(err(500))).toBe("generic");
   });
 
-  it("resend tells the minute limit from the daily one", () => {
-    expect(resendErrorKey(err(429, undefined, "Please wait a minute before requesting another email."))).toBe("wait");
-    expect(resendErrorKey(err(429, undefined, "Daily verification email limit reached. Try again tomorrow."))).toBe("daily");
+  it("resend tells the minute limit from the daily one by the limiter's code", () => {
+    expect(
+      resendErrorKey(
+        err(429, "VERIFICATION_EMAIL_COOLDOWN", "Já te enviámos um email há pouco. Espera um minuto e tenta novamente."),
+      ),
+    ).toBe("wait");
+    expect(
+      resendErrorKey(
+        err(429, "VERIFICATION_EMAIL_DAILY_LIMIT", "Atingiste o limite de emails por hoje. Tenta novamente amanhã."),
+      ),
+    ).toBe("daily");
+    // Better Auth's own endpoint limiter: no code of ours, so just wait.
     expect(resendErrorKey(err(429, undefined, "Too many requests. Please try again later."))).toBe("wait");
     expect(resendErrorKey(err(400, "EMAIL_ALREADY_VERIFIED"))).toBe("alreadyVerified");
     expect(resendErrorKey(err(500))).toBe("generic");
