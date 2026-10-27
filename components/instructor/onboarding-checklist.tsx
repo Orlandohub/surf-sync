@@ -3,48 +3,45 @@ import { useTranslations } from "next-intl";
 import { ArrowRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { ResendVerification } from "@/components/instructor/resend-verification";
 import type { InstructorOnboarding, OnboardingStep } from "@/lib/services/instructor";
 
-const STEP_HREF: Partial<Record<OnboardingStep["key"], string>> = {
+/** The steps that activate the profile, in order, and where each is done. */
+const STEP_HREF = {
   complete_profile: "/instructor/profile",
   set_availability: "/instructor/availability",
-};
+} as const;
 
-type StepState = "done" | "current" | "inbox" | "later";
+type ActivationKey = keyof typeof STEP_HREF;
+type ActivationStep = OnboardingStep & { key: ActivationKey };
+
+const isActivationStep = (step: OnboardingStep): step is ActivationStep => step.key in STEP_HREF;
+
+type StepState = "done" | "current" | "later";
 
 /**
- * Início for a brand-new instructor: the three activation steps with
- * progress. The current step is the first one still to do that can be done
- * here (profile, then availability); its button is the view's one
- * primary. Verifying the email happens in the inbox and never blocks the
- * other steps (the services don't require it), so its row offers
- * "Reenviar email" instead. Steps that need an earlier one wait, muted.
+ * Início for a brand-new instructor: the steps that put the profile in the
+ * schools' search — complete the profile, then set availability — with
+ * progress. The current step's button is the view's one primary; the step
+ * after it waits, muted. Confirming the email isn't one of them (the
+ * services activate the profile without it), so it isn't counted here:
+ * <EmailNotice> asks for it separately, and keeps asking after the
+ * profile is active.
  */
 export function OnboardingChecklist({
   onboarding,
-  email,
   className,
 }: {
   onboarding: InstructorOnboarding;
-  email: string;
   className?: string;
 }) {
   const t = useTranslations("InstructorHomePage.onboarding");
-  const steps = onboarding.steps;
+  const steps = onboarding.steps.filter(isActivationStep);
   const done = steps.filter((s) => s.done).length;
-  const current = steps.find((s) => !s.done && STEP_HREF[s.key]);
-  const currentHref = current ? STEP_HREF[current.key] : undefined;
+  const current = steps.find((s) => !s.done);
   const progress = t("progress", { done, total: steps.length });
 
-  const stateOf = (step: OnboardingStep): StepState =>
-    step.done
-      ? "done"
-      : step.key === current?.key
-        ? "current"
-        : step.key === "verify_email"
-          ? "inbox"
-          : "later";
+  const stateOf = (step: ActivationStep): StepState =>
+    step.done ? "done" : step.key === current?.key ? "current" : "later";
 
   return (
     <section
@@ -102,8 +99,7 @@ export function OnboardingChecklist({
                   "flex size-9 shrink-0 items-center justify-center rounded-full text-label tabular-nums",
                   state === "done" && "bg-tint text-tint-foreground",
                   state === "current" && "bg-primary text-primary-foreground",
-                  (state === "inbox" || state === "later") &&
-                    "border border-border text-muted-foreground",
+                  state === "later" && "border border-border text-muted-foreground",
                 )}
               >
                 {step.done ? <Check className="size-5" strokeWidth={1.75} /> : i + 1}
@@ -120,9 +116,8 @@ export function OnboardingChecklist({
                 <span className="text-meta text-muted-foreground">
                   {state === "done"
                     ? t(`steps.${step.key}.doneDescription`)
-                    : t(`steps.${step.key}.description`, { email })}
+                    : t(`steps.${step.key}.description`)}
                 </span>
-                {state === "inbox" && <ResendVerification email={email} />}
               </span>
               {step.done && (
                 <span className="flex min-h-9 shrink-0 items-center text-meta text-muted-foreground">
@@ -134,10 +129,10 @@ export function OnboardingChecklist({
         })}
       </ol>
 
-      {current && currentHref && (
+      {current && (
         <div className="border-t p-card sm:px-6">
           <Link
-            href={currentHref}
+            href={STEP_HREF[current.key]}
             className={cn(buttonVariants({ size: "lg" }), "sm:h-11 sm:w-auto")}
           >
             {t(`steps.${current.key}.title`)}

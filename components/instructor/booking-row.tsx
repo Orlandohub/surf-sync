@@ -12,10 +12,8 @@ import {
   CancelAction,
   DeclineAction,
 } from "@/components/instructor/booking-actions";
-import {
-  displayStatus,
-  type InstructorBooking,
-} from "@/components/instructor/booking-groups";
+import type { InstructorBooking } from "@/components/instructor/booking-groups";
+import { displayStatus } from "@/lib/booking-view";
 import { formatDayTimeRange, type IsoDate } from "@/lib/format";
 
 /**
@@ -31,6 +29,8 @@ import { formatDayTimeRange, type IsoDate } from "@/lib/format";
  * - `history`: read-only, except a request nobody answered whose day has
  *   passed ("Sem resposta"), which can still be declined.
  * - `actions={false}`: read-only (Início's lesson previews).
+ * - `showStatus={false}`: no status badge, for a list whose title already
+ *   says it (Início's "Próximas aulas" holds confirmed lessons only).
  *
  * The note is the school's request (meeting point, group, languages): it
  * is shown in full wherever the instructor decides. `clampNote` keeps
@@ -41,12 +41,14 @@ export function InstructorBookingRow({
   today,
   view,
   actions = true,
+  showStatus = true,
   clampNote = false,
 }: {
   booking: InstructorBooking;
   today: IsoDate;
   view: "request" | "upcoming" | "history";
   actions?: boolean;
+  showStatus?: boolean;
   clampNote?: boolean;
 }) {
   const t = useTranslations("InstructorBookingRow");
@@ -79,7 +81,7 @@ export function InstructorBookingRow({
       title={booking.schoolName}
       description={when}
       status={
-        status === "expired" ? (
+        !showStatus ? undefined : status === "expired" ? (
           <StatusBadge tone="neutral" icon={CalendarClock}>
             {t("status.expired")}
           </StatusBadge>

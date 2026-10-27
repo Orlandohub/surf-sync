@@ -21,7 +21,9 @@ import { useFieldControlProps } from "@/components/ui/field"
  *
  * `className` is layout only (width, margins) and goes on the wrapper,
  * which the select fills. To restyle the control itself (rare) use
- * `selectClassName`.
+ * `selectClassName`. A long option label truncates; for short values
+ * that must always show (times), give the select a rem-based minimum
+ * width (TimeSelect has one) and let the row around it wrap.
  */
 function Select({
   className,
@@ -39,7 +41,9 @@ function Select({
         data-slot="select-control"
         className={cn(
           controlClassName,
-          "h-12 cursor-pointer appearance-none truncate pr-11 pl-4 tabular-nums",
+          // The chevron's gutter (pr-10) stays as small as it can: every rem
+          // of padding doubles at 200% text and comes out of the value.
+          "h-12 cursor-pointer appearance-none truncate pr-10 pl-4 tabular-nums",
           selectClassName
         )}
         {...fieldProps}
@@ -49,7 +53,7 @@ function Select({
       <ChevronDown
         aria-hidden
         strokeWidth={1.75}
-        className="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-muted-foreground"
       />
     </div>
   )

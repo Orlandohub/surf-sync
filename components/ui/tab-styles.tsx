@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Badge } from "@/components/ui/badge"
 
 /**
  * Shared look for <Tabs> (client state) and <LinkTabs> (URL state). Lives
@@ -47,3 +48,18 @@ export function StableLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
+/**
+ * A tab's count ("Pedidos 2"): a neutral badge — `count` (filled teal) is
+ * for unread counts only — whose number is read with its noun, so the tab
+ * says "Pedidos (2 por responder)" rather than "Pedidos 2".
+ *
+ *   badge: <TabCount count={2} label="2 por responder" />
+ */
+export function TabCount({ count, label }: { count: number; label: string }) {
+  return (
+    <Badge variant="neutral" className="tabular-nums">
+      <span aria-hidden>{count}</span>
+      <span className="sr-only"> ({label})</span>
+    </Badge>
+  )
+}

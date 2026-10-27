@@ -59,6 +59,14 @@ export function AvailabilityForm({
   const activates = status === "incomplete";
   const savedActive = status === "active";
   const [active, setActive] = useState(savedActive);
+  // A save that changes the status (activating, pausing, reactivating)
+  // comes back as a new `status`: the switch restarts from it. The form
+  // isn't remounted for this, so the focused submit button keeps focus.
+  const [syncedStatus, setSyncedStatus] = useState(status);
+  if (status !== syncedStatus) {
+    setSyncedStatus(status);
+    setActive(status === "active");
+  }
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -115,7 +123,8 @@ export function AvailabilityForm({
       setFormError(saved.error);
       return;
     }
-    if (canToggle && active !== savedActive) {
+    const toggles = canToggle && active !== savedActive;
+    if (toggles) {
       const toggled = await setPausedAction(!active);
       if (!toggled.ok) {
         setSaving(false);
@@ -125,7 +134,7 @@ export function AvailabilityForm({
       }
     }
     setSaving(false);
-    toast(activates ? t("activated") : t("saved"));
+    toast(activates ? t("activated") : toggles ? t(active ? "reactivated" : "paused") : t("saved"));
     startTransition(() => router.refresh());
   }
 
@@ -136,7 +145,7 @@ export function AvailabilityForm({
       noValidate
       className="flex flex-col gap-section"
     >
-      <div className="grid items-start gap-section lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-section lg:grid-cols-2">
         <div className="flex flex-col gap-section">
           <section aria-labelledby="visibilidade" className="flex flex-col gap-3">
             <SectionHeading id="visibilidade" title={t("active.title")} />
@@ -247,12 +256,19 @@ function DayWindow({
   const labelId = `${id}-day`;
   const errorId = `${id}-error`;
   return (
-    <li className="relative flex flex-col gap-2 px-card py-3 not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-card not-first:before:h-px not-first:before:bg-border">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-        <span id={labelId} className="text-label text-foreground sm:w-24">
+    // A size container: the day and its two times share a line while they
+    // fit, and stack as the text grows (rem-based, so 200% text counts) —
+    // never squeezing a time to "09:…".
+    <li className="@container relative flex flex-col gap-2 px-card py-3 not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-card not-first:before:h-px not-first:before:bg-border">
+      <div className="flex flex-col gap-2 @md:flex-row @md:items-center @md:gap-4">
+        <span id={labelId} className="text-label text-foreground @md:w-24 @md:shrink-0">
           {weekdayName(day)}
         </span>
-        <div role="group" aria-labelledby={labelId} className="flex flex-1 items-center gap-2">
+        <div
+          role="group"
+          aria-labelledby={labelId}
+          className="flex min-w-0 flex-1 flex-col gap-2 @3xs:flex-row @3xs:items-center"
+        >
           <Field label={t("start", { day: weekdayName(day) })} hideLabel className="flex-1">
             <TimeSelect
               value={window.start}
@@ -260,7 +276,7 @@ function DayWindow({
               selectClassName="h-11"
             />
           </Field>
-          <span aria-hidden className="text-body text-muted-foreground">
+          <span aria-hidden className="text-body text-muted-foreground @max-3xs:hidden">
             –
           </span>
           <Field label={t("end", { day: weekdayName(day) })} hideLabel className="flex-1">
@@ -275,7 +291,7 @@ function DayWindow({
         </div>
       </div>
       {invalid && (
-        <FieldError id={errorId} className="sm:pl-28">
+        <FieldError id={errorId} className="@md:pl-28">
           {t("endBeforeStart")}
         </FieldError>
       )}

@@ -42,7 +42,9 @@ export async function inviteStaffAction(input: unknown): Promise<ActionResult> {
       await sendStaffInvitationEmail({
         to: parsed.email,
         schoolName,
-        signupUrl: `${process.env.BETTER_AUTH_URL?.replace(/\/api\/auth$/, "") ?? ""}/sign-up`,
+        // Opens sign-up with "Escola de surf" chosen: the invitation is
+        // accepted by a school account with this address.
+        signupUrl: `${process.env.BETTER_AUTH_URL?.replace(/\/api\/auth$/, "") ?? ""}/sign-up?type=school_staff`,
       });
       await recordVerificationEmailSent(parsed.email);
     } catch {

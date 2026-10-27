@@ -161,7 +161,7 @@ export async function requestBooking(
     startTime: input.startTime,
     endTime: input.endTime,
     byUserName: requester.name,
-  });
+  }, "instructor");
 
   return created.id;
 }
@@ -217,7 +217,7 @@ export async function respondToBooking(
     startTime: row.startTime,
     endTime: row.endTime,
     declineReason: accept ? undefined : declineReason,
-  });
+  }, "school");
 }
 
 /** Either side cancels a requested/accepted booking. */
@@ -286,14 +286,14 @@ export async function cancelBooking(userId: string, bookingId: string): Promise<
       .from(user)
       .where(eq(user.id, row.instructorId))
       .limit(1);
-    await notifyBookingEvent(row.instructorId, instructorUser.email, "booking_cancelled", payload);
+    await notifyBookingEvent(row.instructorId, instructorUser.email, "booking_cancelled", payload, "instructor");
   } else {
     const [requester] = await db
       .select({ email: user.email })
       .from(user)
       .where(eq(user.id, row.requestedByUserId))
       .limit(1);
-    await notifyBookingEvent(row.requestedByUserId, requester.email, "booking_cancelled", payload);
+    await notifyBookingEvent(row.requestedByUserId, requester.email, "booking_cancelled", payload, "school");
   }
 }
 

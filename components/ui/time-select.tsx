@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "@/lib/utils"
 import { Select } from "@/components/ui/select"
 import { formatSlot, timeOptions } from "@/lib/format"
 
@@ -17,6 +18,11 @@ import { formatSlot, timeOptions } from "@/lib/format"
  * Accepts DB values as they come ("09:00:00" → selects "09:00"). The
  * submitted value is always "HH:MM". A value outside the grid (legacy
  * "09:15") is kept as an extra option rather than silently dropped.
+ *
+ * Never narrower than 7rem (`min-w-28`), so "09:00" always shows, at any
+ * text size. Two side by side (start – end) need about 15rem: let the pair
+ * stack when the row is narrower (a container query, see the instructor's
+ * availability-form DayWindow), rather than letting them squeeze.
  */
 type TimeSelectProps = Omit<React.ComponentProps<typeof Select>, "children" | "value" | "defaultValue"> & {
   value?: string
@@ -42,6 +48,7 @@ function TimeSelect({
   max = "22:00",
   step = 30,
   placeholder,
+  className,
   ...props
 }: TimeSelectProps) {
   const selected = normalize(value)
@@ -57,6 +64,7 @@ function TimeSelect({
   return (
     <Select
       {...props}
+      className={cn("min-w-28", className)}
       {...(value !== undefined ? { value: selected } : { defaultValue: initial })}
     >
       {placeholder !== undefined && <option value="">{placeholder}</option>}

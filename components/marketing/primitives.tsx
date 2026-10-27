@@ -52,8 +52,13 @@ export function Panel({ tone, children }: { tone: "ink" | "card"; children: Reac
   );
 }
 
-/** Wrapping for BD Sans display lines: hyphenate (html lang is pt-PT), else break the word. */
-export const displayWrap = "hyphens-auto wrap-break-word";
+/**
+ * Wrapping for BD Sans display lines: hyphenate (html lang is pt-PT), else
+ * break the word. `anywhere` (not `break-word`) so the line can also
+ * shrink below its longest word when it's a flex item (the centred
+ * closing line at 200% text on a 320px phone).
+ */
+export const displayWrap = "hyphens-auto wrap-anywhere";
 
 /**
  * Section title in BD Sans: lowercase, weight 400, 32 px on phones and

@@ -31,9 +31,6 @@ export default async function InstructorAvailabilityPage() {
       <PageHeader title={t("title")} description={t("description")} />
       {onboarding.hasProfile ? (
         <AvailabilityForm
-          // A status change (first save activates the profile) remounts the
-          // form so the switch starts from the saved state.
-          key={onboarding.profileStatus ?? "none"}
           status={onboarding.profileStatus}
           availability={data.availability.map((a) => ({
             dayOfWeek: a.dayOfWeek,

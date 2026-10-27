@@ -252,7 +252,11 @@
   --destructive-foreground: var(--color-white);
 
   --border: var(--color-atlantic-200);
-  --input: var(--color-atlantic-300);
+  --input: var(--color-atlantic-300);              /* outline buttons (their label identifies them) */
+  /* Text fields and selects: the border is all that shows where a field is
+     (card fill on a card), so it needs 3:1 (WCAG 1.4.11). Halfway between
+     atlantic-400 (2.7:1, fails) and -500: 3.3:1 on card, 3.1:1 on canvas. */
+  --field-border: color-mix(in srgb, var(--color-atlantic-400), var(--color-atlantic-500));
   --control-off: var(--color-atlantic-500);        /* switch track off: 4.3:1 on card (WCAG 1.4.11) */
   --ring: var(--color-ocean-600);                  /* 3.8:1 on canvas */
 
@@ -355,6 +359,7 @@
 
   --border: var(--color-atlantic-800);
   --input: var(--color-atlantic-700);
+  --field-border: var(--color-atlantic-500);       /* 3.5:1 on card, 4.1:1 on canvas */
   --control-off: var(--color-atlantic-500);        /* 3.5:1 on card */
   --ring: var(--color-ocean-400);
 
@@ -437,6 +442,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-field-border: var(--field-border);
   --color-control-off: var(--control-off);
   --color-ring: var(--ring);
 
@@ -603,6 +609,16 @@
     --bottom-cta: 0px;
     --bottom-clearance: calc(var(--bottom-chrome) + var(--bottom-cta));
     --viewport-below-chrome: calc(100svh - var(--top-chrome) - var(--bottom-clearance));
+    /* Pinned CTA placement (components/ui/pinned-cta). With no tab bar
+       (tablets, signed-out screens) the bar reaches the bottom edge and
+       pads itself above the home indicator, so nothing shows through the
+       inset under it; its sides clear a landscape notch. On the tab bar,
+       the tab bar takes the inset. */
+    --pinned-cta-bottom: 0px;
+    --pinned-cta-safe: var(--safe-bottom);
+    --pinned-cta-pb: calc(1rem + var(--pinned-cta-safe));
+    --pinned-cta-pl: max(var(--spacing-gutter), env(safe-area-inset-left, 0px));
+    --pinned-cta-pr: max(var(--spacing-gutter), env(safe-area-inset-right, 0px));
   }
   @media (width >= 48rem) {
     :root {
@@ -612,6 +628,8 @@
   @media (width < 48rem) {
     :root:has([data-slot="tab-bar"]) {
       --bottom-chrome: calc(var(--spacing-tabbar) + var(--safe-bottom));
+      --pinned-cta-bottom: var(--bottom-chrome);
+      --pinned-cta-safe: 0px;
     }
   }
   body {
@@ -635,11 +653,13 @@
   }
 
   /* A pinned CTA (data-pinned-cta = the breakpoint where it goes inline,
-     md or lg) adds its height to the bottom clearance while it is pinned.
-     It is bottom chrome itself then, so its own controls need no margin. */
+     md or lg) adds its height to the bottom clearance while it is pinned
+     (less the home-indicator inset it pads itself with when there is no
+     tab bar: --bottom-chrome already counts that). It is bottom chrome
+     itself then, so its own controls need no margin. */
   @media (width < 48rem) {
     :root:has([data-pinned-cta]) {
-      --bottom-cta: var(--pinned-cta-height, var(--spacing-cta));
+      --bottom-cta: calc(var(--pinned-cta-height, var(--spacing-cta)) - var(--pinned-cta-safe));
     }
     :where([data-pinned-cta]) * {
       scroll-margin-block: 0px;
@@ -647,7 +667,7 @@
   }
   @media (width < 64rem) {
     :root:has([data-pinned-cta="lg"]) {
-      --bottom-cta: var(--pinned-cta-height, var(--spacing-cta));
+      --bottom-cta: calc(var(--pinned-cta-height, var(--spacing-cta)) - var(--pinned-cta-safe));
     }
     :where([data-pinned-cta="lg"]) * {
       scroll-margin-block: 0px;

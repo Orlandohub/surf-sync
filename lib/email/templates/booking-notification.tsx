@@ -13,7 +13,11 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
-import type { BookingEventType, NotificationPayload } from "@/lib/services/notifications";
+import type {
+  BookingEventType,
+  NotificationPayload,
+  NotificationRecipient,
+} from "@/lib/services/notifications";
 import { formatDate, formatTimeRange } from "@/lib/format";
 
 // surfsync email brand — Atlantic palette (docs/design/DESIGN.md).
@@ -113,12 +117,34 @@ function BookingNotificationEmail({
   );
 }
 
+/**
+ * "Abrir surfsync" opens the recipient's own bookings screen, on the tab
+ * where this event put the booking: a new request on the instructor's
+ * Pedidos, a cancellation in either side's Histórico, a confirmation in
+ * the school's Próximas.
+ */
+export function bookingEmailPath(type: BookingEventType, recipient: NotificationRecipient): string {
+  if (recipient === "instructor") {
+    return type === "booking_requested"
+      ? "/instructor/bookings?tab=requests"
+      : type === "booking_accepted"
+        ? "/instructor/bookings?tab=upcoming"
+        : "/instructor/bookings?tab=history";
+  }
+  return type === "booking_requested"
+    ? "/school/bookings"
+    : type === "booking_accepted"
+      ? "/school/bookings?tab=upcoming"
+      : "/school/bookings?tab=history";
+}
+
 export async function renderBookingNotificationEmail(
   type: BookingEventType,
   payload: NotificationPayload,
+  recipient: NotificationRecipient,
 ): Promise<{ html: string; text: string }> {
   const base = process.env.BETTER_AUTH_URL?.replace(/\/api\/auth$/, "") ?? "https://www.surfsync.org";
-  const dashboardUrl = `${base}${type === "booking_requested" ? "/instructor" : "/school"}`;
+  const dashboardUrl = `${base}${bookingEmailPath(type, recipient)}`;
   const html = await render(
     <BookingNotificationEmail type={type} payload={payload} dashboardUrl={dashboardUrl} />,
     { plainText: false },
