@@ -8,10 +8,9 @@ type RegionKey = "leiria" | "lisboa" | "setubal" | "other";
 
 // Presentation knowledge only: the coast from north to south and the
 // district each zone sits in, keyed by zone name. The zones themselves
-// come from the database. The DB `region` column is never printed: older
-// seeds wrote an English "Lisbon area" for some rows, so headings come
-// from this map and next-intl instead. Cascais is listed because the
-// documented launch seed (scripts/seed.ts) creates it.
+// come from the database. The DB `region` column is never printed (an
+// older seed wrote an English "Lisbon area"), so headings come from this
+// map and next-intl instead. Keep in step with scripts/seed.ts.
 const COAST: readonly (readonly [string, RegionKey])[] = [
   ["Nazaré", "leiria"],
   ["Peniche", "leiria"],

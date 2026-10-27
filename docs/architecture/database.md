@@ -27,10 +27,10 @@ The current development branch had Better Auth tables created before migrations 
 
 ## Seed Data
 
-The launch `location` rows are:
+The launch `location` rows (surf zones), by district in `region`:
 
-- Cascais
-- Costa da Caparica
-- Ericeira
+- Leiria: Nazaré, Peniche
+- Lisboa: Ericeira, Guincho, Cascais, Carcavelos
+- Setúbal: Costa da Caparica, Costa da Caparica Norte, Sesimbra
 
-All three are in the `Lisbon area` region.
+`scripts/seed.ts` (`pnpm db:seed`) and `scripts/seed-locations.sql` hold the same list; re-running either corrects a zone's region.
