@@ -463,15 +463,19 @@ export function AccountSettings({
   );
 }
 
-/** Two-line label for a data row: "Email" over the address. */
+/**
+ * Two-line label for a data row: "Email" over the address. Never
+ * truncated: at large text the address wraps anywhere (an email has no
+ * spaces) and the badge drops under the label.
+ */
 function Stacked({ label, value, badge }: { label: string; value: string; badge?: React.ReactNode }) {
   return (
     <span className="flex min-w-0 flex-col">
-      <span className="flex items-center gap-2">
-        <span className="truncate text-meta text-muted-foreground">{label}</span>
+      <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="min-w-0 text-meta wrap-break-word text-muted-foreground">{label}</span>
         {badge}
       </span>
-      <span className="truncate text-body text-foreground">{value}</span>
+      <span className="min-w-0 text-body wrap-anywhere text-foreground">{value}</span>
     </span>
   );
 }

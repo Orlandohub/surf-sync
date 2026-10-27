@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Link2Off } from "lucide-react";
+import { ArrowRight, Link2Off } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -23,6 +23,7 @@ export function ResetLinkInvalid({ focusOnMount = false }: { focusOnMount?: bool
       </div>
       <Link href="/forgot-password" className={buttonVariants({ size: "lg" })}>
         {t("requestNew")}
+        <ArrowRight aria-hidden strokeWidth={1.75} />
       </Link>
       <AuthAltLink lead={t("remembered")} href="/sign-in">
         {t("signIn")}

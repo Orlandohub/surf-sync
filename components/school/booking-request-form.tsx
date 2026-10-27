@@ -168,8 +168,10 @@ export function BookingRequestForm({
             error={dateError}
             helper={slot ? t("range", { start: formatTime(slot.start), end: formatTime(slot.end) }) : undefined}
           >
+            {/* wrap: "Amanhã · 28 de outubro" stays whole at large text. */}
             <Select
               ref={dateRef}
+              wrap
               name="bookingDate"
               required
               value={date}

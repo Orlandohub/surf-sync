@@ -9,7 +9,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Avatar } from "@/components/ui/avatar";
 import { BookmarkToggle } from "@/components/school/bookmark-toggle";
-import { LevelBadge, VerifiedMark } from "@/components/school/instructor-bits";
+import { LevelBadge } from "@/components/school/instructor-bits";
+import { VerifiedMark } from "@/components/brand/verified-mark";
 import { WeeklyAvailability } from "@/components/school/weekly-availability";
 import { BookingRequestForm } from "@/components/school/booking-request-form";
 import { DAY_KEYS, formatSlot, type DayKey } from "@/lib/format";
@@ -72,13 +73,12 @@ export default async function InstructorProfilePage({
             <Avatar name={instructor.displayName} size={44} className="md:hidden" />
           </>
         }
+        // The mark follows the name's last word, inline, as on Perfil.
         title={
-          // The name wraps (and the mark drops after it) rather than
-          // running under the bookmark at large text.
-          <span className="flex flex-wrap items-center gap-x-2">
-            <span className="min-w-0 break-words">{instructor.displayName}</span>
+          <>
+            {instructor.displayName}
             {verified && <VerifiedMark className="size-5" />}
-          </span>
+          </>
         }
         description={instructor.locations.length > 0 ? instructor.locations.join(", ") : undefined}
         action={

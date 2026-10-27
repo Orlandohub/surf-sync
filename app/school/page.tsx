@@ -16,7 +16,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { BookingRow } from "@/components/school/booking-row";
 import { TeamSection } from "@/components/school/team-section";
 import { CreateSchoolForm } from "@/components/school/create-school-form";
-import { bookingStats, groupBookings } from "@/components/school/booking-groups";
+import { groupBookings, monthLessons, weekLessons } from "@/lib/booking-view";
 import { lisbonToday } from "@/lib/format";
 
 export async function generateMetadata() {
@@ -50,8 +50,14 @@ export default async function SchoolPage() {
     countSavedInstructors(session.user.id),
   ]);
   const today = lisbonToday();
-  const stats = bookingStats(bookings, today);
-  const { upcoming } = groupBookings(bookings, today);
+  const { requests, upcoming } = groupBookings(bookings, today);
+  // Real numbers only: requests still waiting, and lessons (accepted or
+  // completed) this week and this calendar month.
+  const stats = {
+    pending: requests.length,
+    thisWeek: weekLessons(bookings, today),
+    thisMonth: monthLessons(bookings, today).lessons,
+  };
   // A brand-new school has nothing to count yet: no row of zeros, the
   // header's "Encontrar instrutores" and Equipa are the next steps.
   const showStats = bookings.length > 0 || savedCount > 0;

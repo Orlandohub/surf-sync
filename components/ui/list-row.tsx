@@ -52,7 +52,8 @@ const rowFocus =
  * instead — it is rendered in both places (one hidden), so pass a plain
  * element: no `id`, no state.
  * `density="compact"` drops the 88px min height to 64px for dense lists
- * without thumbnails.
+ * without thumbnails. A size container: in a row under 16rem (200% text
+ * on a phone) `leading` hides and title and meta wrap unclamped.
  */
 function LinkRow({
   href,
@@ -82,18 +83,24 @@ function LinkRow({
       href={href}
       data-slot="link-row"
       className={cn(
-        "flex items-center gap-3 rounded-card border bg-card p-card text-card-foreground shadow-card",
+        // A size container (rem-based, so larger text counts): under 16rem
+        // (200% text on a phone) the leading thumbnail or circle gives its
+        // room to the text, which then wraps in full instead of clamping —
+        // never a title squeezed to a letter per line.
+        "@container flex items-center gap-3 rounded-card border bg-card p-card text-card-foreground shadow-card",
         "transition-[background-color,transform] duration-(--duration-fast) ease-move hover:bg-accent/50 active:scale-99",
         rowFocus,
         density === "default" ? "min-h-22" : "min-h-16",
         className
       )}
     >
-      {leading && <span className="flex shrink-0 items-center">{leading}</span>}
+      {leading && <span className="flex shrink-0 items-center @max-3xs:hidden">{leading}</span>}
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="line-clamp-2 text-label text-foreground">{title}</span>
+        <span className="line-clamp-2 text-label wrap-break-word hyphens-auto text-foreground @max-3xs:line-clamp-none">
+          {title}
+        </span>
         {description && (
-          <span className="mt-0.5 line-clamp-2 text-meta text-muted-foreground tabular-nums">
+          <span className="mt-0.5 line-clamp-2 text-meta wrap-break-word text-muted-foreground tabular-nums @max-3xs:line-clamp-none">
             {description}
           </span>
         )}
@@ -429,10 +436,10 @@ function MenuRow({
         )}
         {showTrailing && (
           // my-1 keeps it off the label when it wraps; a badge in it may
-          // wrap its own words rather than be clipped by the card.
+          // wrap its own words (Badge does) rather than be clipped by the card.
           <span
             data-slot="menu-row-trailing"
-            className="my-1 ml-auto flex max-w-full items-center self-center *:data-[slot=badge]:h-auto *:data-[slot=badge]:min-h-6 *:data-[slot=badge]:whitespace-normal"
+            className="my-1 ml-auto flex max-w-full items-center self-center"
           >
             {trailing}
           </span>
@@ -546,7 +553,9 @@ function NotificationGroup({
           {heading}
         </h3>
       )}
-      <ul role="list" className="overflow-hidden rounded-card border bg-card shadow-card">
+      {/* A size container (rem-based, so larger text counts): its rows
+          drop their decorative circle when the card is under 16rem. */}
+      <ul role="list" className="@container overflow-hidden rounded-card border bg-card shadow-card">
         {children}
       </ul>
     </section>
@@ -591,13 +600,19 @@ function NotificationRow({
   const instant = at instanceof Date ? at : new Date(at)
   const body = (
     <>
-      {leading ?? (
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-tint text-tint-foreground">
-          {Icon && <Icon aria-hidden className="size-5" strokeWidth={1.75} />}
-        </span>
-      )}
+      {/* Decorative: in a card under 16rem (200% text on a phone) it gives
+          its room to the sentence, as MenuRow's icon does. */}
+      <span data-slot="notification-leading" className="flex shrink-0 @max-3xs:hidden">
+        {leading ?? (
+          <span className="flex size-9 items-center justify-center rounded-full bg-tint text-tint-foreground">
+            {Icon && <Icon aria-hidden className="size-5" strokeWidth={1.75} />}
+          </span>
+        )}
+      </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-body text-foreground [&_strong]:font-semibold">{children}</span>
+        <span className="text-body text-pretty wrap-break-word hyphens-auto text-foreground [&_strong]:font-semibold">
+          {children}
+        </span>
         <span className="flex items-center gap-1.5 text-caption text-muted-foreground tabular-nums">
           {unread && (
             <>
@@ -621,7 +636,9 @@ function NotificationRow({
     <li
       data-slot="notification-row"
       data-unread={unread || undefined}
-      className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border"
+      // Inset divider: starts at the text (at the card edge once the
+      // circle is hidden).
+      className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border @max-3xs:not-first:before:left-card"
     >
       {href ? (
         <Link

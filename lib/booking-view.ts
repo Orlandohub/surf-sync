@@ -1,4 +1,4 @@
-import type { IsoDate } from "@/lib/format";
+import { addDays, dayKeyOf, DAY_KEYS, type IsoDate } from "@/lib/format";
 
 /**
  * How the bookings screens of both sides slice a list of bookings —
@@ -12,9 +12,14 @@ import type { IsoDate } from "@/lib/format";
  *   history   everything else: completed, declined, cancelled, and
  *             requests or lessons whose day has passed
  *
+ * Each side names the lists in its own words and URLs (the school's tab
+ * for `requests` is "Pendentes", ?tab absent); map them at the URL, never
+ * with a second grouping.
+ *
  * Display status: the DB status, plus "expired" for a request nobody
  * answered whose day has passed (still `requested` in the DB). Show it as
- * "Sem resposta" on both sides, never as pending.
+ * "Sem resposta" on both sides, never as pending: StatusBadge's
+ * bookingStatusTone/Icon know it (neutral, CalendarClock).
  */
 
 export type BookingStatus = "requested" | "accepted" | "declined" | "cancelled" | "completed";
@@ -61,6 +66,18 @@ export function displayStatus(
 /** A lesson that happens (accepted) or happened (completed). */
 export const isLesson = (b: Pick<Slotted, "status">) =>
   b.status === "accepted" || b.status === "completed";
+
+/** Monday and Sunday of the calendar week that contains `today`. */
+export function weekBounds(today: IsoDate): { start: IsoDate; end: IsoDate } {
+  const start = addDays(today, -DAY_KEYS.indexOf(dayKeyOf(today)));
+  return { start, end: addDays(start, 6) };
+}
+
+/** Lessons (accepted or completed) in this calendar week, Monday to Sunday. */
+export function weekLessons(bookings: readonly Pick<Slotted, "status" | "bookingDate">[], today: IsoDate): number {
+  const { start, end } = weekBounds(today);
+  return bookings.filter((b) => isLesson(b) && b.bookingDate >= start && b.bookingDate <= end).length;
+}
 
 function minutesOf(time: string): number {
   const [h, m] = time.split(":").map(Number);

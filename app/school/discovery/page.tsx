@@ -12,7 +12,7 @@ import {
 import { PageContainer } from "@/components/shell/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { LinkTabs } from "@/components/ui/link-tabs";
-import { Badge } from "@/components/ui/badge";
+import { TabCount } from "@/components/ui/tab-styles";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { DiscoveryFilters } from "@/components/school/discovery-filters";
@@ -78,13 +78,10 @@ export default async function DiscoveryPage({
               value: "saved",
               href: discoveryHref({ ...query, view: "saved" }),
               label: t("views.saved"),
-              // The number is read with its noun: "Guardados, 1 instrutor".
+              // Read with its noun: "Guardados (1 instrutor)".
               badge:
                 savedCount > 0 ? (
-                  <Badge variant="neutral" className="tabular-nums">
-                    <span aria-hidden>{savedCount}</span>
-                    <span className="sr-only">{t("views.savedCount", { count: savedCount })}</span>
-                  </Badge>
+                  <TabCount count={savedCount} label={t("views.savedCount", { count: savedCount })} />
                 ) : undefined,
             },
           ]}

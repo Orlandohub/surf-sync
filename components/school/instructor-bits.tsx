@@ -1,4 +1,3 @@
-import { BadgeCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -9,17 +8,6 @@ import type { InstructorCard } from "@/lib/services/discovery";
  * Small pieces shared by the instructor list and the instructor profile.
  * Server-component friendly (no client JS).
  */
-
-/** COMPONENTS.md "Avatar & stack": BadgeCheck after the name, not on the avatar. */
-export function VerifiedMark({ className }: { className?: string }) {
-  const t = useTranslations("DiscoveryPage.row");
-  return (
-    <>
-      <BadgeCheck aria-hidden strokeWidth={1.75} className={cn("size-4 shrink-0 text-primary", className)} />
-      <span className="sr-only">{t("verified")}</span>
-    </>
-  );
-}
 
 export function LevelBadge({ level }: { level: InstructorCard["experienceLevel"] }) {
   const t = useTranslations("DiscoveryPage.levels");

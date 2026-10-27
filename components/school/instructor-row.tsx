@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { BookmarkToggle } from "@/components/school/bookmark-toggle";
-import { LevelBadge, VerifiedMark, WeekStrip } from "@/components/school/instructor-bits";
+import { LevelBadge, WeekStrip } from "@/components/school/instructor-bits";
+import { VerifiedMark } from "@/components/brand/verified-mark";
 import type { InstructorCard } from "@/lib/services/discovery";
 
 /**
@@ -43,7 +44,8 @@ export function InstructorRow({
       <div className="flex flex-wrap items-center gap-x-3 gap-y-4 @2xl:flex-nowrap @2xl:gap-x-4">
         <Avatar name={instructor.displayName} />
         <div className="flex min-w-0 flex-1 flex-col @max-3xs:order-2 @max-3xs:basis-full">
-          <span className="flex flex-wrap items-center gap-x-1.5">
+          {/* The mark follows the name inline, as in the profile headers. */}
+          <span className="min-w-0 break-words">
             <Link
               href={href}
               className="min-w-0 text-label break-words text-foreground outline-none after:absolute after:inset-0 after:rounded-card after:transition-shadow focus-visible:after:ring-2 focus-visible:after:ring-ring focus-visible:after:ring-offset-2 focus-visible:after:ring-offset-background"

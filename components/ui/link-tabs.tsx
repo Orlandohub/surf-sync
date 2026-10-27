@@ -17,13 +17,13 @@ import {
  * Props are plain data, so a Server Component can render it.
  *
  *   // app/instructor/bookings/page.tsx
- *   const tab = (await searchParams).tab === "history" ? "history" : "upcoming"
+ *   const tab = (await searchParams).tab === "history" ? "history" : "requests"
  *   <LinkTabs
  *     label="Aulas"
  *     value={tab}
  *     items={[
- *       { value: "upcoming", href: "/instructor/bookings", label: "Próximas" },
- *       { value: "history", href: "/instructor/bookings?tab=history", label: "Histórico", badge: <Badge variant="count">2</Badge> },
+ *       { value: "requests", href: "/instructor/bookings?tab=requests", label: "Pedidos", badge: <TabCount count={2} label="2 por responder" /> },
+ *       { value: "history", href: "/instructor/bookings?tab=history", label: "Histórico" },
  *     ]}
  *   />
  *

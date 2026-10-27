@@ -81,7 +81,10 @@ export function OnboardingChecklist({
         </div>
       </div>
 
-      <ol role="list" className="border-t">
+      {/* A size container (rem-based, so larger text counts): under 16rem
+          (200% text on a phone) each step's number sits above its text,
+          which then has the card's full width. */}
+      <ol role="list" className="@container border-t">
         {steps.map((step, i) => {
           const state = stateOf(step);
           return (
@@ -89,8 +92,8 @@ export function OnboardingChecklist({
               key={step.key}
               aria-current={state === "current" ? "step" : undefined}
               className={cn(
-                "relative flex min-h-18 items-start gap-3 px-card py-4 sm:px-6",
-                "not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border sm:not-first:before:left-18",
+                "relative flex min-h-18 items-start gap-3 px-card py-4 @max-3xs:flex-col sm:px-6",
+                "not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border sm:not-first:before:left-18 @max-3xs:not-first:before:left-card",
               )}
             >
               <span
@@ -104,7 +107,7 @@ export function OnboardingChecklist({
               >
                 {step.done ? <Check className="size-5" strokeWidth={1.75} /> : i + 1}
               </span>
-              <span className="flex min-h-9 min-w-0 flex-1 flex-col justify-center gap-0.5">
+              <span className="flex min-h-9 min-w-0 flex-1 flex-col justify-center gap-0.5 wrap-break-word hyphens-auto @max-3xs:min-h-0">
                 <span
                   className={cn(
                     "text-label",
@@ -130,10 +133,15 @@ export function OnboardingChecklist({
       </ol>
 
       {current && (
-        <div className="border-t p-card sm:px-6">
+        // Under 16rem the button gives its padding and its (decorative)
+        // arrow to the label, so "Completar perfil" stays inside it.
+        <div className="@container border-t p-card sm:px-6">
           <Link
             href={STEP_HREF[current.key]}
-            className={cn(buttonVariants({ size: "lg" }), "sm:h-11 sm:w-auto")}
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "sm:h-11 sm:w-auto @max-3xs:px-3 @max-3xs:[&>svg]:hidden",
+            )}
           >
             {t(`steps.${current.key}.title`)}
             <ArrowRight aria-hidden strokeWidth={1.75} />

@@ -35,6 +35,7 @@
     "toastRegion": "Avisos",
     "actionFailed": "Não foi possível concluir. Verifica a ligação e tenta novamente.",
     "unread": "Não lida",
+    "verified": "Identidade verificada",
     "notificationGroups": {
       "today": "Hoje",
       "yesterday": "Ontem",
@@ -533,7 +534,6 @@
   },
   "InstructorProfilePage": {
     "title": "Perfil",
-    "verified": "Identidade verificada",
     "newProfile": "Completa o teu perfil para as escolas te encontrarem.",
     "status": {
       "active": "Ativo",
@@ -666,7 +666,6 @@
       "action": "Ver todos os instrutores"
     },
     "row": {
-      "verified": "Identidade verificada",
       "availableOn": "Disponível: {days}.",
       "noAvailability": "Sem disponibilidade definida."
     },
@@ -727,10 +726,10 @@
     "description": "Os pedidos da tua escola e as aulas marcadas.",
     "tabs": {
       "label": "Reservas",
-      "pending": "Pendentes",
+      "requests": "Pendentes",
       "upcoming": "Próximas",
       "history": "Histórico",
-      "pendingCount": "{count, plural, one {# pedido} other {# pedidos}}"
+      "requestsCount": "{count, plural, one {# pedido} other {# pedidos}}"
     },
     "status": {
       "requested": "Pendente",
@@ -745,8 +744,8 @@
     "cancel": {
       "lesson": "Cancelar aula",
       "request": "Cancelar pedido",
-      "lessonAria": "Cancelar aula com {instructor}, {when}",
-      "requestAria": "Cancelar pedido a {instructor}, {when}",
+      "lessonContext": "com {instructor}, {when}",
+      "requestContext": "a {instructor}, {when}",
       "lessonTitle": "Cancelar a aula de {day}?",
       "requestTitle": "Cancelar o pedido de {day}?",
       "description": "Das {start} às {end}, com {instructor}. Enviamos-lhe um aviso do cancelamento. Esta ação não pode ser anulada.",
@@ -757,7 +756,7 @@
       "requestDone": "Pedido cancelado."
     },
     "empty": {
-      "pending": {
+      "requests": {
         "title": "Sem pedidos pendentes",
         "description": "Os pedidos que enviares ficam aqui até o instrutor responder."
       },
@@ -772,19 +771,16 @@
       "action": "Encontrar instrutores"
     },
     "notifications": {
-      "title": "Notificações",
-      "jump": "{count, plural, =0 {Ver notificações} one {Ver notificações, # por ler} other {Ver notificações, # por ler}}",
-      "unread": "{count, plural, =0 {Tudo lido} one {# por ler} other {# por ler}}",
-      "markAll": "Marcar tudo como lido",
-      "markingAll": "A marcar…",
-      "markedAll": "Tudo marcado como lido.",
       "empty": "Sem notificações. Quando um instrutor responder a um pedido, avisamos aqui.",
       "types": {
-        "booking_requested": "<strong>{school}</strong> pediu uma aula a {instructor} para {day}.",
         "booking_accepted": "<strong>{instructor}</strong> confirmou a aula de {day}.",
+        "booking_accepted_at": "<strong>{instructor}</strong> confirmou a aula de {day} · {time}.",
         "booking_declined": "<strong>{instructor}</strong> recusou o pedido de {day}.",
+        "booking_declined_at": "<strong>{instructor}</strong> recusou o pedido de {day} · {time}.",
         "booking_cancelled": "<strong>{name}</strong> cancelou a aula de {day}.",
+        "booking_cancelled_at": "<strong>{name}</strong> cancelou a aula de {day} · {time}.",
         "booking_cancelled_anonymous": "A aula de {day} foi cancelada.",
+        "booking_cancelled_anonymous_at": "A aula de {day} · {time} foi cancelada.",
         "other": "Há uma atualização numa reserva."
       }
     }

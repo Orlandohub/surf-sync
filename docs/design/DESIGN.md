@@ -118,7 +118,8 @@ Five brand colours, one job each.
 
 "Glassmorphism subtil e funcional. Nunca exagerado ou futurista."
 
-- G1 — Glass only where something passes behind it: bottom tab bar, top app bar once content scrolls under it, controls floating on photos (back/share on a hero image), sheets over imagery. **Never on a card sitting on a flat background** — there is nothing to see through.
+- G1 — Glass only where something passes behind it: the bottom tab bar, controls floating on photos (back/share on a hero image), sheets over imagery. **Never on a card sitting on a flat background** — there is nothing to see through.
+- G1a — **The top app bar is not glass.** It is an opaque `bg-background` bar that gains a `border-border` hairline once content scrolls under it. Over the landing's ink panels and photos the blur turned into a muddy band with dark smudges past the panels' rounded corners, and over the light product pages it looked the same as opaque. The tab bar keeps glass (content passes behind it on every screen).
 - G2 — One layer deep. No glass on glass.
 - G3 — Use the `glass` utility; never hand-roll `backdrop-blur-*` `[SS06]`. Blur 12 px default, 16 px absolute ceiling; background 64–80 % opaque.
 - G4 — No tinted/coloured glass, no glow, no gradient borders, no noise textures, no refraction effects.
@@ -205,12 +206,20 @@ All semantic pairings were computed against WCAG 2.x. AA requires 4.5:1 for text
 | tint-foreground / tint (badges) | 6.7 | | tint-foreground / tint | 7.9 |
 | destructive-foreground / destructive | 5.0 | | destructive-foreground / destructive | 5.6 |
 | ring / background (focus) | 3.8 | | ring / background | 8.1 |
+| field-border / card (text fields, selects) | 3.3 | | field-border / card | 3.5 |
+| field-border / background | 3.1 | | field-border / background | 4.1 |
+| control-off / card (switch track off) | 4.3 | | control-off / card | 3.5 |
+| *input / card (outline buttons only)* | *1.7 — decorative, the label identifies the button* | | *input / card* | *1.6* |
 | status soft pairs (success / warning / danger) | 6.8 / 7.1 / 7.3 | | status soft pairs | 10.5+ |
 | sand-foreground / sand | 7.8 | | | |
 | rating star / card (graphic) | 3.6 | | | |
 | *brand teal `ocean-500` / white* | *3.0 — graphics & ≥24 px only* | | | |
 
 Further rules: focus is always visible (2 px `ring`, 2 px offset); never colour alone for state; inputs always have a persistent visible label (placeholder is never the label); icons that act have an `aria-label` in PT-PT.
+
+**Field borders.** The border is all that shows where a text field or select is on a white card, so it must reach 3:1 against what is around it (WCAG 1.4.11). Controls use `border-field-border` — `--field-border`, halfway between `atlantic-400` and `atlantic-500` (`#828E9B`; `atlantic-500` in dark mode). The deck's pale `--input` (`atlantic-300`, `#BFC9D1`; `atlantic-700` in dark mode) stays on outline buttons only, whose label already identifies them; never use it for a field.
+
+**Large text.** Every screen must work at 200 % text on a 360 px phone: no page scrolls sideways, no label or value is clipped or truncated (a title wraps, a long word breaks, a badge or button label wraps inside its box), and decorative leading icons give their room to the text in a row under 16rem. Layouts that must change with the text size use size containers with rem breakpoints (`@container`, `@max-3xs:`), not viewport media queries.
 
 ## 9. Don't
 

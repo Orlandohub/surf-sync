@@ -62,11 +62,24 @@ function EmptyState({
           <Icon aria-hidden className="size-6" strokeWidth={1.75} />
         </span>
       )}
-      <Title className="max-w-xs text-title-sm text-balance text-foreground">{title}</Title>
+      {/* w-full: never wider than the card's padding box, so at 200% text
+          a long word breaks and the action's label wraps inside it instead
+          of running to the card's edge. Centred text looks the same. */}
+      <Title className="w-full max-w-xs text-title-sm text-balance wrap-break-word hyphens-auto text-foreground">
+        {title}
+      </Title>
       {description && (
-        <p className="mt-1.5 max-w-xs text-body text-pretty text-muted-foreground">{description}</p>
+        <p className="mt-1.5 w-full max-w-xs text-body text-pretty wrap-break-word hyphens-auto text-muted-foreground">
+          {description}
+        </p>
       )}
-      {action && <div className="mt-5 flex justify-center">{action}</div>}
+      {/* A size container: under 16rem (200% text on a phone) the action
+          gives its side padding and its decorative arrow to the label. */}
+      {action && (
+        <div className="@container mt-5 flex w-full justify-center @max-3xs:*:px-3 @max-3xs:[&_svg]:hidden">
+          {action}
+        </div>
+      )}
     </div>
   )
 }

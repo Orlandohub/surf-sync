@@ -1,8 +1,9 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { Bell } from "lucide-react";
+import { Bell, CalendarCheck, CalendarPlus, CalendarX } from "lucide-react";
 import type { IconComponent } from "@/components/brand/icons";
 import type { NotificationItem } from "@/lib/services/notifications";
+import type { BookingList } from "@/lib/booking-view";
 import { NotificationGroup, NotificationRow } from "@/components/ui/list-row";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { buttonVariants } from "@/components/ui/button";
@@ -18,27 +19,35 @@ const LIMIT = 15;
 export const NOTIFICATIONS_HEADING_ID = "notificacoes";
 const SECTION_ID = "notificacoes-secao";
 
-/** What one notification shows: its sentence, its icon, and where it leads. */
-export type NotificationView = {
-  message: React.ReactNode;
-  icon?: IconComponent;
-  /** The page where that booking is now (omit for no link). */
-  href?: string;
+/** One glyph per booking event, the same on both sides. */
+const ICONS: Record<string, IconComponent> = {
+  booking_requested: CalendarPlus,
+  booking_accepted: CalendarCheck,
+  booking_declined: CalendarX,
+  booking_cancelled: CalendarX,
 };
 
 /**
  * Notificações, the same section on both bookings screens (instructor
  * Aulas, school Reservas): the h2 with "N por ler" and "Marcar tudo como
  * lido", then the latest notifications grouped Hoje · Ontem · Esta semana
- * · Anteriores (actor in semibold, unread dot), or a quiet card when there
- * are none. The area supplies only what differs: each notification's
- * sentence, icon and link (`view`) and the empty sentence.
+ * · Anteriores (actor in semibold, unread dot, an icon per event), or a
+ * quiet card when there are none. The area supplies only its words: each
+ * notification's sentence (`message`) and the empty sentence.
+ *
+ * Links: a notification opens the list its booking is in *now*
+ * (`placeOf`, booking id → list, from the page's own bookings, through
+ * `listHref`): a request accepted since opens the upcoming lessons, not an
+ * empty requests tab. A booking the page doesn't know (an old payload
+ * without its id) isn't a link: there is nowhere true to send it.
  *
  *   <NotificationsSection
  *     notifications={notifications}
  *     unread={unread}
  *     empty={t("notifications.empty")}
- *     view={(n) => ({ message: …, icon: CalendarPlus, href: "/instructor/bookings?tab=upcoming" })}
+ *     message={(n) => t.rich(…)}
+ *     placeOf={new Map(bookings.map((b) => [b.id, bookingList(b, today)]))}
+ *     listHref={{ requests: "/instructor/bookings?tab=requests", upcoming: …, history: … }}
  *   />
  *
  * A server component (it takes a function); only "Marcar tudo como lido"
@@ -49,7 +58,9 @@ export function NotificationsSection({
   notifications,
   unread,
   empty,
-  view,
+  message,
+  placeOf,
+  listHref,
   limit = LIMIT,
   className,
 }: {
@@ -58,7 +69,12 @@ export function NotificationsSection({
   unread: number;
   /** One sentence: why it's empty and what will show up here. */
   empty: React.ReactNode;
-  view: (n: NotificationItem) => NotificationView;
+  /** The notification's sentence, in the area's words. */
+  message: (n: NotificationItem) => React.ReactNode;
+  /** Booking id → the list that booking is in today. */
+  placeOf: ReadonlyMap<string, BookingList>;
+  /** Where each list lives on this side (its tab URL). */
+  listHref: Record<BookingList, string>;
   limit?: number;
   className?: string;
 }) {
@@ -88,17 +104,17 @@ export function NotificationsSection({
           {groupNotifications(items, (n) => n.createdAt, { now }).map(({ group, items }) => (
             <NotificationGroup key={group} group={group}>
               {items.map((n) => {
-                const { message, icon, href } = view(n);
+                const place = placeOf.get(payloadText(n.payload.bookingId));
                 return (
                   <NotificationRow
                     key={n.id}
-                    icon={icon ?? Bell}
-                    href={href}
+                    icon={ICONS[n.type] ?? Bell}
+                    href={place ? listHref[place] : undefined}
                     at={n.createdAt}
                     now={now}
                     unread={!n.readAt}
                   >
-                    {message}
+                    {message(n)}
                   </NotificationRow>
                 );
               })}

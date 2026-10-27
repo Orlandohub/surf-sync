@@ -15,11 +15,13 @@ import { formatTime } from "@/lib/format";
  * ("Cancelar a aula de sábado?", destructive "Cancelar aula", dismiss
  * "Manter aula") → the existing cancelBookingAction. A refusal from the
  * server stays in the dialog, inline. The day and time are in the
- * button's name ("Cancelar pedido a Ana Marques, Sábado · 10:00–12:00",
- * the pattern of the instructor's row actions) and in the dialog, so two
- * requests on the same day can't be confused.
+ * button's name and in the dialog, so two requests on the same day can't
+ * be confused. The name is the visible label plus sr-only context, the
+ * pattern of the instructor's row actions: "Cancelar pedido a Ana Marques,
+ * Sábado · 10:00–12:00" (the label is the start of the name, WCAG 2.5.3).
  * After a cancel the row leaves the tab (or loses this button), so focus
- * moves to `focusAfter`, the list's heading.
+ * moves to the list's current tab (visible focus, as after an instructor's
+ * row action), else to `focusAfter`, the list's heading.
  */
 export function CancelBookingButton({
   bookingId,
@@ -54,13 +56,12 @@ export function CancelBookingButton({
   return (
     <ConfirmDialog
       trigger={
-        <Button
-          variant="outline"
-          size="sm"
-          data-cancel-booking={bookingId}
-          aria-label={t(lesson ? "lessonAria" : "requestAria", { instructor: instructorName, when })}
-        >
+        <Button variant="outline" size="sm" data-cancel-booking={bookingId}>
           {lesson ? t("lesson") : t("request")}
+          <span className="sr-only">
+            {" "}
+            {t(lesson ? "lessonContext" : "requestContext", { instructor: instructorName, when })}
+          </span>
         </Button>
       }
       title={lesson ? t("lessonTitle", { day }) : t("requestTitle", { day })}
@@ -88,10 +89,10 @@ export function CancelBookingButton({
           return false;
         }
         toast(lesson ? t("lessonDone") : t("requestDone"));
-        refocusWhenRemoved(
-          document.querySelector(`[data-cancel-booking="${bookingId}"]`),
-          byId(focusAfter),
-        );
+        refocusWhenRemoved(document.querySelector(`[data-cancel-booking="${bookingId}"]`), () => {
+          const heading = byId(focusAfter)();
+          return heading?.closest("section")?.querySelector<HTMLElement>("[aria-current=page]") ?? heading;
+        });
         startTransition(() => router.refresh());
       }}
     />

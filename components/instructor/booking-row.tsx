@@ -1,5 +1,4 @@
 import { useTranslations } from "next-intl";
-import { CalendarClock } from "lucide-react";
 import { ItemRow } from "@/components/ui/list-row";
 import {
   StatusBadge,
@@ -12,7 +11,7 @@ import {
   CancelAction,
   DeclineAction,
 } from "@/components/instructor/booking-actions";
-import type { InstructorBooking } from "@/components/instructor/booking-groups";
+import type { InstructorBooking } from "@/components/instructor/instructor-booking";
 import { displayStatus } from "@/lib/booking-view";
 import { formatDayTimeRange, type IsoDate } from "@/lib/format";
 
@@ -81,15 +80,11 @@ export function InstructorBookingRow({
       title={booking.schoolName}
       description={when}
       status={
-        !showStatus ? undefined : status === "expired" ? (
-          <StatusBadge tone="neutral" icon={CalendarClock}>
-            {t("status.expired")}
-          </StatusBadge>
-        ) : (
+        showStatus ? (
           <StatusBadge tone={bookingStatusTone(status)} icon={bookingStatusIcon(status)}>
             {t(`status.${status}`)}
           </StatusBadge>
-        )
+        ) : undefined
       }
       note={
         // Início's previews: two lines, line breaks folded so they hold more.

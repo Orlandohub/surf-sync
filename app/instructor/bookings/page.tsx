@@ -16,7 +16,7 @@ import { InstructorBookingRow } from "@/components/instructor/booking-row";
 import { ReactivateButton } from "@/components/instructor/reactivate-button";
 import { NotificationsPanel } from "@/components/instructor/notifications-panel";
 import { NotificationsJump } from "@/components/shell/notifications-section";
-import { toInstructorBooking } from "@/components/instructor/booking-groups";
+import { toInstructorBooking } from "@/components/instructor/instructor-booking";
 import { bookingList, groupBookings } from "@/lib/booking-view";
 import { lisbonToday } from "@/lib/format";
 
@@ -117,6 +117,7 @@ export default async function InstructorBookingsPage({
           ) : (
             <EmptyState
               icon={EMPTY_ICON[tab]}
+              as="h3"
               title={t(`empty.${tab}.title`)}
               description={
                 offReason ? t(`empty.off.${offReason}`) : t(`empty.${tab}.description`)

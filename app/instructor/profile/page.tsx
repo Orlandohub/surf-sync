@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { BadgeCheck, CircleUserRound, Eye, EyeOff } from "lucide-react";
+import { CircleUserRound, Eye, EyeOff } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getInstructorProfileData } from "@/lib/services/instructor";
 import { PageContainer } from "@/components/shell/page-container";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { MenuGroup, MenuRow } from "@/components/ui/list-row";
 import { StatusBadge, type StatusTone } from "@/components/brand/status-badge";
 import { CalendarWave } from "@/components/brand/icons";
+import { VerifiedMark } from "@/components/brand/verified-mark";
 import { ProfileForm } from "@/components/instructor/profile-form";
 
 export async function generateMetadata() {
@@ -58,14 +59,7 @@ export default async function InstructorProfilePage() {
         title={
           <>
             {name || t("title")}
-            {verified && (
-              <>
-                <span className="sr-only">, {t("verified")}</span>
-                <span aria-hidden className="ml-2 inline-flex align-middle">
-                  <BadgeCheck className="size-5 text-primary" strokeWidth={1.75} />
-                </span>
-              </>
-            )}
+            {verified && <VerifiedMark className="size-5" />}
           </>
         }
         description={profile ? undefined : t("newProfile")}

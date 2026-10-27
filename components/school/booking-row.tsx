@@ -1,10 +1,9 @@
 import { useTranslations } from "next-intl";
-import { CalendarClock } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { ItemRow } from "@/components/ui/list-row";
 import { StatusBadge, bookingStatusIcon, bookingStatusTone } from "@/components/brand/status-badge";
 import { CancelBookingButton } from "@/components/school/cancel-booking-button";
-import { displayStatus } from "@/components/school/booking-groups";
+import { displayStatus } from "@/lib/booking-view";
 import { formatDayTimeRange, formatRelativeDay, lisbonToday, type IsoDate } from "@/lib/format";
 import type { BookingView } from "@/lib/services/booking";
 
@@ -53,15 +52,11 @@ export function BookingRow({
         title={b.instructorName}
         description={when}
         status={
-          !showStatus ? undefined : status === "expired" ? (
-            <StatusBadge tone="neutral" icon={CalendarClock}>
-              {t("status.expired")}
-            </StatusBadge>
-          ) : (
+          showStatus ? (
             <StatusBadge tone={bookingStatusTone(status)} icon={bookingStatusIcon(status)}>
               {t(`status.${status}`)}
             </StatusBadge>
-          )
+          ) : undefined
         }
         actions={
           canCancel ? (

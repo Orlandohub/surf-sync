@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, Bell, CalendarCheck, Clock3, History } from "lucide-react";
+import { ArrowRight, CalendarCheck, Clock3, History } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { listSchoolBookings } from "@/lib/services/booking";
 import { listNotifications, unreadCount } from "@/lib/services/notifications";
@@ -9,27 +9,32 @@ import { findSchoolIdForUser } from "@/lib/services/school-overview";
 import { PageContainer } from "@/components/shell/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { LinkTabs } from "@/components/ui/link-tabs";
-import { Badge } from "@/components/ui/badge";
+import { TabCount } from "@/components/ui/tab-styles";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { BookingRow } from "@/components/school/booking-row";
 import { SchoolNotifications } from "@/components/school/school-notifications";
-import { bookingTab, groupBookings, type BookingTab } from "@/components/school/booking-groups";
+import { NotificationsJump } from "@/components/shell/notifications-section";
+import { bookingList, groupBookings, type BookingList } from "@/lib/booking-view";
 import { lisbonToday } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
   const t = await getTranslations("SchoolBookingsPage");
   return { title: t("title") };
 }
 
-const TAB_HREF: Record<BookingTab, string> = {
-  pending: "/school/bookings",
+/**
+ * The shared lists (lib/booking-view) at the school's URLs: requests are
+ * "Pendentes", the default tab (no ?tab); the others keep their names.
+ */
+const LIST_HREF: Record<BookingList, string> = {
+  requests: "/school/bookings",
   upcoming: "/school/bookings?tab=upcoming",
   history: "/school/bookings?tab=history",
 };
+const LISTS = ["requests", "upcoming", "history"] as const satisfies readonly BookingList[];
 
-const EMPTY_ICON = { pending: Clock3, upcoming: CalendarCheck, history: History } as const;
+const EMPTY_ICON = { requests: Clock3, upcoming: CalendarCheck, history: History } as const;
 
 export default async function SchoolBookingsPage({
   searchParams,
@@ -43,7 +48,7 @@ export default async function SchoolBookingsPage({
   if (!(await findSchoolIdForUser(session.user.id))) redirect("/school");
 
   const { tab: tabParam } = await searchParams;
-  const tab: BookingTab = tabParam === "upcoming" || tabParam === "history" ? tabParam : "pending";
+  const tab: BookingList = tabParam === "upcoming" || tabParam === "history" ? tabParam : "requests";
 
   const [bookings, notifications, unread, t] = await Promise.all([
     listSchoolBookings(session.user.id),
@@ -54,42 +59,17 @@ export default async function SchoolBookingsPage({
   const today = lisbonToday();
   const groups = groupBookings(bookings, today);
   const shown = groups[tab];
-  // Each notification opens the tab its booking is in now.
-  const notificationTabs = Object.fromEntries(bookings.map((b) => [b.id, bookingTab(b, today)]));
-
-  // The number is read with its noun: "Pendentes, 2 pedidos".
-  const count = (n: number) =>
-    n > 0 ? (
-      <Badge variant="neutral" className="tabular-nums">
-        <span aria-hidden>{n}</span>
-        <span className="sr-only">{t("tabs.pendingCount", { count: n })}</span>
-      </Badge>
-    ) : undefined;
 
   return (
     <PageContainer>
       <PageHeader
         title={t("title")}
         description={t("description")}
-        // Phones: notifications sit after the bookings, always (a stable
-        // order), so the header carries a bell that jumps to them.
-        action={
-          <a
-            href="#notificacoes"
-            aria-label={t("notifications.jump", { count: unread })}
-            className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "relative lg:hidden")}
-          >
-            <Bell aria-hidden strokeWidth={1.75} />
-            {unread > 0 && (
-              <Badge variant="count" aria-hidden className="absolute -top-0.5 -right-0.5">
-                {unread}
-              </Badge>
-            )}
-          </a>
-        }
+        // Phones: notifications sit after the bookings, so the bell jumps there.
+        action={<NotificationsJump unread={unread} />}
       />
 
-      <div className="flex flex-col gap-section lg:grid lg:grid-cols-3 lg:items-start lg:gap-x-8">
+      <div className="grid grid-cols-1 items-start gap-section lg:grid-cols-3">
         <section aria-labelledby="reservas-lista" className="flex flex-col gap-4 lg:col-span-2">
           {/* tabIndex: where focus goes when a cancelled row leaves the list. */}
           <h2 id="reservas-lista" tabIndex={-1} className="sr-only">
@@ -98,11 +78,18 @@ export default async function SchoolBookingsPage({
           <LinkTabs
             label={t("tabs.label")}
             value={tab}
-            items={[
-              { value: "pending", href: TAB_HREF.pending, label: t("tabs.pending"), badge: count(groups.pending.length) },
-              { value: "upcoming", href: TAB_HREF.upcoming, label: t("tabs.upcoming") },
-              { value: "history", href: TAB_HREF.history, label: t("tabs.history") },
-            ]}
+            items={LISTS.map((value) => ({
+              value,
+              href: LIST_HREF[value],
+              label: t(`tabs.${value}`),
+              badge:
+                value === "requests" && groups.requests.length > 0 ? (
+                  <TabCount
+                    count={groups.requests.length}
+                    label={t("tabs.requestsCount", { count: groups.requests.length })}
+                  />
+                ) : undefined,
+            }))}
           />
           {shown.length > 0 ? (
             <ul role="list" className="flex flex-col gap-stack">
@@ -139,9 +126,8 @@ export default async function SchoolBookingsPage({
         <SchoolNotifications
           notifications={notifications}
           unread={unread}
-          tabs={notificationTabs}
-          tabHref={TAB_HREF}
-          className="lg:col-start-3 lg:row-start-1"
+          placeOf={new Map(bookings.map((b) => [b.id, bookingList(b, today)]))}
+          listHref={LIST_HREF}
         />
       </div>
     </PageContainer>

@@ -1,6 +1,7 @@
-import { Ban, Check, CheckCheck, Clock3, X, type LucideIcon } from "lucide-react";
+import { Ban, CalendarClock, Check, CheckCheck, Clock3, X, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { IconComponent } from "@/components/brand/icons";
+import type { BookingDisplayStatus } from "@/lib/booking-view";
 
 /**
  * surfsync DS — status badge on the soft Badge variants (COMPONENTS.md
@@ -8,8 +9,9 @@ import type { IconComponent } from "@/components/brand/icons";
  * explicit word — colour never carries meaning alone (DESIGN.md C7).
  *
  *   <StatusBadge tone="success">Confirmada</StatusBadge>
- *   <StatusBadge tone={bookingStatusTone(b.status)} icon={bookingStatusIcon(b.status)}>
- *     {t(`status.${b.status}`)}
+ *   const status = displayStatus(b, today); // lib/booking-view
+ *   <StatusBadge tone={bookingStatusTone(status)} icon={bookingStatusIcon(status)}>
+ *     {t(`status.${status}`)}
  *   </StatusBadge>
  */
 const TONE_TO_VARIANT = {
@@ -41,33 +43,35 @@ export function StatusBadge({
   );
 }
 
-export type BookingStatus = "requested" | "accepted" | "declined" | "cancelled" | "completed";
-
 /**
- * One mapping for booking states across instructor and school screens:
- * waiting → warning, confirmed → success, declined/cancelled → danger,
- * completed (history, nothing to do) → neutral.
+ * One mapping for booking states across instructor and school screens
+ * (the display status from lib/booking-view): waiting → warning,
+ * confirmed → success, declined/cancelled → danger, completed (history,
+ * nothing to do) → neutral, and a request whose day passed unanswered
+ * ("Sem resposta") → neutral with a clock calendar, never "pending".
  */
-const BOOKING_TONE: Record<BookingStatus, StatusTone> = {
+const BOOKING_TONE: Record<BookingDisplayStatus, StatusTone> = {
   requested: "warning",
   accepted: "success",
   declined: "danger",
   cancelled: "danger",
   completed: "neutral",
+  expired: "neutral",
 };
 
-const BOOKING_ICON: Record<BookingStatus, LucideIcon> = {
+const BOOKING_ICON: Record<BookingDisplayStatus, LucideIcon> = {
   requested: Clock3,
   accepted: Check,
   declined: X,
   cancelled: Ban,
   completed: CheckCheck,
+  expired: CalendarClock,
 };
 
-export function bookingStatusTone(status: BookingStatus): StatusTone {
+export function bookingStatusTone(status: BookingDisplayStatus): StatusTone {
   return BOOKING_TONE[status];
 }
 
-export function bookingStatusIcon(status: BookingStatus): LucideIcon {
+export function bookingStatusIcon(status: BookingDisplayStatus): LucideIcon {
   return BOOKING_ICON[status];
 }

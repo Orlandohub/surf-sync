@@ -17,7 +17,7 @@ import { EmailNotice } from "@/components/instructor/email-notice";
 import { resendStartFor } from "@/components/auth/resend-start";
 import { PausedNotice } from "@/components/instructor/paused-notice";
 import { StatusLine } from "@/components/instructor/status-line";
-import { toInstructorBooking } from "@/components/instructor/booking-groups";
+import { toInstructorBooking } from "@/components/instructor/instructor-booking";
 import { groupBookings, monthLessons } from "@/lib/booking-view";
 import { lisbonToday } from "@/lib/format";
 

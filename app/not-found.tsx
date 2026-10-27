@@ -14,14 +14,16 @@ export async function generateMetadata() {
 
 /**
  * Unmatched URLs and notFound() — inside the app shell, PT-PT. Leads back
- * to the person's own Início (or the landing page when signed out).
+ * to the person's own Início (or the landing page when signed out). A
+ * narrow page like Conta and "Cria a tua escola": it starts under the
+ * logo, at the top, as every page does.
  */
 export default async function NotFound() {
   const [t, session] = await Promise.all([getTranslations("NotFoundPage"), getSession()]);
   const user = toShellUser(session);
 
   return (
-    <PageContainer width="narrow" className="items-center justify-center">
+    <PageContainer width="narrow">
       <EmptyState
         as="h1"
         icon={Compass}

@@ -10,7 +10,7 @@ import { ConfirmDialog } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
-import type { InstructorBooking } from "@/components/instructor/booking-groups";
+import type { InstructorBooking } from "@/components/instructor/instructor-booking";
 import { formatRelativeDay } from "@/lib/format";
 
 /**

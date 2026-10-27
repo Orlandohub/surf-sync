@@ -14,9 +14,10 @@ import { cn } from "@/lib/utils";
  *
  *   <PageContainer width="narrow">       // max-w-2xl content — forms, settings
  *
- * Both start at the same left edge (under the app bar's logo); "narrow"
- * only caps the width of its children. Centre a lone block (the 404) with
- * className="items-center".
+ * Both start at the same left edge (under the app bar's logo) and at the
+ * top; "narrow" only caps the width of its children. No page centres its
+ * content (Conta, "Cria a tua escola" and the 404 all start under the
+ * logo), so moving between pages never shifts the column sideways.
  *
  * Pin the screen's one primary above the tab bar with <PinnedCta> from
  * components/ui/pinned-cta (DESIGN.md "One job per screen"); it adds its
