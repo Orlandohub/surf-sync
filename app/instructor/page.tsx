@@ -1,6 +1,5 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { getInstructorOnboarding, getInstructorProfileData } from "@/lib/services/instructor";
 import { InstructorDashboard } from "@/components/instructor/instructor-dashboard";
 import { getTranslations } from "next-intl/server";
@@ -11,7 +10,7 @@ export async function generateMetadata() {
 }
 
 export default async function InstructorPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) redirect("/sign-in");
   if (session.user.type !== "instructor") redirect("/");
 

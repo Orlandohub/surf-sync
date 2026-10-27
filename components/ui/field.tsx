@@ -17,9 +17,16 @@ import { Label } from "@/components/ui/label"
  *     <Input name="email" type="email" />
  *   </Field>
  *
- * Give the id to the Field (`id="email"`), not the control. For a group
- * of toggles (chips, day chips) pass `group` — the label then names the
- * group (aria-labelledby) instead of pointing at one input.
+ * Ids: the Field owns the control's id, so the label always points at it.
+ * Put it on the Field (`<Field id="email">`); an `id` on a direct child
+ * control is adopted too (`<Field label="Nome"><Input id="school-name" /></Field>`
+ * labels `#school-name`). Deeper inside, the Field's id wins over the
+ * control's (dev warning).
+ * For a group of toggles (chips, day chips) pass `group` — the label then
+ * names the group (aria-labelledby) instead of pointing at one input.
+ *
+ * Errors are announced: the message sits in a polite live region that is
+ * always mounted, so an error that appears after submit is read out.
  * Error copy says what to fix ("Indica um email válido.").
  */
 
@@ -38,7 +45,8 @@ export function useFieldContext() {
 }
 
 /**
- * Merges Field wiring into a control's props. Explicit props win; the
+ * Merges Field wiring into a control's props. Inside a Field the Field's
+ * id wins (so its label stays connected); explicit aria-invalid wins; the
  * Field's describedby ids are prepended to any the control already has.
  */
 export function useFieldControlProps<
@@ -50,14 +58,31 @@ export function useFieldControlProps<
 >(props: P): P {
   const field = React.useContext(FieldContext)
   if (!field) return props
+  if (process.env.NODE_ENV !== "production" && props.id && props.id !== field.id) {
+    console.warn(
+      `[Field] A control inside <Field> has id="${props.id}", but the Field's label points at "${field.id}". ` +
+        `Put the id on the <Field> instead; the Field's id is used.`
+    )
+  }
   const describedBy =
     [field.describedBy, props["aria-describedby"]].filter(Boolean).join(" ") || undefined
   return {
     ...props,
-    id: props.id ?? field.id,
+    id: field.id,
     "aria-describedby": describedBy,
     "aria-invalid": props["aria-invalid"] ?? (field.invalid || undefined),
   }
+}
+
+/** The `id` of the first direct child element that has one. */
+function childControlId(children: React.ReactNode): string | undefined {
+  let found: string | undefined
+  React.Children.forEach(children, (child) => {
+    if (found || !React.isValidElement(child)) return
+    const id = (child.props as { id?: unknown }).id
+    if (typeof id === "string" && id) found = id
+  })
+  return found
 }
 
 type FieldProps = Omit<React.ComponentProps<"div">, "children"> & {
@@ -66,7 +91,7 @@ type FieldProps = Omit<React.ComponentProps<"div">, "children"> & {
   helper?: React.ReactNode
   /** Inline error; replaces the helper while present. */
   error?: React.ReactNode
-  /** The control's id. Generated when omitted. */
+  /** The control's id. Else a direct child's `id`, else generated. */
   id?: string
   /** Label a group of controls (chips, day chips) rather than one input. */
   group?: boolean
@@ -87,7 +112,7 @@ function Field({
   ...props
 }: FieldProps) {
   const autoId = React.useId()
-  const id = idProp ?? `field${autoId.replace(/:/g, "")}`
+  const id = idProp ?? childControlId(children) ?? `field${autoId.replace(/:/g, "")}`
   const labelId = `${id}-label`
   const helperId = `${id}-helper`
   const errorId = `${id}-error`
@@ -121,7 +146,15 @@ function Field({
         </Label>
         {children}
         {hasHelper && <FieldHelper id={helperId}>{helper}</FieldHelper>}
-        {hasError && <FieldError id={errorId}>{error}</FieldError>}
+        {/* Always mounted so screen readers notice the error appearing.
+            Empty, its negative margin cancels the flex gap. */}
+        <div data-slot="field-message" aria-live="polite" className="empty:-mt-2">
+          {hasError && (
+            <FieldError id={errorId} announce={false}>
+              {error}
+            </FieldError>
+          )}
+        </div>
       </div>
     </FieldContext.Provider>
   )
@@ -140,12 +173,25 @@ function FieldHelper({ className, ...props }: React.ComponentProps<"p">) {
 
 /**
  * Inline error — `text-meta text-destructive` with CircleAlert 16px.
- * Also usable on its own for a form-level error under the submit button.
+ *
+ * On its own (a form-level error under the submit button, a failed action
+ * in a dialog) it is `role="alert"`, so it is announced when it appears:
+ *
+ *   {state.error && <FieldError>{state.error}</FieldError>}
+ *
+ * Render it only while there is an error (don't keep an empty one around).
+ * `announce={false}` when something else already announces it (Field does).
  */
-function FieldError({ className, children, ...props }: React.ComponentProps<"p">) {
+function FieldError({
+  className,
+  children,
+  announce = true,
+  ...props
+}: React.ComponentProps<"p"> & { announce?: boolean }) {
   return (
     <p
       data-slot="field-error"
+      role={announce ? "alert" : undefined}
       className={cn("flex items-start gap-1.5 text-meta text-destructive", className)}
       {...props}
     >

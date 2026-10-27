@@ -37,15 +37,18 @@ type AvatarSize = 32 | 44 | 88 | 96
 
 const NAME_PARTICLES = new Set(["de", "da", "do", "das", "dos", "e", "d'"])
 
-/** "Ana Marques" → "AM", "Rui" → "R", "Inês de Sousa" → "IS". */
-function getInitials(name: string | null | undefined): string {
+/**
+ * "Ana Marques" → "AM", "Rui" → "R", "Inês de Sousa" → "IS".
+ * `max: 1` gives the first initial only (overlapping stacks).
+ */
+function getInitials(name: string | null | undefined, max: 1 | 2 = 2): string {
   const words = (name ?? "")
     .trim()
     .split(/\s+/)
     .filter((w) => w && !NAME_PARTICLES.has(w.toLocaleLowerCase("pt-PT")))
   if (words.length === 0) return ""
   const first = Array.from(words[0])[0] ?? ""
-  const last = words.length > 1 ? (Array.from(words[words.length - 1])[0] ?? "") : ""
+  const last = max > 1 && words.length > 1 ? (Array.from(words[words.length - 1])[0] ?? "") : ""
   return (first + last).toLocaleUpperCase("pt-PT")
 }
 
@@ -54,6 +57,7 @@ function Avatar({
   src,
   size = 44,
   label,
+  initials = 2,
   className,
 }: {
   /** Used for the initials fallback. */
@@ -63,6 +67,8 @@ function Avatar({
   size?: AvatarSize
   /** Accessible name when the avatar stands alone. Omit when decorative. */
   label?: string
+  /** How many initials the fallback shows (1 in overlapping stacks). */
+  initials?: 1 | 2
   className?: string
 }) {
   return (
@@ -79,7 +85,7 @@ function Avatar({
         />
       ) : null}
       <AvatarPrimitive.Fallback className="leading-none">
-        {getInitials(name)}
+        {getInitials(name, initials)}
       </AvatarPrimitive.Fallback>
     </AvatarPrimitive.Root>
   )
@@ -87,7 +93,8 @@ function Avatar({
 
 /**
  * Overlapping faces: max 4, then a "+N" circle. Each face gets a card
- * ring so it separates from its neighbour.
+ * ring so it separates from its neighbour. Faces without a photo show one
+ * initial — two would be cut off by the next face.
  */
 function AvatarStack({
   people,
@@ -112,7 +119,7 @@ function AvatarStack({
       {...(label ? { role: "img", "aria-label": label } : {})}
     >
       {shown.map((p, i) => (
-        <Avatar key={`${p.name}-${i}`} name={p.name} src={p.src} size={size} className="ring-2 ring-card" />
+        <Avatar key={`${p.name}-${i}`} name={p.name} src={p.src} size={size} initials={1} className="ring-2 ring-card" />
       ))}
       {rest > 0 && (
         <span

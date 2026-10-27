@@ -1,6 +1,16 @@
 import * as React from "react"
 
 /**
+ * What every `icon` prop in the DS accepts: any Lucide icon or one of
+ * ours (CalendarWave). Rendered as `<Icon aria-hidden className strokeWidth />`.
+ */
+export type IconComponent = React.ComponentType<{
+  className?: string
+  strokeWidth?: number
+  "aria-hidden"?: boolean | "true" | "false"
+}>
+
+/**
  * surfsync's one bespoke glyph (DESIGN.md §10): the calendar-with-wave for
  * availability. Drawn on Lucide's 24px grid with round caps/joins so it
  * sits with Lucide icons; takes the same props (`className`,

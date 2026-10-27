@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils"
  * spinner. Use in `loading.tsx` files and Suspense fallbacks.
  *
  *   <Skeleton className="h-6 w-40" />            // a title
- *   <SkeletonRow />                              // a lesson/link row
+ *   <SkeletonRow />                              // a row with an avatar
+ *   <SkeletonRow leading="thumb" />              // a lesson row with a photo
  */
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -20,8 +21,19 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
-/** Placeholder for a <LinkRow> with a thumbnail: same height and rhythm. */
-function SkeletonRow({ thumbnail = true, className }: { thumbnail?: boolean; className?: string }) {
+/**
+ * Placeholder for a <LinkRow>/<ItemRow>: same card, height and rhythm.
+ * `leading` mirrors the real row so nothing shifts when it loads:
+ * "avatar" (44px circle — Avatar or RowIcon, the default), "thumb" (72px
+ * lesson photo), or "none".
+ */
+function SkeletonRow({
+  leading = "avatar",
+  className,
+}: {
+  leading?: "avatar" | "thumb" | "none"
+  className?: string
+}) {
   return (
     <div
       data-slot="skeleton-row"
@@ -31,7 +43,8 @@ function SkeletonRow({ thumbnail = true, className }: { thumbnail?: boolean; cla
         className
       )}
     >
-      {thumbnail && <Skeleton className="size-14 shrink-0 rounded-thumb" />}
+      {leading === "avatar" && <Skeleton className="size-11 shrink-0 rounded-full" />}
+      {leading === "thumb" && <Skeleton className="size-18 shrink-0 rounded-thumb" />}
       <div className="flex flex-1 flex-col gap-2">
         <Skeleton className="h-4 w-1/2" />
         <Skeleton className="h-3.5 w-1/3" />

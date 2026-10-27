@@ -1,5 +1,6 @@
 import { Ban, Check, CheckCheck, Clock3, X, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import type { IconComponent } from "@/components/brand/icons";
 
 /**
  * surfsync DS — status badge on the soft Badge variants (COMPONENTS.md
@@ -29,7 +30,7 @@ export function StatusBadge({
 }: {
   tone: StatusTone;
   /** Optional leading glyph (14px) to make the state scannable. */
-  icon?: LucideIcon;
+  icon?: IconComponent;
   children: React.ReactNode;
 }) {
   return (

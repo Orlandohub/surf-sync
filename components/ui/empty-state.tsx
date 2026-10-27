@@ -1,5 +1,5 @@
 import * as React from "react"
-import type { LucideIcon } from "lucide-react"
+import type { IconComponent } from "@/components/brand/icons"
 import { cn } from "@/lib/utils"
 import { LogoMark } from "@/components/brand/logo"
 
@@ -31,14 +31,15 @@ function EmptyState({
   as: Title = "h2",
   className,
 }: {
-  icon?: LucideIcon
+  icon?: IconComponent
   title: React.ReactNode
   description?: React.ReactNode
   action?: React.ReactNode
   surface?: "card" | "none"
   mark?: boolean
-  /** Heading level of the title; "h3" under a section heading, "p" for none. */
-  as?: "h2" | "h3" | "p"
+  /** Heading level of the title; "h1" when it is the whole page (404),
+   *  "h3" under a section heading, "p" for none. */
+  as?: "h1" | "h2" | "h3" | "p"
   className?: string
 }) {
   return (

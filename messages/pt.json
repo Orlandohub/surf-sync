@@ -12,6 +12,7 @@
     "account": "Conta",
     "signOut": "Terminar sessão",
     "signOutError": "Não foi possível terminar sessão. Verifica a ligação e tenta novamente.",
+    "unread": "({count, plural, one {# notificação por ler} other {# notificações por ler}})",
     "instructor": {
       "home": "Início",
       "bookings": "Aulas",
@@ -26,7 +27,21 @@
     }
   },
   "UI": {
-    "toastRegion": "Avisos"
+    "toastRegion": "Avisos",
+    "actionFailed": "Não foi possível concluir. Verifica a ligação e tenta novamente.",
+    "unread": "Não lida",
+    "notificationGroups": {
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "week": "Esta semana",
+      "earlier": "Anteriores"
+    }
+  },
+  "NotFoundPage": {
+    "metaTitle": "Página não encontrada",
+    "title": "Esta página não existe",
+    "description": "O endereço pode estar errado ou a página foi removida.",
+    "backHome": "Voltar ao início"
   },
   "HomePage": {
     "title": "SurfSync",

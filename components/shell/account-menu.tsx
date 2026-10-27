@@ -43,18 +43,22 @@ export function AccountMenu({ user }: { user: ShellUser }) {
       <Menu.Portal>
         <Menu.Positioner side="bottom" align="end" sideOffset={8} collisionPadding={12} className="z-50 outline-none">
           <Menu.Popup className="w-72 max-w-(--available-width) origin-(--transform-origin) rounded-card border bg-popover p-1.5 text-popover-foreground shadow-float outline-none transition-[opacity,scale] duration-(--duration-base) ease-enter data-ending-style:scale-95 data-ending-style:opacity-0 data-ending-style:duration-(--duration-fast) data-ending-style:ease-exit data-starting-style:scale-95 data-starting-style:opacity-0">
-            <div className="flex items-center gap-3 px-2.5 pt-2 pb-2.5">
-              <Avatar name={user.name || user.email} size={44} />
-              <div className="flex min-w-0 flex-col">
-                {user.name && <span className="truncate text-label">{user.name}</span>}
-                <span className="truncate text-meta text-muted-foreground">{user.email}</span>
-              </div>
-            </div>
-            <Menu.Separator className="-mx-1.5 my-1.5 h-px bg-border" />
-            <Menu.LinkItem closeOnClick render={<Link href="/account" />} className={itemClass}>
-              <UserRoundCog aria-hidden strokeWidth={1.75} />
-              {t("account")}
-            </Menu.LinkItem>
+            {/* Who is signed in labels the group (role="group"), so screen
+                readers in menu mode hear it with "Conta". */}
+            <Menu.Group>
+              <Menu.GroupLabel className="flex items-center gap-3 px-2.5 pt-2 pb-2.5">
+                <Avatar name={user.name || user.email} size={44} />
+                <span className="flex min-w-0 flex-col">
+                  {user.name && <span className="truncate text-label">{user.name}</span>}
+                  <span className="truncate text-meta text-muted-foreground">{user.email}</span>
+                </span>
+              </Menu.GroupLabel>
+              <Menu.Separator className="-mx-1.5 my-1.5 h-px bg-border" />
+              <Menu.LinkItem closeOnClick render={<Link href="/account" />} className={itemClass}>
+                <UserRoundCog aria-hidden strokeWidth={1.75} />
+                {t("account")}
+              </Menu.LinkItem>
+            </Menu.Group>
             <Menu.Separator className="-mx-1.5 my-1.5 h-px bg-border" />
             <Menu.Item onClick={signOut} className={cn(itemClass, "text-destructive [&_svg]:text-destructive")}>
               <LogOut aria-hidden strokeWidth={1.75} />

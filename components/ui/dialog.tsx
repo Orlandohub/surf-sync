@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog"
 import { cn } from "@/lib/utils"
@@ -135,6 +136,7 @@ type ConfirmResult = void | boolean
  *       toast("Aula cancelada.")
  *     }}
  *     error={error}
+ *     onOpenChange={(open) => { if (!open) setError(null) }} // no stale error next time
  *   />
  *
  * - Title states the consequence; the confirm button names the action and
@@ -143,7 +145,10 @@ type ConfirmResult = void | boolean
  * - Focus starts on the dismiss, so Enter never confirms by accident.
  * - `onConfirm` may be async: the confirm button shows `pendingLabel` and
  *   the dialog can't be dismissed meanwhile. Return `false` to keep it open
- *   (show the reason via `error`, inline — not a toast).
+ *   (show the reason via `error`, inline — not a toast; it is announced).
+ *   If it throws, the dialog stays open with a generic error (logged).
+ * - Clear your `error` state in `onOpenChange(false)` — works with
+ *   `trigger` too (it's called on every open/close).
  * - Extra content (e.g. an optional reason field) goes in `children`.
  * - Controlled use: pass `open` + `onOpenChange` instead of `trigger`.
  */
@@ -175,25 +180,36 @@ function ConfirmDialog({
   onConfirm: () => ConfirmResult | Promise<ConfirmResult>
   error?: React.ReactNode
 }) {
+  const t = useTranslations("UI")
   const [internalOpen, setInternalOpen] = React.useState(false)
   const [pending, setPending] = React.useState(false)
+  const [failed, setFailed] = React.useState(false)
   const cancelRef = React.useRef<HTMLButtonElement>(null)
   const isOpen = open ?? internalOpen
 
   function setOpen(next: boolean) {
     if (open === undefined) setInternalOpen(next)
+    if (!next) setFailed(false)
     onOpenChange?.(next)
   }
 
   async function handleConfirm() {
     setPending(true)
+    setFailed(false)
     try {
       const result = await onConfirm()
       if (result !== false) setOpen(false)
+    } catch (err) {
+      // Not silent: logged (Sentry picks up console errors once SUR-28 lands)
+      // and shown inline; the dialog stays open so the person can retry.
+      console.error(err)
+      setFailed(true)
     } finally {
       setPending(false)
     }
   }
+
+  const shownError = error || (failed ? t("actionFailed") : null)
 
   return (
     <AlertDialogPrimitive.Root
@@ -209,7 +225,7 @@ function ConfirmDialog({
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         {children && <div className="mt-5 flex flex-col gap-4">{children}</div>}
-        {error ? <FieldError className="mt-4">{error}</FieldError> : null}
+        {shownError ? <FieldError className="mt-4">{shownError}</FieldError> : null}
         <DialogFooter>
           <AlertDialogPrimitive.Close
             ref={cancelRef}
@@ -221,9 +237,10 @@ function ConfirmDialog({
           <Button
             variant={tone === "destructive" ? "destructive" : "default"}
             pending={pending}
+            pendingLabel={pendingLabel}
             onClick={handleConfirm}
           >
-            {pending && pendingLabel ? pendingLabel : confirmLabel}
+            {confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

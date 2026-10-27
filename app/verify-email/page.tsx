@@ -1,6 +1,5 @@
-import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { ContinueLink } from "@/components/auth/continue-link";
 
 export const metadata = {
@@ -22,7 +21,7 @@ export default async function VerifyEmailPage({
   const failed = Boolean(params.error);
 
   // Email verification signs the user in — offer the right destination.
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   const destination = session
     ? session.user.type === "instructor"
       ? "/instructor"

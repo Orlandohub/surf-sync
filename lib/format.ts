@@ -7,7 +7,9 @@
  *   formatSlot("09:00:00")                       → "09:00"     (slot grids)
  *   formatTimeRange("09:00:00", "11:00:00")      → "9:00–11:00"
  *   formatDayTime("2026-10-28", "09:00:00")      → "Amanhã · 9:00"
+ *   formatDayDate("2026-10-30")                  → "Sexta · 30 de outubro"  (date pickers)
  *   formatNotificationTime(createdAt)            → "há 5 min" · "Hoje · 14:30" · "Ontem · 9:10" · "25 out."
+ *   lisbonDate(createdAt)                        → "2026-10-27"  (an instant's Lisbon calendar date)
  *
  * Two kinds of input, never mixed:
  * - **Calendar dates** (`"2026-10-28"`, Postgres `date`) and **wall-clock
@@ -15,15 +17,21 @@
  *   They are formatted as written — never turned into a `Date`, so they
  *   can't shift a day on a UTC server (Vercel) or in a browser elsewhere.
  * - **Instants** (`Date` or ISO timestamp, e.g. `createdAt`) are shown in
- *   Europe/Lisbon time.
+ *   Europe/Lisbon time. To use an instant where a calendar date is
+ *   expected, convert it with `lisbonDate(instant)` first — date functions
+ *   reject timestamp strings (reading "2026-07-15T23:30Z" as 15 July would be
+ *   wrong: it is already 16 July in Lisbon).
+ *
+ * Malformed input (wrong shape, month 13, 31 April, 25:00) throws RangeError.
  *
  * "Today" is always the Lisbon calendar date. Every function that depends on
  * it takes an optional `now` (an instant) so callers and tests can pin it.
  *
  * Month and weekday names come from date-fns' `pt` locale. The handful of
  * relative words ("Hoje", "Amanhã", "Ontem", "Agora", "há … min") are locale
- * data for these formatters; the app ships PT-PT only — if a second locale
- * ever ships, move them into next-intl.
+ * data for these formatters, like the month names — a documented exception
+ * to the next-intl rule (COMPONENTS.md "In code"). The app ships PT-PT only;
+ * if a second locale ever ships, move them into next-intl.
  *
  * Pure functions, no Next/React imports: safe in Server and Client
  * Components, services and tests.
@@ -71,19 +79,36 @@ const LOCALE_DAY_INDEX: Record<DayKey, Day> = {
 
 type CalendarDate = { year: number; month: number; day: number };
 
-const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})/;
-const WALL_TIME = /^(\d{1,2}):(\d{2})/;
+// Anchored: a timestamp is not a calendar date (see the header).
+const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
+// "9:00", "09:00", "09:00:00", "09:00:00.000000" (Postgres `time`).
+const WALL_TIME = /^(\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d{1,6})?)?$/;
+
+function daysInMonth(year: number, month: number): number {
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+}
 
 function parseIsoDate(value: IsoDate): CalendarDate {
   const m = ISO_DATE.exec(value);
-  if (!m) throw new RangeError(`Expected a YYYY-MM-DD date, got "${value}"`);
-  return { year: Number(m[1]), month: Number(m[2]), day: Number(m[3]) };
+  const year = Number(m?.[1]);
+  const month = Number(m?.[2]);
+  const day = Number(m?.[3]);
+  if (!m || month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) {
+    throw new RangeError(`Expected a YYYY-MM-DD calendar date, got "${value}"`);
+  }
+  return { year, month, day };
 }
 
 function parseWallTime(value: string): { hour: number; minute: number } {
   const m = WALL_TIME.exec(value);
-  if (!m) throw new RangeError(`Expected an HH:MM time, got "${value}"`);
-  return { hour: Number(m[1]), minute: Number(m[2]) };
+  const hour = Number(m?.[1]);
+  const minute = Number(m?.[2]);
+  const second = Number(m?.[3] ?? 0);
+  // 24:00 is allowed as an end time ("até às 24:00"), nothing past it.
+  const valid =
+    !!m && minute <= 59 && second <= 59 && (hour <= 23 || (hour === 24 && minute === 0 && second === 0));
+  if (!valid) throw new RangeError(`Expected an HH:MM time, got "${value}"`);
+  return { hour, minute };
 }
 
 function toInstant(value: Instant): Date {
@@ -103,6 +128,11 @@ function pad2(n: number): string {
 
 function toIso({ year, month, day }: CalendarDate): IsoDate {
   return `${year}-${pad2(month)}-${pad2(day)}`;
+}
+
+function fromEpochDay(n: number): CalendarDate {
+  const d = new Date(n * DAY_MS);
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
 }
 
 function capitalize(s: string): string {
@@ -142,6 +172,21 @@ function lisbonParts(instant: Instant): LisbonParts {
 /** Today's calendar date in Lisbon, e.g. `"2026-10-27"` — even on a UTC server. */
 export function lisbonToday(now: Instant = new Date()): IsoDate {
   return toIso(lisbonParts(now));
+}
+
+/**
+ * The Lisbon calendar date of an instant: `lisbonDate(createdAt)` →
+ * `"2026-07-16"` for 2026-07-15T23:30Z. Use it before handing a timestamp
+ * to a date formatter (`formatDate(lisbonDate(b.requestedAt))`).
+ */
+export function lisbonDate(at: Instant): IsoDate {
+  return toIso(lisbonParts(at));
+}
+
+/** Calendar arithmetic: `addDays("2026-10-31", 1)` → `"2026-11-01"`. */
+export function addDays(date: IsoDate, days: number): IsoDate {
+  if (!Number.isInteger(days)) throw new RangeError("days must be an integer");
+  return toIso(fromEpochDay(epochDay(parseIsoDate(date)) + days));
 }
 
 /**
@@ -222,6 +267,37 @@ export function formatRelativeDay(
   return lowercase ? label.charAt(0).toLocaleLowerCase("pt-PT") + label.slice(1) : label;
 }
 
+/**
+ * A date with its weekday, for date pickers and detail lines:
+ * "Hoje · 27 de outubro", "Amanhã · 28 de outubro", "Sexta · 30 de outubro".
+ */
+export function formatDayDate(date: IsoDate, { now = new Date() }: NowOption = {}): string {
+  const diff = daysFromToday(date, now);
+  const day =
+    diff === 0 ? WORDS.today : diff === 1 ? WORDS.tomorrow : diff === -1 ? WORDS.yesterday : weekdayName(dayKeyOf(date));
+  return `${day}${SEP}${formatDate(date, { now })}`;
+}
+
+/**
+ * The next `count` calendar dates from Lisbon today (inclusive), optionally
+ * only on some weekdays — the options of a date picker:
+ * `upcomingDates(14, { days: ["sat", "sun"] })`.
+ */
+export function upcomingDates(
+  count: number,
+  { now = new Date(), days }: NowOption & { days?: readonly DayKey[] } = {},
+): IsoDate[] {
+  if (!Number.isInteger(count) || count < 0) throw new RangeError("count must be a non-negative integer");
+  const out: IsoDate[] = [];
+  if (days && days.length === 0) return out;
+  const start = epochDay(lisbonParts(now));
+  for (let n = start; out.length < count; n++) {
+    const iso = toIso(fromEpochDay(n));
+    if (!days || days.includes(dayKeyOf(iso))) out.push(iso);
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Times
 // ---------------------------------------------------------------------------
@@ -282,6 +358,40 @@ export function formatNotificationTime(at: Instant, { now = new Date() }: NowOpt
 
   const short = `${p.day} ${monthShort(p.month)}`;
   return p.year === today.year ? short : `${short} ${p.year}`;
+}
+
+export type NotificationGroup = "today" | "yesterday" | "week" | "earlier";
+
+/**
+ * Which list group an activity row belongs to (COMPONENTS.md "Notification
+ * row": Hoje · Ontem · Esta semana · Anteriores), by Lisbon calendar day.
+ * "week" is 2–6 days ago. Labels live in next-intl (`UI.notificationGroups`).
+ */
+export function notificationGroup(at: Instant, { now = new Date() }: NowOption = {}): NotificationGroup {
+  const diff = epochDay(lisbonParts(at)) - epochDay(lisbonParts(now));
+  if (diff >= 0) return "today"; // future timestamps (clock skew) count as today
+  if (diff === -1) return "yesterday";
+  if (diff >= -6) return "week";
+  return "earlier";
+}
+
+/**
+ * Splits an activity list (newest first) into consecutive day groups, in
+ * order: `[{ group: "today", items }, { group: "yesterday", items }, …]`.
+ */
+export function groupNotifications<T>(
+  items: readonly T[],
+  at: (item: T) => Instant,
+  { now = new Date() }: NowOption = {},
+): { group: NotificationGroup; items: T[] }[] {
+  const out: { group: NotificationGroup; items: T[] }[] = [];
+  for (const item of items) {
+    const group = notificationGroup(at(item), { now });
+    const last = out.at(-1);
+    if (last?.group === group) last.items.push(item);
+    else out.push({ group, items: [item] });
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------

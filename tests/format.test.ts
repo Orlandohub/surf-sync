@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   DAY_KEYS,
+  addDays,
   dayKeyOf,
   daysFromToday,
   formatDate,
+  formatDayDate,
   formatDayTime,
   formatDayTimeRange,
   formatNotificationTime,
@@ -11,8 +13,12 @@ import {
   formatSlot,
   formatTime,
   formatTimeRange,
+  groupNotifications,
+  lisbonDate,
   lisbonToday,
+  notificationGroup,
   timeOptions,
+  upcomingDates,
   weekdayLong,
   weekdayName,
   weekdayShort,
@@ -91,12 +97,26 @@ describe("formatDate", () => {
     expect(formatDate("2025-12-31", { now: NOW })).toBe("31 de dezembro de 2025");
   });
 
-  it("accepts a timestamp-shaped string and reads only its date part", () => {
-    expect(formatDate("2026-05-25T00:00:00.000Z", { now: NOW })).toBe("25 de maio");
+  it("rejects timestamps — they need lisbonDate() first", () => {
+    // 23:30 UTC on 15 July is already 16 July in Lisbon; reading the date
+    // part would silently give the wrong day.
+    expect(() => formatDate("2026-07-15T23:30:00.000Z", { now: NOW })).toThrow(RangeError);
+    expect(() => formatRelativeDay("2026-07-15T23:30:00Z", { now: NOW })).toThrow(RangeError);
+    expect(formatDate(lisbonDate("2026-07-15T23:30:00.000Z"), { now: NOW })).toBe("16 de julho");
   });
 
-  it("rejects malformed dates", () => {
+  it("rejects malformed and impossible dates", () => {
     expect(() => formatDate("25/05/2026", { now: NOW })).toThrow(RangeError);
+    expect(() => formatDate("2026-13-01", { now: NOW })).toThrow(RangeError);
+    expect(() => formatDate("2026-13-45", { now: NOW })).toThrow(RangeError);
+    expect(() => formatDate("2026-04-31", { now: NOW })).toThrow(RangeError);
+    expect(() => formatDate("2026-02-29", { now: NOW })).toThrow(RangeError);
+    expect(() => formatDate("2026-00-10", { now: NOW })).toThrow(RangeError);
+    expect(() => dayKeyOf("2026-10-00")).toThrow(RangeError);
+  });
+
+  it("accepts leap days", () => {
+    expect(formatDate("2028-02-29", { now: NOW })).toBe("29 de fevereiro de 2028");
   });
 });
 
@@ -162,8 +182,22 @@ describe("times", () => {
     expect(formatTimeRange("14:30", "17:00")).toBe("14:30–17:00");
   });
 
-  it("rejects malformed times", () => {
+  it("accepts Postgres time values with fractional seconds", () => {
+    expect(formatTime("09:00:00.000000")).toBe("9:00");
+  });
+
+  it("allows 24:00 as an end time, nothing later", () => {
+    expect(formatTimeRange("20:00", "24:00:00")).toBe("20:00–24:00");
+    expect(() => formatTime("24:30")).toThrow(RangeError);
+  });
+
+  it("rejects malformed and out-of-range times", () => {
     expect(() => formatTime("9h")).toThrow(RangeError);
+    expect(() => formatTime("25:99")).toThrow(RangeError);
+    expect(() => formatTime("09:60")).toThrow(RangeError);
+    expect(() => formatTime("09:00:61")).toThrow(RangeError);
+    expect(() => formatSlot("09:00 ")).toThrow(RangeError);
+    expect(() => formatTime("2026-10-27T09:00:00Z")).toThrow(RangeError);
   });
 });
 
@@ -178,6 +212,85 @@ describe("day + time lines", () => {
     expect(formatDayTimeRange("2026-10-28", "09:00:00", "11:00:00", { now: NOW })).toBe(
       "Amanhã · 9:00–11:00",
     );
+  });
+});
+
+describe("lisbonDate / addDays", () => {
+  it("gives an instant's Lisbon calendar date", () => {
+    expect(lisbonDate(new Date("2026-07-15T22:59:00Z"))).toBe("2026-07-15");
+    expect(lisbonDate(new Date("2026-07-15T23:30:00Z"))).toBe("2026-07-16");
+    expect(lisbonDate("2026-01-15T23:30:00Z")).toBe("2026-01-15");
+  });
+
+  it("adds calendar days across months, years and DST", () => {
+    expect(addDays("2026-10-31", 1)).toBe("2026-11-01");
+    expect(addDays("2026-12-31", 1)).toBe("2027-01-01");
+    expect(addDays("2026-03-28", 2)).toBe("2026-03-30");
+    expect(addDays("2026-03-01", -1)).toBe("2026-02-28");
+    expect(() => addDays("2026-03-01", 0.5)).toThrow(RangeError);
+  });
+});
+
+describe("formatDayDate / upcomingDates (date pickers)", () => {
+  it("pairs the relative day or weekday with the date", () => {
+    expect(formatDayDate("2026-10-27", { now: NOW })).toBe("Hoje · 27 de outubro");
+    expect(formatDayDate("2026-10-28", { now: NOW })).toBe("Amanhã · 28 de outubro");
+    expect(formatDayDate("2026-10-30", { now: NOW })).toBe("Sexta · 30 de outubro");
+    expect(formatDayDate("2026-11-10", { now: NOW })).toBe("Terça · 10 de novembro");
+    expect(formatDayDate("2027-01-04", { now: NOW })).toBe("Segunda · 4 de janeiro de 2027");
+  });
+
+  it("lists the next dates from Lisbon today", () => {
+    expect(upcomingDates(3, { now: NOW })).toEqual(["2026-10-27", "2026-10-28", "2026-10-29"]);
+    // 23:30 UTC on 15 July is 16 July in Lisbon: the list starts there.
+    expect(upcomingDates(1, { now: new Date("2026-07-15T23:30:00Z") })).toEqual(["2026-07-16"]);
+  });
+
+  it("can keep only some weekdays", () => {
+    expect(upcomingDates(4, { now: NOW, days: ["sat", "sun"] })).toEqual([
+      "2026-10-31",
+      "2026-11-01",
+      "2026-11-07",
+      "2026-11-08",
+    ]);
+    expect(upcomingDates(5, { now: NOW, days: [] })).toEqual([]);
+  });
+});
+
+describe("notificationGroup", () => {
+  const now = new Date("2026-10-27T15:00:00Z");
+
+  it.each([
+    ["2026-10-27T00:10:00Z", "today"],
+    ["2026-10-26T23:50:00Z", "yesterday"],
+    ["2026-10-25T09:00:00Z", "week"],
+    ["2026-10-21T09:00:00Z", "week"],
+    ["2026-10-20T09:00:00Z", "earlier"],
+    ["2026-10-27T15:00:30Z", "today"],
+  ] as const)("%s → %s", (at, group) => {
+    expect(notificationGroup(at, { now })).toBe(group);
+  });
+
+  it("uses the Lisbon day (summer)", () => {
+    const summerNow = new Date("2026-07-16T08:00:00Z");
+    expect(notificationGroup("2026-07-15T23:30:00Z", { now: summerNow })).toBe("today");
+    expect(notificationGroup("2026-07-15T22:30:00Z", { now: summerNow })).toBe("yesterday");
+  });
+
+  it("groups a newest-first list in order", () => {
+    const items = [
+      { id: 1, at: "2026-10-27T14:00:00Z" },
+      { id: 2, at: "2026-10-27T08:00:00Z" },
+      { id: 3, at: "2026-10-26T20:00:00Z" },
+      { id: 4, at: "2026-10-01T20:00:00Z" },
+    ];
+    expect(
+      groupNotifications(items, (i) => i.at, { now }).map((g) => [g.group, g.items.map((i) => i.id)]),
+    ).toEqual([
+      ["today", [1, 2]],
+      ["yesterday", [3]],
+      ["earlier", [4]],
+    ]);
   });
 });
 

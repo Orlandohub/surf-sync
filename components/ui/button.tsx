@@ -1,3 +1,4 @@
+import * as React from "react"
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
 import { LoaderCircle } from "lucide-react"
@@ -7,10 +8,20 @@ import { cn } from "@/lib/utils"
  * surfsync DS (COMPONENTS.md) — Button.
  * One filled primary per view; arrows only on forward navigation.
  *
- * Pending: pass `pending` and switch the label to the gerund yourself
- * ("A guardar…"). The button shows a spinner, is disabled but keeps focus,
- * and is marked aria-busy. Don't render a leading icon while pending.
+ * Pending: pass `pending` and the gerund as `pendingLabel` — don't swap
+ * the children yourself:
  *
+ *   <Button pending={saving} pendingLabel="A guardar…">Guardar alterações</Button>
+ *
+ * Both labels share one grid cell, so the button is as wide as the longer
+ * one from the start and never jumps; while pending the spinner and the
+ * gerund replace the children (leading icon included). Without
+ * `pendingLabel` the label stays (hidden) to hold the width and the
+ * spinner sits centred over it. The button is disabled but keeps focus,
+ * and is marked aria-busy.
+ *
+ * `variant="link"` is an inline text link (no height or padding, whatever
+ * the size) — for a section's "Ver todas" prefer <SectionLink>.
  * A link that looks like a button: style a Next <Link> with
  * `buttonVariants({ variant, size })` — don't nest a <button> in an <a>.
  */
@@ -39,15 +50,20 @@ const buttonVariants = cva(
         "icon-sm": "tap size-9 rounded-full",
       },
     },
+    // A text link keeps its text box whatever the size: no height, no padding.
+    compoundVariants: [{ variant: "link", className: "h-auto px-0" }],
     defaultVariants: { variant: "default", size: "default" },
   }
 )
+
+const layer = "inline-flex items-center justify-center gap-2"
 
 function Button({
   className,
   variant = "default",
   size = "default",
   pending = false,
+  pendingLabel,
   disabled,
   children,
   ...props
@@ -55,7 +71,29 @@ function Button({
   VariantProps<typeof buttonVariants> & {
     /** Shows a spinner and blocks clicks while an action runs. */
     pending?: boolean
+    /** The gerund shown while pending ("A guardar…"). */
+    pendingLabel?: React.ReactNode
   }) {
+  let content: React.ReactNode = children
+  if (pendingLabel !== undefined) {
+    content = (
+      <span data-slot="button-label" className="grid place-items-center *:col-start-1 *:row-start-1">
+        <span className={cn(layer, pending && "invisible")}>{children}</span>
+        <span className={cn(layer, !pending && "invisible")}>
+          <LoaderCircle aria-hidden strokeWidth={1.75} className={cn(pending && "animate-spin")} />
+          {pendingLabel}
+        </span>
+      </span>
+    )
+  } else if (pending) {
+    content = (
+      <>
+        <span className={cn(layer, "invisible")}>{children}</span>
+        <LoaderCircle aria-hidden strokeWidth={1.75} className="absolute inset-0 m-auto animate-spin" />
+      </>
+    )
+  }
+
   return (
     <ButtonPrimitive
       data-slot="button"
@@ -63,13 +101,10 @@ function Button({
       aria-busy={pending || undefined}
       disabled={disabled || pending}
       focusableWhenDisabled={pending || undefined}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(buttonVariants({ variant, size, className }), pending && pendingLabel === undefined && "relative")}
       {...props}
     >
-      {pending && (
-        <LoaderCircle aria-hidden strokeWidth={1.75} className="animate-spin" />
-      )}
-      {children}
+      {content}
     </ButtonPrimitive>
   )
 }

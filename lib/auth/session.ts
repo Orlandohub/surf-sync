@@ -6,8 +6,9 @@ import { auth } from "@/lib/auth/server";
  * The current Better-Auth session, read once per request.
  *
  * Wrapped in React `cache()`, so the root layout (which needs it for the
- * nav) and a page that calls this too share one lookup. Pages may keep
- * calling `auth.api.getSession` directly; switching to this saves a query.
+ * nav) and the page share one lookup. In pages and layouts always use
+ * this, not `auth.api.getSession` (that would be a second DB query).
+ * Server Actions keep calling `auth.api.getSession` (no render cache there).
  */
 export const getSession = cache(async () => auth.api.getSession({ headers: await headers() }));
 

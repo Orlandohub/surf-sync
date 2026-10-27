@@ -84,7 +84,8 @@ export function Toaster() {
           description: "text-meta opacity-80",
           icon: "flex size-5 shrink-0 items-center justify-center",
           actionButton:
-            "tap shrink-0 cursor-pointer text-label text-inverse-primary underline-offset-4 outline-none hover:underline focus-visible:underline",
+            "tap shrink-0 cursor-pointer rounded-chip text-label text-inverse-primary underline-offset-4 outline-none hover:underline " +
+            "focus-visible:underline focus-visible:ring-2 focus-visible:ring-inverse-primary focus-visible:ring-offset-2 focus-visible:ring-offset-inverse",
         },
       }}
     />

@@ -1,8 +1,7 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 
 export async function generateMetadata() {
   const t = await getTranslations("SignInPage");
@@ -11,7 +10,7 @@ export async function generateMetadata() {
 
 export default async function SignInPage() {
   // Signed-in users skip the login form.
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (session) redirect("/");
 
   return (

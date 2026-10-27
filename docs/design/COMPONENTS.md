@@ -231,7 +231,7 @@ Label above, `text-meta font-medium`, always visible. Input `h-12 rounded-contro
 
 ### Switch
 
-shadcn `Switch`: track `bg-input data-[state=checked]:bg-primary`, thumb `bg-card shadow-card`, thumb travel `duration-instant ease-move`. Label on the left, switch on the right, full row tappable. Changes in a settings list apply immediately; on a form screen they wait for "Guardar alterações".
+shadcn `Switch`: track `bg-control-off data-[state=checked]:bg-primary`, thumb `bg-card shadow-card`, thumb travel `duration-instant ease-move`. The off track is `--control-off` (atlantic-500, 4.3:1 on a card), not the deck's pale `bg-input` (1.7:1): a switch's state must read at 3:1 (WCAG 1.4.11). Label on the left, switch on the right, full row tappable. Changes in a settings list apply immediately; on a form screen they wait for "Guardar alterações".
 
 ### Day chips (weekday selector)
 
@@ -305,17 +305,20 @@ Where each spec above lives. Copy goes through next-intl; dates and times throug
 
 | Spec | Import | Notes |
 |---|---|---|
-| App bar, Bottom tab bar | `components/shell/*` (mounted in `app/layout.tsx`) | Session read on the server; tabs per user type in `nav-items.ts`. `--top-chrome` / `--bottom-chrome` CSS vars give the bar heights. |
+| App bar, Bottom tab bar | `components/shell/*` (mounted in `app/layout.tsx`) | Session and unread-notification count read on the server; tabs per user type in `nav-items.ts` (`unread: true` marks the item that carries the count). `--top-chrome` / `--bottom-chrome` CSS vars give the bar heights. Focusable content and `[id]` anchors already keep clear of both bars (scroll-margin in `globals.css`). |
 | Page frame | `PageContainer` — `components/shell/page-container` | `<main>`, `max-w-5xl` (or `width="narrow"` = `max-w-2xl`), `px-gutter`, `gap-section`. |
 | App bar title | `PageHeader` — `components/ui/page-header` | `text-headline` h1, description, back link, one action. No eyebrow. |
 | Section head | `SectionHeading`, `SectionLink` — `components/ui/section-heading` | `text-title-sm`; "Ver todas ›". |
-| Button | `Button`, `buttonVariants` — `components/ui/button` | `pending` prop; links styled with `buttonVariants()`. |
+| Button | `Button`, `buttonVariants` — `components/ui/button` | `pending` + `pendingLabel` (width locked); links styled with `buttonVariants()`; `variant="link"` is an inline text link at any size. |
 | Badge / status | `Badge` — `components/ui/badge`; `StatusBadge`, `bookingStatusTone/Icon` — `components/brand/status-badge` | One booking-status → tone map for every screen. |
 | Card | `Card…` — `components/ui/card` | |
-| Lesson row, Action banner, Menu row | `LinkRow`, `RowIcon`, `ActionBanner`, `MenuGroup`, `MenuRow` — `components/ui/list-row` | |
+| Lesson row, Action banner, Menu row | `LinkRow`, `RowIcon`, `ActionBanner`, `MenuGroup`, `MenuRow` — `components/ui/list-row` | Max 2 badges per row, status included. |
+| Row with actions (booking requests) | `ItemRow` — `components/ui/list-row` | Same anatomy as LinkRow, not a link; `status` + `actions` slots. |
+| Notification row | `NotificationGroup`, `NotificationRow` — `components/ui/list-row`; `groupNotifications()` — `lib/format` | Hoje · Ontem · Esta semana · Anteriores. |
 | Stat tile | `StatTile` — `components/ui/stat-tile` | |
 | Tabs | `Tabs…` — `components/ui/tabs` (client state); `LinkTabs` — `components/ui/link-tabs` (URL state) | Same look. |
-| Text field | `Field`, `FieldError` + `Input` / `Textarea` / `Select` / `TimeSelect` | `Field` wires label, helper, error and aria onto the control. |
+| Text field | `Field`, `FieldError` + `Input` / `Textarea` / `Select` / `TimeSelect` / `DateSelect` | `Field` wires label, helper, error and aria onto the control and owns its id. Field errors are announced (live region); a standalone `FieldError` is `role="alert"`. |
+| Date picker | `DateSelect` — `components/ui/date-select` | Native select of the next days ("Amanhã · 28 de outubro"), submits `YYYY-MM-DD`. Never `<input type="date">`. |
 | Switch | `Switch`, `SwitchRow` — `components/ui/switch` | |
 | Day chips | `DayChips`, `ChipToggleGroup` — `components/ui/chip-toggle-group` | `name` submits hidden inputs. |
 | Avatar & stack | `Avatar`, `AvatarStack` — `components/ui/avatar` | Sizes 32 / 44 / 88 / 96. |
@@ -323,4 +326,5 @@ Where each spec above lives. Copy goes through next-intl; dates and times throug
 | Toast | `toast()` — `components/ui/toast` | `<Toaster />` is in the root layout. |
 | Empty state | `EmptyState` — `components/ui/empty-state` | |
 | Loading | `Skeleton`, `SkeletonRow` — `components/ui/skeleton` | |
-| Availability glyph | `CalendarWave` — `components/brand/icons` | |
+| Availability glyph | `CalendarWave` — `components/brand/icons` | Every `icon` prop takes `IconComponent` (Lucide or ours). |
+| Dates & times | `lib/format` | Calendar dates are `YYYY-MM-DD` only; convert timestamps with `lisbonDate()`. Its relative words (Hoje, Amanhã, Ontem, Agora, há N min) are locale data like date-fns' month names — the one exception to "all copy through next-intl". |

@@ -1,8 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LogoLockup, LogoMark } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { StableLabel } from "@/components/ui/tab-styles";
 import { cn } from "@/lib/utils";
 import type { ShellUser } from "@/lib/auth/session";
 import { AccountMenu } from "@/components/shell/account-menu";
+import { UnreadBadge } from "@/components/shell/unread-badge";
 import { homeHrefFor, navItemsFor } from "@/components/shell/nav-items";
 
 // Glass only once content scrolls under the bar (DESIGN.md G1).
@@ -22,6 +23,9 @@ const notScrolled = () => false;
 
 // Auth screens carry their own primary action; the bar stays quiet there.
 const AUTH_PATHS = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password", "/verify-email"];
+// The server redirects signed-in people away from these, so reaching one
+// with a `user` means the root layout's session is stale.
+const SIGNED_OUT_ONLY = ["/sign-in", "/sign-up"];
 
 /**
  * App bar (COMPONENTS.md "App bar"), sticky, `--top-chrome` tall.
@@ -33,27 +37,45 @@ const AUTH_PATHS = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password
  * 640px the lockup shrinks to the mark so all three fit at 360px.
  *
  * `user` comes from the server (root layout), so the first paint is
- * already right — no client session fetch, no flash.
+ * already right — no client session fetch, no flash. The root layout isn't
+ * re-rendered on client navigation: if a soft redirect lands a "signed-in"
+ * header on /sign-in (session revoked elsewhere), it refreshes once.
+ *
+ * `unread` (unread notifications) shows as a count on the item flagged
+ * `unread` in nav-items.ts. It updates with the layout — `router.refresh()`
+ * after marking notifications read.
  */
-export function SiteHeader({ user }: { user: ShellUser | null }) {
+export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unread?: number }) {
   const t = useTranslations("Nav");
   const pathname = usePathname();
+  const router = useRouter();
   const scrolled = useSyncExternalStore(subscribeScroll, isScrolled, notScrolled);
   const items = user ? navItemsFor(user.type).filter((item) => item.desktop) : [];
+
+  const refreshedFor = useRef<string | null>(null);
+  const stale = !!user && SIGNED_OUT_ONLY.includes(pathname);
+  useEffect(() => {
+    if (!stale || refreshedFor.current === pathname) return;
+    refreshedFor.current = pathname;
+    router.refresh();
+  }, [stale, pathname, router]);
 
   return (
     <header
       data-slot="app-bar"
       className={cn(
-        "sticky top-0 z-40 transition-[background-color,border-color,box-shadow] duration-(--duration-fast) ease-move",
-        scrolled ? "glass" : "border border-transparent bg-background",
+        // Exactly --top-chrome tall, bottom hairline included (border-box),
+        // so sticky sub-headers at top-(--top-chrome) meet it flush.
+        "sticky top-0 z-40 h-(--top-chrome) border-b transition-[background-color,border-color,box-shadow] duration-(--duration-fast) ease-move",
+        scrolled ? "glass border-x-0! border-t-0!" : "border-transparent bg-background",
       )}
     >
-      <div className="mx-auto flex h-(--top-chrome) w-full max-w-5xl items-center gap-8 px-gutter">
+      <div className="mx-auto flex h-full w-full max-w-5xl items-center gap-8 px-gutter">
         <Link
           href={user ? homeHrefFor(user.type) : "/"}
           aria-label={t("home")}
-          className="tap flex shrink-0 items-center rounded-chip text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          // Padded so the focus ring clears the lockup (DESIGN.md §10 clear space).
+          className="tap -mx-2 flex shrink-0 items-center rounded-control p-2 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {user ? (
             <LogoLockup height={24} />
@@ -84,6 +106,7 @@ export function SiteHeader({ user }: { user: ShellUser | null }) {
                       )}
                     >
                       <StableLabel>{t(item.label)}</StableLabel>
+                      {item.unread && unread > 0 && <UnreadBadge count={unread} className="ml-1.5" />}
                     </Link>
                   </li>
                 );

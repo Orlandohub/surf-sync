@@ -252,6 +252,7 @@
 
   --border: var(--color-atlantic-200);
   --input: var(--color-atlantic-300);
+  --control-off: var(--color-atlantic-500);        /* switch track off: 4.3:1 on card (WCAG 1.4.11) */
   --ring: var(--color-ocean-600);                  /* 3.8:1 on canvas */
 
   /* surfsync roles */
@@ -349,6 +350,7 @@
 
   --border: var(--color-atlantic-800);
   --input: var(--color-atlantic-700);
+  --control-off: var(--color-atlantic-500);        /* 3.5:1 on card */
   --ring: var(--color-ocean-400);
 
   --brand: var(--color-ocean-500);
@@ -429,6 +431,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-control-off: var(--control-off);
   --color-ring: var(--ring);
 
   --color-brand: var(--brand);
@@ -555,11 +558,8 @@
 
   /* App shell chrome (components/shell). Read these, never hard-code the
      bar heights:
-       --top-chrome     height of the sticky top bar → sticky sub-headers
-                        use top-(--top-chrome); anchor targets use
-                        scroll-mt-(--top-chrome). (Not scroll-padding on
-                        <html>: it makes focusing the sticky bar's own
-                        links scroll the page.)
+       --top-chrome     height of the sticky top bar (hairline included) →
+                        sticky sub-headers use top-(--top-chrome).
        --bottom-chrome  space the fixed bottom chrome takes: the mobile tab
                         bar (+ home-indicator inset) when it is rendered,
                         else just the inset. The layout pads <body> with it;
@@ -583,6 +583,17 @@
   body {
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Focus never lands under the bars (WCAG 2.4.11): anything in the page
+     content that can be scrolled into view — focusable controls, anchor
+     targets — keeps clear of the sticky top bar and the fixed tab bar.
+     Scoped to #conteudo on purpose: scroll-padding on <html> would also
+     apply to the bars' own links and scroll the page when they get focus.
+     A sticky element of your own in the content: add its height with
+     the scroll-mt / scroll-mb utilities (they win over this). */
+  :where(#conteudo) :where(a[href], button, input, select, textarea, summary, [tabindex], [id]) {
+    scroll-margin-block: calc(var(--top-chrome) + 0.5rem) calc(var(--bottom-chrome) + 0.5rem);
   }
 
   @media (prefers-reduced-motion: reduce) {

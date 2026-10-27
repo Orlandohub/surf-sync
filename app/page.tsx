@@ -1,15 +1,14 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { ArrowRight, Compass, Waves } from "lucide-react";
 import { LogoLockup } from "@/components/brand/logo";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 
 export default async function Home() {
   // Authenticated users never see the marketing page — straight to
   // their own dashboard.
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (session) {
     redirect(session.user.type === "instructor" ? "/instructor" : "/school");
   }

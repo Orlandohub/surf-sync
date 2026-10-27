@@ -1,6 +1,5 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { searchInstructors, listLocations, searchSchema } from "@/lib/services/discovery";
 import { DiscoverySearch } from "@/components/school/discovery-search";
 import { getTranslations } from "next-intl/server";
@@ -15,7 +14,7 @@ export default async function DiscoveryPage({
 }: {
   searchParams: Promise<{ location?: string; experience?: string; day?: string }>;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) redirect("/sign-in");
   if (session.user.type !== "school_staff") redirect("/");
 

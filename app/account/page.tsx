@@ -1,6 +1,5 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { AccountSettings } from "@/components/auth/account-settings";
 import { getTranslations } from "next-intl/server";
 
@@ -10,7 +9,7 @@ export async function generateMetadata() {
 }
 
 export default async function AccountSettingsPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) redirect("/sign-in");
 
   return (

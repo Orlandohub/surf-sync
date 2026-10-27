@@ -19,13 +19,19 @@ import { useFieldControlProps } from "@/components/ui/field"
  *     </Select>
  *   </Field>
  *
- * `className` goes on the wrapper (width/layout); the select fills it.
+ * `className` is layout only (width, margins) and goes on the wrapper,
+ * which the select fills. To restyle the control itself (rare) use
+ * `selectClassName`.
  */
 function Select({
   className,
+  selectClassName,
   children,
   ...props
-}: React.ComponentProps<"select">) {
+}: React.ComponentProps<"select"> & {
+  /** Classes for the <select> itself; `className` sizes the wrapper. */
+  selectClassName?: string
+}) {
   const fieldProps = useFieldControlProps(props)
   return (
     <div data-slot="select" className={cn("relative w-full", className)}>
@@ -33,7 +39,8 @@ function Select({
         data-slot="select-control"
         className={cn(
           controlClassName,
-          "h-12 cursor-pointer appearance-none truncate pr-11 pl-4 tabular-nums"
+          "h-12 cursor-pointer appearance-none truncate pr-11 pl-4 tabular-nums",
+          selectClassName
         )}
         {...fieldProps}
       >

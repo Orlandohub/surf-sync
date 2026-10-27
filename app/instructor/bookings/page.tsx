@@ -1,6 +1,5 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { listInstructorBookings } from "@/lib/services/booking";
 import { listNotifications, unreadCount } from "@/lib/services/notifications";
 import { InstructorBookings } from "@/components/instructor/instructor-bookings";
@@ -12,7 +11,7 @@ export async function generateMetadata() {
 }
 
 export default async function InstructorBookingsPage() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (!session) redirect("/sign-in");
   if (session.user.type !== "instructor") redirect("/");
 
