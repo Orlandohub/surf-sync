@@ -30,13 +30,18 @@ export async function Hero() {
         <MarkBackdrop className="-top-24 -right-40 size-120 text-brand-panel-foreground/5 md:top-auto md:right-auto md:-bottom-64 md:-left-48 md:size-200" />
 
         <div className={marketingColumn}>
-          <div className="flex min-w-0 flex-col pt-8 pb-10 sm:pt-14 sm:pb-12 md:w-7/12 md:py-20 md:pr-10 lg:py-24 xl:w-2/3 xl:py-32">
+          {/* A size container: the headline steps up with the column's
+              width in rem, not the viewport's, so raising the browser's
+              text size never sets 72 px type in a column too narrow for it. */}
+          <div className="@container flex min-w-0 flex-col pt-8 pb-10 sm:pt-14 sm:pb-12 md:w-7/12 md:py-20 md:pr-10 lg:py-24 xl:w-2/3 xl:py-32">
             <LogoLockup height={32} className="mb-12 self-start text-brand-panel-foreground sm:hidden" />
             <h1
               id="hero-title"
               className={cn(
                 displayWrap,
-                "font-display text-display-sm text-balance lowercase sm:text-display xl:text-display-lg",
+                // 32 px on phones, 48 px from a 22rem column (tablets), 72 px
+                // from 36rem (desktop at 100%: 38.5rem).
+                "font-display text-display-sm text-balance lowercase @min-[22rem]:text-display @min-[36rem]:text-display-lg",
               )}
             >
               {t("hero.title")}
@@ -44,7 +49,7 @@ export async function Hero() {
             <p className="mt-6 max-w-prose text-body-lg text-brand-panel-foreground/80 lg:mt-8">
               {t("hero.tagline")}
             </p>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href="/sign-up"
                 className={cn(

@@ -106,7 +106,7 @@ export function ProfileForm({
   }
 
   return (
-    <div className="grid items-start gap-section lg:grid-cols-3">
+    <div className="grid grid-cols-1 items-start gap-section lg:grid-cols-3">
       <form
         id={formId}
         ref={formRef}

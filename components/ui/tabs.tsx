@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import {
   StableLabel,
   tabsListClassName,
+  tabsScrollClassName,
   tabsTriggerClassName,
 } from "@/components/ui/tab-styles"
 
@@ -38,19 +39,26 @@ function Tabs({ className, ...props }: TabsPrimitive.Root.Props) {
   )
 }
 
+/**
+ * When the tabs don't fit (a count badge on a 360px phone, larger text)
+ * the strip scrolls sideways inside its wrapper, as LinkTabs does; the
+ * page never does.
+ */
 function TabsList({ className, children, ...props }: TabsPrimitive.List.Props) {
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      className={cn(tabsListClassName, className)}
-      {...props}
-    >
-      {children}
-      <TabsPrimitive.Indicator
-        renderBeforeHydration
-        className="absolute -bottom-px left-0 h-0.5 w-(--active-tab-width) translate-x-(--active-tab-left) rounded-full bg-primary transition-[translate,width] duration-(--duration-base) ease-move"
-      />
-    </TabsPrimitive.List>
+    <div data-slot="tabs-scroll" className={tabsScrollClassName}>
+      <TabsPrimitive.List
+        data-slot="tabs-list"
+        className={cn(tabsListClassName, "min-w-max", className)}
+        {...props}
+      >
+        {children}
+        <TabsPrimitive.Indicator
+          renderBeforeHydration
+          className="absolute -bottom-px left-0 h-0.5 w-(--active-tab-width) translate-x-(--active-tab-left) rounded-full bg-primary transition-[translate,width] duration-(--duration-base) ease-move"
+        />
+      </TabsPrimitive.List>
+    </div>
   )
 }
 

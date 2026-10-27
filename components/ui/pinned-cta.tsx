@@ -16,8 +16,10 @@ const INLINE = {
  * the tab bar; DESIGN.md "One job per screen").
  *
  * Below `until` (md by default, or lg) the bar is fixed right above the
- * bottom chrome (tab bar + home indicator): full-bleed, top hairline,
- * `min-h-cta` (80 px: pt-3 + Button size lg + pb-4), the same everywhere.
+ * tab bar, or at the bottom edge where there is none (tablets), padded
+ * above the home indicator and clear of a landscape notch: full-bleed,
+ * top hairline, `min-h-cta` (80 px: pt-3 + Button size lg + pb-4), the
+ * same everywhere.
  * From `until` it is an ordinary row where it sits in the form, actions
  * right-aligned. While it is pinned globals.css adds it to
  * --bottom-clearance, so the page's bottom padding, the focus
@@ -78,7 +80,9 @@ function PinnedCta({
       data-slot="pinned-cta"
       data-pinned-cta={until}
       className={cn(
-        "fixed inset-x-0 bottom-(--bottom-chrome) z-30 flex min-h-cta flex-col justify-center gap-3 bg-background px-gutter pt-3 pb-4",
+        // On the tab bar, or (no tab bar) at the bottom edge padded above
+        // the home indicator; see --pinned-cta-* in globals.css.
+        "fixed inset-x-0 bottom-(--pinned-cta-bottom) z-30 flex min-h-cta flex-col justify-center gap-3 bg-background pt-3 pr-(--pinned-cta-pr) pb-(--pinned-cta-pb) pl-(--pinned-cta-pl)",
         "before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-border",
         "md:flex-row md:items-center md:justify-end",
         INLINE[until],

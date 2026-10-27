@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Compass } from "lucide-react";
+import { ArrowRight, Compass } from "lucide-react";
 import { getSession, toShellUser } from "@/lib/auth/session";
 import { homeHrefFor } from "@/components/shell/nav-items";
 import { PageContainer } from "@/components/shell/page-container";
@@ -21,7 +21,7 @@ export default async function NotFound() {
   const user = toShellUser(session);
 
   return (
-    <PageContainer width="narrow" className="justify-center">
+    <PageContainer width="narrow" className="items-center justify-center">
       <EmptyState
         as="h1"
         icon={Compass}
@@ -30,6 +30,7 @@ export default async function NotFound() {
         action={
           <Link href={user ? homeHrefFor(user.type) : "/"} className={buttonVariants()}>
             {t("backHome")}
+            <ArrowRight aria-hidden strokeWidth={1.75} />
           </Link>
         }
       />

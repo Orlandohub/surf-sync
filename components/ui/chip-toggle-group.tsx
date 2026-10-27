@@ -56,8 +56,10 @@ type ChipToggleGroupProps<V extends string> = {
   "aria-describedby"?: string
 }
 
+// min-h, not h: a label longer than the group is wide ("Costa da Caparica
+// Norte" at 200% text) wraps inside its chip instead of widening the page.
 const chipClassName =
-  "tap inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 text-meta font-medium whitespace-nowrap select-none outline-none " +
+  "tap inline-flex min-h-9 max-w-full cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 py-1.5 text-center text-meta font-medium text-balance wrap-break-word select-none outline-none " +
   "bg-muted text-muted-foreground transition-[background-color,color,transform] duration-(--duration-fast) ease-move " +
   "hover:text-foreground active:scale-98 " +
   "data-pressed:bg-primary data-pressed:text-primary-foreground data-pressed:hover:bg-primary-hover " +
@@ -120,12 +122,17 @@ function ChipToggleGroup<V extends string>({
 
 /**
  * Weekday selector: SEG TER QUA QUI SEX SÁB DOM, Monday first, values are
- * the DB day keys ("mon" … "sun"). A 7-column grid, so the week always
- * fits one row — down to 320px of content width.
+ * the DB day keys ("mon" … "sun"). A 7-column grid, so the week is one
+ * row of equal chips — down to 320px of content width at 100% text. The
+ * wrapper is a size container (rem-based): below 17rem (larger text on a
+ * phone) the chips keep a 44px minimum and wrap onto a second row instead
+ * of running into each other.
  *
  *   <Field label="Dias da semana" group>
  *     <DayChips name="days" value={days} onValueChange={setDays} />
  *   </Field>
+ *
+ * `className` goes on the wrapper (width, margins).
  */
 function DayChips({
   className,
@@ -142,16 +149,18 @@ function DayChips({
     []
   )
   return (
-    <ChipToggleGroup<DayKey>
-      {...props}
-      options={options}
-      className={cn("grid max-w-md grid-cols-7 gap-1.5", className)}
-      chipClassName={cn(
-        // design-lint-disable-next-line SS09 -- weekday labels (COMPONENTS.md "Day chips")
-        "min-w-0 px-0 text-caption uppercase tabular-nums",
-        chipExtra
-      )}
-    />
+    <div data-slot="day-chips" className={cn("@container w-full max-w-md", className)}>
+      <ChipToggleGroup<DayKey>
+        {...props}
+        options={options}
+        className="grid grid-cols-7 gap-1.5 @max-[17rem]:flex @max-[17rem]:flex-wrap"
+        chipClassName={cn(
+          // design-lint-disable-next-line SS09 -- weekday labels (COMPONENTS.md "Day chips")
+          "min-w-0 px-0 text-caption uppercase tabular-nums @max-[17rem]:min-w-11 @max-[17rem]:px-2",
+          chipExtra
+        )}
+      />
+    </div>
   )
 }
 

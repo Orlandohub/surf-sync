@@ -76,8 +76,10 @@ function useFocusAfterRemoval() {
       const control = target.next?.isConnected
         ? target.next.querySelector<HTMLElement>("button:not(:disabled), a[href]")
         : null;
+      // The current tab (visible focus) before the section's heading.
       const landmark = target.section?.isConnected
-        ? target.section.querySelector<HTMLElement>("h2, h3, [aria-current=page]")
+        ? (target.section.querySelector<HTMLElement>("[aria-current=page]") ??
+          target.section.querySelector<HTMLElement>("h2, h3"))
         : null;
       const next = control ?? landmark ?? document.getElementById("conteudo");
       if (!next) return;
@@ -93,6 +95,8 @@ function useFocusAfterRemoval() {
  * Recusar: outline, opens a confirmation with an optional reason. `list`
  * is where the row is: Pedidos, or Histórico for a request nobody answered
  * whose day has passed (declining it tells the school it's closed).
+ * A refusal from the server stays in the dialog, inline (role=alert), with
+ * the reason kept; closing it then refreshes the list.
  */
 export function DeclineAction({
   booking,
@@ -103,6 +107,7 @@ export function DeclineAction({
   const { refresh } = useRefresh(list);
   const { anchorRef, plan } = useFocusAfterRemoval();
   const [reason, setReason] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const day = formatRelativeDay(booking.bookingDate, { lowercase: true });
 
   return (
@@ -119,16 +124,26 @@ export function DeclineAction({
       confirmLabel={t("decline.confirm")}
       pendingLabel={t("decline.pending")}
       tone="destructive"
+      error={error}
       onOpenChange={(open) => {
-        if (!open) setReason("");
+        if (open) return;
+        setReason("");
+        if (!error) return;
+        // The server refused (usually: the school cancelled meanwhile).
+        // Show the booking's real state now that the dialog is closed.
+        setError(null);
+        plan();
+        refresh();
       }}
       onConfirm={async () => {
         const res = await respondBookingAction(booking.id, false, reason.trim() || undefined);
+        if (!res.ok) {
+          // Inline, in the dialog: the typed reason stays for a retry.
+          setError(res.error);
+          return false;
+        }
         plan();
-        // Answered or not, the list is refreshed: a request someone already
-        // answered (the usual failure) leaves the list too.
-        if (res.ok) toast(t("decline.done"));
-        else toast.error(res.error);
+        toast(t("decline.done"));
         refresh();
       }}
     >
@@ -188,12 +203,13 @@ export function AcceptAction({ booking, when }: ActionProps) {
 /**
  * Cancelar aula: outline, behind a confirmation. A lone action, so ItemRow
  * keeps it compact on phones: a list of lessons isn't a column of
- * full-width destructive buttons.
+ * full-width destructive buttons. Server refusals show in the dialog.
  */
 export function CancelAction({ booking, when }: ActionProps) {
   const t = useTranslations("InstructorBookingRow");
   const { refresh } = useRefresh("upcoming");
   const { anchorRef, plan } = useFocusAfterRemoval();
+  const [error, setError] = useState<string | null>(null);
   const day = formatRelativeDay(booking.bookingDate, { lowercase: true });
 
   return (
@@ -210,11 +226,21 @@ export function CancelAction({ booking, when }: ActionProps) {
       confirmLabel={t("cancel.confirm")}
       pendingLabel={t("cancel.pending")}
       tone="destructive"
+      error={error}
+      onOpenChange={(open) => {
+        if (open || !error) return;
+        setError(null);
+        plan();
+        refresh();
+      }}
       onConfirm={async () => {
         const res = await cancelBookingAction(booking.id);
+        if (!res.ok) {
+          setError(res.error);
+          return false;
+        }
         plan();
-        if (res.ok) toast(t("cancel.done"));
-        else toast.error(res.error);
+        toast(t("cancel.done"));
         refresh();
       }}
     />

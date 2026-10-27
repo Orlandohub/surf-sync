@@ -333,12 +333,15 @@ type MenuRowProps = {
   /**
    * Trailing muted value ("Ativo", an email, a count) or a badge. When
    * label and value don't fit on one line (a narrow column, large text),
-   * the value moves under the label instead of truncating it.
+   * the value moves under the label instead of truncating it (and a value
+   * longer than the row, an email at 200% text, wraps).
    */
   value?: React.ReactNode
   /**
-   * End of a static row, never shrinks: a badge ("Esta sessão") or a small
-   * outline Button ("Terminar"). Only on rows without `href`/`onClick`/
+   * End of a static row: a badge ("Este dispositivo") or a small outline
+   * Button ("Terminar"). Beside the label while both fit; when they don't
+   * (a narrow column, large text) it moves to its own line under the label
+   * and description, right-aligned. Only on rows without `href`/`onClick`/
    * `type` (no control inside a link or a button).
    */
   trailing?: React.ReactNode
@@ -358,8 +361,8 @@ type MenuRowProps = {
  * One row, 52px (taller with a `description`). A link with `href`
  * (chevron), a button with `onClick` or `type="submit"` (no chevron),
  * otherwise a static label/value row, which may end in a `trailing`
- * badge or button. The label is one truncated line, or wraps when the row
- * has a description.
+ * badge or button. The label is one line while it fits and wraps (never
+ * truncates) when it doesn't — a narrow column, large text.
  *
  * Button rows: `pending` while the action runs; `aria-disabled` (rather
  * than `disabled`, which drops keyboard focus) for a row that can't act
@@ -383,6 +386,7 @@ function MenuRow({
   const iconTone = destructive ? "text-destructive" : "text-muted-foreground"
   const hasValue = value != null && value !== false && value !== ""
   const hasDescription = description != null && description !== false && description !== ""
+  const showTrailing = trailing != null && trailing !== false && !href && !isButton
 
   if (process.env.NODE_ENV !== "production" && trailing && (href || isButton)) {
     console.warn("MenuRow: `trailing` is only rendered on static rows (no href, onClick or type).")
@@ -395,15 +399,21 @@ function MenuRow({
           aria-hidden
           data-slot="menu-row-icon"
           strokeWidth={1.75}
-          className={cn("size-5 shrink-0", iconTone, busy && "animate-spin")}
+          // Decorative: in a row under 16rem (large text on a phone) it
+          // gives its room to the label. A pending spinner always shows.
+          className={cn("size-5 shrink-0", iconTone, busy ? "animate-spin" : "@max-3xs:hidden")}
         />
       )}
       {/* Label and value share a line while they fit; when they don't,
           the value moves under the label (right-aligned) rather than
-          squeezing it. The label truncates only if it alone doesn't fit. */}
+          squeezing it. The label wraps only if it alone doesn't fit.
+          `trailing` does the same: beside the label while both fit, else
+          on its own line under the label and description. */}
       <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3">
         <span className="flex max-w-full min-w-0 grow flex-col">
-          <span className={hasDescription ? "break-words text-pretty" : "truncate"}>{label}</span>
+          {/* Wraps, never truncates: at large text a label that doesn't
+              fit on one line keeps all its words. */}
+          <span className="wrap-break-word hyphens-auto text-pretty">{label}</span>
           {hasDescription && (
             // w-0 min-w-full: wraps to the row's width without making the
             // label block wide enough to push the value down.
@@ -413,15 +423,24 @@ function MenuRow({
           )}
         </span>
         {hasValue && (
-          <span className="ml-auto max-w-full min-w-0 truncate text-meta text-muted-foreground tabular-nums">
+          <span className="ml-auto max-w-full min-w-0 text-right text-meta wrap-anywhere text-muted-foreground tabular-nums">
             {value}
+          </span>
+        )}
+        {showTrailing && (
+          // my-1 keeps it off the label when it wraps; a badge in it may
+          // wrap its own words rather than be clipped by the card.
+          <span
+            data-slot="menu-row-trailing"
+            className="my-1 ml-auto flex max-w-full items-center self-center *:data-[slot=badge]:h-auto *:data-[slot=badge]:min-h-6 *:data-[slot=badge]:whitespace-normal"
+          >
+            {trailing}
           </span>
         )}
       </span>
       {busy && !Icon && (
         <LoaderCircle aria-hidden strokeWidth={1.75} className={cn("size-5 shrink-0 animate-spin", iconTone)} />
       )}
-      {trailing && !href && !isButton && <span className="flex shrink-0 items-center">{trailing}</span>}
       {href && !destructive && (
         <ChevronRight aria-hidden className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.75} />
       )}
@@ -477,7 +496,9 @@ function MenuRow({
     <li
       data-slot="menu-row"
       className={cn(
-        "relative",
+        // A size container: the row lays out by its own width in rem, so
+        // larger text counts (see the icon and `trailing`).
+        "@container relative",
         // Inset divider: starts at the text, not the card edge.
         "not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-card not-first:before:h-px not-first:before:bg-border",
         "not-first:has-data-[slot=menu-row-icon]:before:left-12"

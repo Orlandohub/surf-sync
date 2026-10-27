@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils"
 /**
  * surfsync DS — section head inside a page ("Próximas aulas",
  * "Estatísticas"): `text-title-sm`, optional muted description, optional
- * trailing action — usually a <SectionLink> ("Ver todas").
+ * trailing action — usually a <SectionLink> ("Ver todas"), which moves
+ * under the title when the two don't fit on one line.
  * Sections stack with `gap-section`; heading → content is `gap-3`.
  *
  *   <section className="flex flex-col gap-3">
@@ -33,7 +34,9 @@ function SectionHeading({
   return (
     <div
       data-slot="section-heading"
-      className={cn("flex items-end justify-between gap-4", className)}
+      // The action drops under the title when both don't fit on one line
+      // (large text on a phone) instead of widening the page.
+      className={cn("flex flex-wrap items-end justify-between gap-x-4 gap-y-1", className)}
     >
       <div className="flex min-w-0 flex-col gap-0.5">
         <Heading id={id} className="text-title-sm text-foreground">
@@ -41,7 +44,7 @@ function SectionHeading({
         </Heading>
         {description && <p className="text-meta text-muted-foreground">{description}</p>}
       </div>
-      {action && <div className="flex shrink-0 items-center">{action}</div>}
+      {action && <div className="flex max-w-full items-center">{action}</div>}
     </div>
   )
 }

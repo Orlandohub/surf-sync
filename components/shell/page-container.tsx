@@ -12,10 +12,15 @@ import { cn } from "@/lib/utils";
  *     <section>…</section>
  *   </PageContainer>
  *
- *   <PageContainer width="narrow">       // max-w-2xl — forms, settings
+ *   <PageContainer width="narrow">       // max-w-2xl content — forms, settings
  *
- * Pin a mobile CTA above the tab bar with
- * `sticky bottom-(--bottom-chrome)` (DESIGN.md "One job per screen").
+ * Both start at the same left edge (under the app bar's logo); "narrow"
+ * only caps the width of its children. Centre a lone block (the 404) with
+ * className="items-center".
+ *
+ * Pin the screen's one primary above the tab bar with <PinnedCta> from
+ * components/ui/pinned-cta (DESIGN.md "One job per screen"); it adds its
+ * own height to the page's bottom clearance.
  */
 export function PageContainer({
   width = "default",
@@ -26,8 +31,10 @@ export function PageContainer({
     <main
       data-slot="page"
       className={cn(
-        "mx-auto flex w-full flex-1 flex-col gap-section px-gutter pt-6 pb-section md:pt-10",
-        width === "narrow" ? "max-w-2xl" : "max-w-5xl",
+        "mx-auto flex w-full max-w-5xl flex-1 flex-col gap-section px-gutter pt-6 pb-section md:pt-10",
+        // Narrow pages keep a readable column but start under the logo,
+        // like every other page: no sideways jump between tabs.
+        width === "narrow" && "*:w-full *:max-w-2xl",
         className,
       )}
       {...props}

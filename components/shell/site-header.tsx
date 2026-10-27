@@ -26,6 +26,12 @@ const AUTH_PATHS = ["/sign-in", "/sign-up", "/forgot-password", "/reset-password
 // The server redirects signed-in people away from these, so reaching one
 // with a `user` means the root layout's session is stale.
 const SIGNED_OUT_ONLY = ["/sign-in", "/sign-up"];
+// …and signed-out people away from these: reaching one with no `user`
+// means a session started behind the layout (signing up, then following
+// a client link into the app).
+const SIGNED_IN_ONLY = ["/instructor", "/school", "/account"];
+const under = (pathname: string, base: string) =>
+  pathname === base || pathname.startsWith(`${base}/`);
 
 /**
  * App bar (COMPONENTS.md "App bar"), sticky, `--top-chrome` tall.
@@ -33,7 +39,8 @@ const SIGNED_OUT_ONLY = ["/sign-in", "/sign-up"];
  * Signed in — desktop: lockup, the primary links (active = teal + 2px
  * underline), account menu. Mobile: lockup + account menu only; the links
  * move to the bottom tab bar.
- * Anonymous — logo, quiet "Entrar", small primary "Criar conta". Below
+ * Anonymous — logo, quiet "Entrar", small primary "Criar conta" (on the
+ * landing; elsewhere both are quiet, the page has its own primary). Below
  * 640px the lockup shrinks to the mark so all three fit at 360px.
  *
  * Surface: an opaque canvas bar that gains a hairline once content scrolls
@@ -51,8 +58,11 @@ const SIGNED_OUT_ONLY = ["/sign-in", "/sign-up"];
  *
  * `user` comes from the server (root layout), so the first paint is
  * already right — no client session fetch, no flash. The root layout isn't
- * re-rendered on client navigation: if a soft redirect lands a "signed-in"
- * header on /sign-in (session revoked elsewhere), it refreshes once.
+ * re-rendered on client navigation, so the header refreshes once when it
+ * is out of date: a "signed-in" header on /sign-in or /sign-up (session
+ * revoked elsewhere), or a signed-out one inside /instructor, /school or
+ * /account (a session that started after the layout rendered, e.g. right
+ * after sign-up), which also brings the tab bar back.
  *
  * `unread` (unread notifications) shows as a "new activity" dot on the
  * item flagged `unread` in nav-items.ts; screen readers hear the count.
@@ -67,7 +77,9 @@ export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unrea
   const items = user ? navItemsFor(user.type).filter((item) => item.desktop) : [];
 
   const refreshedFor = useRef<string | null>(null);
-  const stale = !!user && SIGNED_OUT_ONLY.includes(pathname);
+  const stale = user
+    ? SIGNED_OUT_ONLY.includes(pathname)
+    : SIGNED_IN_ONLY.some((base) => under(pathname, base));
   useEffect(() => {
     if (!stale || refreshedFor.current === pathname) return;
     refreshedFor.current = pathname;
@@ -136,16 +148,32 @@ export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unrea
         )}
 
         <div className="ml-auto flex shrink-0 items-center gap-1">
-          {user ? <AccountMenu user={user} /> : <AnonymousActions pathname={pathname} />}
+          {user ? <AccountMenu user={user} /> : <AnonymousActions pathname={pathname} quietOnly={pathname !== "/"} />}
         </div>
       </div>
     </header>
   );
 }
 
-function AnonymousActions({ pathname }: { pathname: string }) {
+function AnonymousActions({ pathname, quietOnly }: { pathname: string; quietOnly: boolean }) {
   const t = useTranslations("Nav");
   const quiet = buttonVariants({ variant: "ghost", size: "sm" });
+
+  if (quietOnly && !AUTH_PATHS.includes(pathname)) {
+    // The filled "Criar conta" belongs to the landing. Any other page a
+    // signed-out person can reach (today the 404) has its own primary
+    // ("Voltar ao início"), so both ways in stay, quiet.
+    return (
+      <>
+        <Link href="/sign-in" className={quiet}>
+          {t("signIn")}
+        </Link>
+        <Link href="/sign-up" className={cn(quiet, "@max-3xs:hidden")}>
+          {t("signUp")}
+        </Link>
+      </>
+    );
+  }
 
   if (AUTH_PATHS.includes(pathname)) {
     // One quiet way out of the current auth screen.

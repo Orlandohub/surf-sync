@@ -11,8 +11,8 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * "Reenviar email" for the onboarding checklist's email step: sends a new
- * confirmation link and says where it went. Same budget and feedback as
+ * "Reenviar email" on Início while the email isn't confirmed (EmailNotice):
+ * sends a new confirmation link and says where it went. Same budget and feedback as
  * the auth screens (useResendVerification): a 60 s countdown after each
  * send, and the server's refusals — an email sent from elsewhere less than
  * a minute ago, or the daily cap — shown as such. The "sent" line is a
@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
  * sent; without it the countdown starts at the first refusal.
  */
 export function ResendVerification({ email, start }: { email: string; start?: ResendStart }) {
-  const t = useTranslations("InstructorHomePage.onboarding.resend");
+  const t = useTranslations("InstructorHomePage.email.resend");
   const state = useResendVerification(email, start);
   const generic = state.error === "generic";
 

@@ -9,16 +9,15 @@ import { listNotifications, unreadCount } from "@/lib/services/notifications";
 import { PageContainer } from "@/components/shell/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { LinkTabs } from "@/components/ui/link-tabs";
-import { Badge } from "@/components/ui/badge";
+import { TabCount } from "@/components/ui/tab-styles";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { InstructorBookingRow } from "@/components/instructor/booking-row";
 import { ReactivateButton } from "@/components/instructor/reactivate-button";
 import { NotificationsPanel } from "@/components/instructor/notifications-panel";
-import {
-  groupInstructorBookings,
-  toInstructorBooking,
-} from "@/components/instructor/booking-groups";
+import { NotificationsJump } from "@/components/shell/notifications-section";
+import { toInstructorBooking } from "@/components/instructor/booking-groups";
+import { bookingList, groupBookings } from "@/lib/booking-view";
 import { lisbonToday } from "@/lib/format";
 
 export async function generateMetadata() {
@@ -53,7 +52,7 @@ export default async function InstructorBookingsPage({
   ]);
 
   const today = lisbonToday();
-  const groups = groupInstructorBookings(bookings.map(toInstructorBooking), today);
+  const groups = groupBookings(bookings.map(toInstructorBooking), today);
   const requested = typeof params.tab === "string" ? params.tab : undefined;
   // No tab in the URL: open on the requests when there are any to answer.
   const tab: Tab = TABS.includes(requested as Tab)
@@ -78,10 +77,18 @@ export default async function InstructorBookingsPage({
 
   return (
     <PageContainer>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        // Phones: notifications sit after the list, so the bell jumps there.
+        action={<NotificationsJump unread={unread} />}
+      />
 
-      <div className="grid items-start gap-section lg:grid-cols-3">
-        <section aria-label={t(`tabs.${tab}`)} className="flex flex-col gap-4 lg:col-span-2">
+      <div className="grid grid-cols-1 items-start gap-section lg:grid-cols-3">
+        <section aria-labelledby="aulas-lista" className="flex flex-col gap-4 lg:col-span-2">
+          <h2 id="aulas-lista" className="sr-only">
+            {t(`tabs.${tab}`)}
+          </h2>
           <LinkTabs
             label={t("tabs.label")}
             value={tab}
@@ -91,7 +98,10 @@ export default async function InstructorBookingsPage({
               label: t(`tabs.${value}`),
               badge:
                 value === "requests" && groups.requests.length > 0 ? (
-                  <Badge variant="count">{groups.requests.length}</Badge>
+                  <TabCount
+                    count={groups.requests.length}
+                    label={t("tabs.requestsCount", { count: groups.requests.length })}
+                  />
                 ) : undefined,
             }))}
           />
@@ -132,7 +142,11 @@ export default async function InstructorBookingsPage({
           )}
         </section>
 
-        <NotificationsPanel notifications={notifications} unread={unread} />
+        <NotificationsPanel
+          notifications={notifications}
+          unread={unread}
+          placeOf={new Map(bookings.map((b) => [b.id, bookingList(b, today)]))}
+        />
       </div>
     </PageContainer>
   );

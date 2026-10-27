@@ -29,11 +29,15 @@ export type NotificationPayload = {
   declineReason?: string;
 };
 
+/** Which side the recipient is on: their email links to their own bookings screen. */
+export type NotificationRecipient = "instructor" | "school";
+
 export async function notifyBookingEvent(
   recipientUserId: string,
   recipientEmail: string,
   type: BookingEventType,
   payload: NotificationPayload,
+  recipient: NotificationRecipient,
 ): Promise<void> {
   await db.insert(notification).values({
     userId: recipientUserId,
@@ -44,7 +48,7 @@ export async function notifyBookingEvent(
   // Best-effort email; in-app row already persisted. (SUR-29 tracks the
   // queue migration for sends.)
   try {
-    await sendBookingNotificationEmail({ to: recipientEmail, type, payload });
+    await sendBookingNotificationEmail({ to: recipientEmail, type, payload, recipient });
   } catch {
     // Deliberate swallow: a booking must not fail because an email didn't
     // go out. Surfaced via logging when Sentry lands (SUR-28).

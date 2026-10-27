@@ -40,6 +40,14 @@
       "yesterday": "Ontem",
       "week": "Esta semana",
       "earlier": "Anteriores"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "unread": "{count, plural, =0 {Tudo lido} one {# por ler} other {# por ler}}",
+      "markAll": "Marcar tudo como lido",
+      "marking": "A marcar…",
+      "markedAll": "Tudo marcado como lido.",
+      "jump": "{count, plural, =0 {Ver notificações} one {Ver notificações, # por ler} other {Ver notificações, # por ler}}"
     }
   },
   "NotFoundPage": {
@@ -82,7 +90,8 @@
             "title": "A tua equipa na mesma escola",
             "description": "Convida colegas por email. Cada um entra com a sua conta e todos gerem as reservas da escola."
           }
-        }
+        },
+        "signUp": "Criar conta de escola"
       },
       "instructors": {
         "title": "para instrutores",
@@ -104,7 +113,8 @@
             "title": "Pausa quando quiseres",
             "description": "Pausa o perfil e sais da pesquisa. Reativa-o quando voltares."
           }
-        }
+        },
+        "signUp": "Criar conta de instrutor"
       }
     },
     "steps": {
@@ -425,11 +435,6 @@
       "progress": "{done} de {total} passos concluídos",
       "done": "Concluído",
       "steps": {
-        "verify_email": {
-          "title": "Verificar email",
-          "description": "Abre o link que enviámos para {email}.",
-          "doneDescription": "O teu email está confirmado."
-        },
         "complete_profile": {
           "title": "Completar perfil",
           "description": "O teu nome, nível e as zonas onde dás aulas.",
@@ -440,7 +445,11 @@
           "description": "Os dias e as horas em que podes dar aulas.",
           "doneDescription": "Dias e horas guardados."
         }
-      },
+      }
+    },
+    "email": {
+      "title": "Confirma o teu email",
+      "description": "Os pedidos das escolas chegam a {email}. Abre o link que te enviámos para confirmares que o endereço está certo.",
       "resend": {
         "action": "Reenviar email",
         "sending": "A enviar…",
@@ -507,6 +516,8 @@
     "saving": "A guardar…",
     "saved": "Alterações guardadas.",
     "activated": "Perfil ativado. Já apareces na pesquisa.",
+    "paused": "Perfil pausado.",
+    "reactivated": "Perfil reativado.",
     "errors": {
       "invalid": "Corrige os horários assinalados para guardares.",
       "activateNeedsDays": "Escolhe pelo menos um dia para ativares o perfil.",
@@ -558,6 +569,9 @@
     },
     "menu": {
       "label": "Mais",
+      "visibility": "Visibilidade",
+      "visibilityActive": "Visível",
+      "visibilityPaused": "Pausado",
       "availability": "Disponibilidade",
       "availabilityValue": "{count, plural, =0 {Por definir} one {# dia} other {# dias}}",
       "account": "Conta"
@@ -777,6 +791,7 @@
     "tabs": {
       "label": "Aulas",
       "requests": "Pedidos",
+      "requestsCount": "{count, plural, one {# por responder} other {# por responder}}",
       "upcoming": "Próximas",
       "history": "Histórico"
     },
@@ -803,11 +818,6 @@
       }
     },
     "notifications": {
-      "title": "Notificações",
-      "unread": "{count, plural, =0 {Tudo lido} one {# não lida} other {# não lidas}}",
-      "markAll": "Marcar tudo como lido",
-      "marking": "A marcar…",
-      "markAllFailed": "Não foi possível marcar como lidas. Verifica a ligação e tenta novamente.",
       "types": {
         "booking_requested": "<strong>{school}</strong> pediu uma aula para {day}.",
         "booking_requested_at": "<strong>{school}</strong> pediu uma aula para {day} · {time}.",

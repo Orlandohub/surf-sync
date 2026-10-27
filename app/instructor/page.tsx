@@ -13,13 +13,12 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { CalendarWave } from "@/components/brand/icons";
 import { InstructorBookingRow } from "@/components/instructor/booking-row";
 import { OnboardingChecklist } from "@/components/instructor/onboarding-checklist";
+import { EmailNotice } from "@/components/instructor/email-notice";
+import { resendStartFor } from "@/components/auth/resend-start";
 import { PausedNotice } from "@/components/instructor/paused-notice";
 import { StatusLine } from "@/components/instructor/status-line";
-import {
-  groupInstructorBookings,
-  monthStats,
-  toInstructorBooking,
-} from "@/components/instructor/booking-groups";
+import { toInstructorBooking } from "@/components/instructor/booking-groups";
+import { groupBookings, monthLessons } from "@/lib/booking-view";
 import { lisbonToday } from "@/lib/format";
 
 export async function generateMetadata() {
@@ -53,6 +52,15 @@ export default async function InstructorHomePage() {
       description={<StatusLine onboarding={onboarding} />}
     />
   );
+  // Booking requests are emailed: until the address is confirmed, Início
+  // says so — during onboarding and after the profile is live.
+  const emailNotice = onboarding.emailVerified ? null : (
+    <EmailNotice
+      email={session.user.email}
+      start={await resendStartFor(session.user.email)}
+      className="lg:max-w-2xl"
+    />
+  );
 
   if (onboardingOpen) {
     // Same container as every other tab (content starts under the logo);
@@ -60,19 +68,16 @@ export default async function InstructorHomePage() {
     return (
       <PageContainer>
         {header}
-        <OnboardingChecklist
-          onboarding={onboarding}
-          email={session.user.email}
-          className="lg:max-w-2xl"
-        />
+        <OnboardingChecklist onboarding={onboarding} className="lg:max-w-2xl" />
+        {emailNotice}
       </PageContainer>
     );
   }
 
   const today = lisbonToday();
   const all = bookings.map(toInstructorBooking);
-  const { requests, upcoming } = groupInstructorBookings(all, today);
-  const stats = monthStats(all, today);
+  const { requests, upcoming } = groupBookings(all, today);
+  const stats = monthLessons(all, today);
   const hours = format.number(stats.hours, { maximumFractionDigits: 1 });
   // The availability nudge is for instructors who've been taking lessons a
   // while, not someone who set their days a moment ago to activate.
@@ -83,8 +88,9 @@ export default async function InstructorHomePage() {
       {header}
 
       {status === "inactive" && <PausedNotice hasAvailability={onboarding.hasAvailability} />}
+      {emailNotice}
 
-      <div className="grid items-start gap-section lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-section lg:grid-cols-3">
         <div className="flex flex-col gap-section lg:col-span-2">
           {requests.length > 0 && (
             <section aria-labelledby="pedidos" className="flex flex-col gap-3">
@@ -128,6 +134,7 @@ export default async function InstructorHomePage() {
                       today={today}
                       view="upcoming"
                       actions={false}
+                      showStatus={false}
                       clampNote
                     />
                   </li>

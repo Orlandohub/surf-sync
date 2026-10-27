@@ -25,8 +25,12 @@ import { cn } from "@/lib/utils"
  * A link that looks like a button: style a Next <Link> with
  * `buttonVariants({ variant, size })` — don't nest a <button> in an <a>.
  */
+// Never wider than its container, and its label wraps rather than being
+// clipped (a lone "Cancelar pedido" or "Voltar ao início" at 200% text on a
+// phone). The size's height stays the minimum: min-h-min lets two lines
+// grow the button past it; one line looks exactly as before.
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-control text-label outline-none select-none " +
+  "inline-flex max-w-full min-h-min shrink-0 items-center justify-center gap-2 py-1.5 text-center rounded-control text-label outline-none select-none " +
   "transition-[color,background-color,border-color,transform] duration-(--duration-fast) ease-move active:scale-98 " +
   "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background " +
   "disabled:pointer-events-none disabled:opacity-40 aria-invalid:ring-2 aria-invalid:ring-destructive " +
@@ -50,8 +54,9 @@ const buttonVariants = cva(
         "icon-sm": "tap size-9 rounded-full",
       },
     },
-    // A text link keeps its text box whatever the size: no height, no padding.
-    compoundVariants: [{ variant: "link", className: "h-auto px-0" }],
+    // A text link keeps its text box whatever the size: no height, no
+    // padding; it wraps like text ("Marcar tudo como lido" at 200%).
+    compoundVariants: [{ variant: "link", className: "h-auto px-0 py-0 text-left" }],
     defaultVariants: { variant: "default", size: "default" },
   }
 )

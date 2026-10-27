@@ -1,6 +1,10 @@
 import { sendEmail } from "@/lib/email/transport";
 import { renderBookingNotificationEmail } from "@/lib/email/templates/booking-notification";
-import type { BookingEventType, NotificationPayload } from "@/lib/services/notifications";
+import type {
+  BookingEventType,
+  NotificationPayload,
+  NotificationRecipient,
+} from "@/lib/services/notifications";
 import { formatDate } from "@/lib/format";
 
 /**
@@ -12,12 +16,14 @@ export async function sendBookingNotificationEmail({
   to,
   type,
   payload,
+  recipient,
 }: {
   to: string;
   type: BookingEventType;
   payload: NotificationPayload;
+  recipient: NotificationRecipient;
 }): Promise<void> {
-  const { html, text } = await renderBookingNotificationEmail(type, payload);
+  const { html, text } = await renderBookingNotificationEmail(type, payload, recipient);
   const date = formatDate(payload.bookingDate);
   const subjects: Record<BookingEventType, string> = {
     booking_requested: `Novo pedido de aula — ${date}`,

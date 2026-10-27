@@ -23,14 +23,19 @@ import { cn } from "@/lib/utils"
  *   </PageHeader>
  *
  * - `leading`: an avatar or logo beside the title block — level with the
- *   title on phones, centred on the block from md. For a smaller one on
- *   phones pass both sizes (`<Avatar size={44} className="md:hidden" />`
- *   + `<Avatar size={88} className="max-md:hidden" />`).
+ *   title on phones, centred on the block from md. When the title can't
+ *   have 11rem beside it (large text), it moves under the avatar. For a
+ *   smaller one on phones pass both sizes (`<Avatar size={44}
+ *   className="md:hidden" />` + `<Avatar size={88} className="max-md:hidden" />`).
  * - `children`: a badge row under the description.
  * - `action`: one at most; more goes in a menu. By default it sits at the
- *   end of the title row (an icon button, a small outline button). With
- *   `stackAction` it drops under the header, full width, below 640px — for
- *   a labelled primary such as "Encontrar instrutores".
+ *   end of the title row (an icon button, a small outline button), and
+ *   wraps under the header when the title can't keep 12rem beside it (a
+ *   long name, large text). With `stackAction` it drops under the header,
+ *   full width, below 640px — for a labelled primary such as "Encontrar
+ *   instrutores".
+ * - The title wraps (balanced); a single word wider than the line breaks.
+ *   Never truncate a page title.
  * - Focus: the h1 is focusable from script (tabIndex -1, no ring, not in
  *   the Tab order). `focusOnMount` moves focus to it when the header
  *   mounts — for a result screen that replaces the form someone just
@@ -80,9 +85,27 @@ function PageHeader({
     if (shouldFocus) ownRef.current?.focus()
   }, [shouldFocus])
 
+  // In a row with an action, the title block (or the avatar + title) asks
+  // for 12rem; when the row can't give it that beside the action (a long
+  // name, 200% text), the action wraps under the header instead of
+  // squeezing the title into a sliver.
+  const inRow = !stackAction && action != null
   const titleBlock = (
-    <div className="flex min-w-0 flex-col gap-1">
-      <h1 ref={ownRef} tabIndex={-1} className="text-headline text-balance text-foreground outline-none">
+    <div
+      className={cn(
+        "flex min-w-0 flex-col gap-1",
+        // Beside an avatar it needs 11rem, else it drops under it (a long
+        // name at large text on a phone) rather than breaking every word.
+        leading ? "grow basis-44" : inRow && "grow basis-48"
+      )}
+    >
+      {/* A word wider than the line (a long name at 200% text) breaks
+          rather than running out of the header. */}
+      <h1
+        ref={ownRef}
+        tabIndex={-1}
+        className="text-headline text-balance wrap-break-word hyphens-auto text-foreground outline-none"
+      >
         {title}
       </h1>
       {description && (
@@ -108,11 +131,19 @@ function PageHeader({
           "flex",
           stackAction
             ? "flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-            : cn("justify-between gap-4", leading ? "items-start md:items-center" : "items-start")
+            : cn(
+                "flex-wrap justify-between gap-x-4 gap-y-3",
+                leading ? "items-start md:items-center" : "items-start"
+              )
         )}
       >
         {leading ? (
-          <div className="flex min-w-0 items-start gap-4 md:items-center md:gap-5">
+          <div
+            className={cn(
+              "flex min-w-0 grow flex-wrap items-start gap-4 md:items-center md:gap-5",
+              inRow && "basis-48"
+            )}
+          >
             <div className="flex shrink-0">{leading}</div>
             {titleBlock}
           </div>
