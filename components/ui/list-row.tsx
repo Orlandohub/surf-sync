@@ -1,6 +1,6 @@
 import * as React from "react"
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, LoaderCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { IconComponent } from "@/components/brand/icons"
@@ -120,17 +120,26 @@ function LinkRow({
 /**
  * A card row that is not a link, with actions — the booking request an
  * instructor answers, the booking a school can cancel. Same anatomy as
- * LinkRow (leading, title, meta, badge row); `status` leads the badge row.
- * Actions sit on the right from 640px and share a full-width row under
- * the content on phones. Put the dismissive action first and the primary
- * last (primary ends up on the right); consequential ones open a
- * <ConfirmDialog>.
+ * LinkRow (leading, title, meta, badge row); `status` leads the badge row
+ * and `note` is a full-width block under it (the school's note, a decline
+ * reason, who asked). The leading element and the actions line up with
+ * the title, so they stay put however long the note runs.
+ *
+ * Actions sit on the right once the row is 32rem wide (inside its
+ * padding; a container query, so 200% text counts) and take a row under
+ * the content below that: two share it equally, a single one stays
+ * compact on the right ("Cancelar aula"). Put the dismissive action first
+ * and the primary last (primary ends up on the right); consequential ones
+ * open a <ConfirmDialog>. Being a size container, ItemRow takes the width
+ * of its parent (a list item, a column); don't put it in a shrink-to-fit
+ * box.
  *
  *   <ItemRow
  *     leading={<Avatar name={b.schoolName} />}
  *     title={b.schoolName}
  *     description={formatDayTimeRange(b.bookingDate, b.startTime, b.endTime)}
  *     status={<StatusBadge tone={bookingStatusTone(b.status)} icon={bookingStatusIcon(b.status)}>{t(`status.${b.status}`)}</StatusBadge>}
+ *     note={b.notes}
  *     actions={<>
  *       <ConfirmDialog trigger={<Button variant="outline" size="sm">Recusar</Button>} … />
  *       <Button size="sm" pending={accepting} pendingLabel="A aceitar…" onClick={accept}>Aceitar</Button>
@@ -147,6 +156,7 @@ function ItemRow({
   description,
   leading,
   status,
+  note,
   actions,
   children,
   className,
@@ -155,44 +165,70 @@ function ItemRow({
   title: React.ReactNode
   /** Meta line — "Amanhã · 9:00–11:00". */
   description?: React.ReactNode
-  /** Avatar or <RowIcon>. */
+  /** Avatar, date tile or <RowIcon>. Top-aligned with the title. */
   leading?: React.ReactNode
   /** Status badge, first in the badge row. */
   status?: React.ReactNode
+  /**
+   * Full-width block under the badge row, `text-meta` muted, line breaks
+   * kept: a note, a decline reason. Several lines go in as several
+   * elements (stacked `gap-1`); clamp one with `line-clamp-*` on it.
+   */
+  note?: React.ReactNode
   /** One or two buttons. */
   actions?: React.ReactNode
-  /** More badges (2 in total with the status) or a short note. */
+  /** More badges (2 in total with the status). */
   children?: React.ReactNode
 }) {
   return (
+    // A size container: the row lays itself out by its own width (in rem,
+    // so larger text counts), not the viewport's, and its content never
+    // widens a grid or flex parent.
     <div
       data-slot="item-row"
       className={cn(
-        "flex flex-col gap-4 rounded-card border bg-card p-card text-card-foreground shadow-card sm:flex-row sm:items-center",
+        "@container rounded-card border bg-card p-card text-card-foreground shadow-card",
         className
       )}
       {...props}
     >
-      <div className="flex min-w-0 flex-1 items-center gap-3">
-        {leading && <span className="flex shrink-0 items-center">{leading}</span>}
-        <div className="flex min-w-0 flex-1 flex-col">
-          <span className="line-clamp-2 text-label text-foreground">{title}</span>
-          {description && (
-            <span className="mt-0.5 text-meta text-muted-foreground tabular-nums">{description}</span>
-          )}
-          {(status || children) && (
-            <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              {status}
-              {children}
-            </span>
-          )}
+      <div className="flex flex-col gap-4 @lg:flex-row @lg:items-start">
+        {/* The content drops under the leading element when it can't
+            have 11rem beside it (large text on a phone). */}
+        <div className="flex min-w-0 flex-1 flex-wrap items-start gap-3">
+          {leading && <span className="flex shrink-0">{leading}</span>}
+          <div className="flex min-w-0 grow basis-44 flex-col">
+            <span className="line-clamp-2 text-label text-foreground">{title}</span>
+            {description && (
+              <span className="mt-0.5 text-meta text-muted-foreground tabular-nums">{description}</span>
+            )}
+            {(status || children) && (
+              <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {status}
+                {children}
+              </span>
+            )}
+            {note != null && note !== false && note !== "" && (
+              <div
+                data-slot="item-row-note"
+                className="mt-1.5 flex flex-col gap-1 text-meta break-words whitespace-pre-line text-muted-foreground"
+              >
+                {note}
+              </div>
+            )}
+          </div>
         </div>
+        {actions && (
+          // Under the content: two actions split the row (one per line if
+          // they don't fit), a lone one stays compact on the right.
+          <div
+            data-slot="item-row-actions"
+            className="flex flex-wrap justify-end gap-2 @max-lg:*:not-only:flex-1 @lg:shrink-0"
+          >
+            {actions}
+          </div>
+        )}
       </div>
-      {actions && (
-        <div data-slot="item-row-actions" className="flex gap-2 *:flex-1 sm:shrink-0 sm:*:flex-none">
-          {actions}
-        </div>
-      )}
     </div>
   )
 }
@@ -257,7 +293,7 @@ function ActionBanner({
  *     <MenuRow icon={Mail} label="Email" value={user.email} />
  *   </MenuGroup>
  *   <MenuGroup>
- *     <MenuRow icon={LogOut} label="Terminar sessão" destructive onClick={signOut} />
+ *     <MenuRow icon={LogOut} label="Terminar sessão" destructive pending={signingOut} onClick={signOut} />
  *   </MenuGroup>
  */
 function MenuGroup({
@@ -282,47 +318,110 @@ function MenuGroup({
   )
 }
 
+function preventClick(event: React.MouseEvent) {
+  event.preventDefault()
+}
+
 type MenuRowProps = {
   label: React.ReactNode
   icon?: IconComponent
-  /** Trailing muted value ("Ativo", an email, a count). */
+  /**
+   * Secondary line under the label, `text-meta` muted; it wraps
+   * ("Iniciada hoje às 14:30 · expira a 3 de novembro").
+   */
+  description?: React.ReactNode
+  /**
+   * Trailing muted value ("Ativo", an email, a count) or a badge. When
+   * label and value don't fit on one line (a narrow column, large text),
+   * the value moves under the label instead of truncating it.
+   */
   value?: React.ReactNode
+  /**
+   * End of a static row, never shrinks: a badge ("Esta sessão") or a small
+   * outline Button ("Terminar"). Only on rows without `href`/`onClick`/
+   * `type` (no control inside a link or a button).
+   */
+  trailing?: React.ReactNode
   /** Navigates → renders a link with a chevron. */
   href?: string
+  /**
+   * Button rows: the row's action is running. A spinner replaces the icon,
+   * the row is aria-busy and ignores clicks, and keeps focus.
+   */
+  pending?: boolean
   /** "Terminar sessão" and the like: `text-destructive`, no chevron, last in its own group. */
   destructive?: boolean
   className?: string
-} & Omit<React.ComponentProps<"button">, "children" | "className">
+} & Omit<React.ComponentProps<"button">, "children" | "className" | "value">
 
 /**
- * One 52px row. A link with `href` (chevron), a button with `onClick` or
- * `type="submit"` (no chevron), otherwise a static label/value row.
+ * One row, 52px (taller with a `description`). A link with `href`
+ * (chevron), a button with `onClick` or `type="submit"` (no chevron),
+ * otherwise a static label/value row, which may end in a `trailing`
+ * badge or button. The label is one truncated line, or wraps when the row
+ * has a description.
+ *
+ * Button rows: `pending` while the action runs; `aria-disabled` (rather
+ * than `disabled`, which drops keyboard focus) for a row that can't act
+ * right now — it is dimmed and ignores clicks but stays focusable.
  */
 function MenuRow({
   label,
   icon: Icon,
+  description,
   value,
+  trailing,
   href,
+  pending = false,
   destructive = false,
   className,
   ...buttonProps
 }: MenuRowProps) {
+  const isButton = !href && (buttonProps.onClick != null || buttonProps.type != null)
+  const busy = isButton && pending
+  const LeadIcon = busy && Icon ? LoaderCircle : Icon
+  const iconTone = destructive ? "text-destructive" : "text-muted-foreground"
+  const hasValue = value != null && value !== false && value !== ""
+  const hasDescription = description != null && description !== false && description !== ""
+
+  if (process.env.NODE_ENV !== "production" && trailing && (href || isButton)) {
+    console.warn("MenuRow: `trailing` is only rendered on static rows (no href, onClick or type).")
+  }
+
   const inner = (
     <>
-      {Icon && (
-        <Icon
+      {LeadIcon && (
+        <LeadIcon
           aria-hidden
           data-slot="menu-row-icon"
           strokeWidth={1.75}
-          className={cn("size-5 shrink-0", destructive ? "text-destructive" : "text-muted-foreground")}
+          className={cn("size-5 shrink-0", iconTone, busy && "animate-spin")}
         />
       )}
-      <span className="min-w-0 flex-1 truncate">{label}</span>
-      {value != null && (
-        <span className="max-w-1/2 shrink-0 truncate text-meta text-muted-foreground tabular-nums">
-          {value}
+      {/* Label and value share a line while they fit; when they don't,
+          the value moves under the label (right-aligned) rather than
+          squeezing it. The label truncates only if it alone doesn't fit. */}
+      <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3">
+        <span className="flex max-w-full min-w-0 grow flex-col">
+          <span className={hasDescription ? "break-words text-pretty" : "truncate"}>{label}</span>
+          {hasDescription && (
+            // w-0 min-w-full: wraps to the row's width without making the
+            // label block wide enough to push the value down.
+            <span className="mt-0.5 w-0 min-w-full text-meta text-pretty text-muted-foreground tabular-nums">
+              {description}
+            </span>
+          )}
         </span>
+        {hasValue && (
+          <span className="ml-auto max-w-full min-w-0 truncate text-meta text-muted-foreground tabular-nums">
+            {value}
+          </span>
+        )}
+      </span>
+      {busy && !Icon && (
+        <LoaderCircle aria-hidden strokeWidth={1.75} className={cn("size-5 shrink-0 animate-spin", iconTone)} />
       )}
+      {trailing && !href && !isButton && <span className="flex shrink-0 items-center">{trailing}</span>}
       {href && !destructive && (
         <ChevronRight aria-hidden className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.75} />
       )}
@@ -330,7 +429,8 @@ function MenuRow({
   )
 
   const rowClass = cn(
-    "flex h-13 w-full items-center gap-3 px-card text-left text-body",
+    "flex min-h-13 w-full items-center gap-3 px-card text-left text-body",
+    hasDescription ? "py-3" : "py-1",
     destructive ? "text-destructive" : "text-foreground",
     className
   )
@@ -339,7 +439,39 @@ function MenuRow({
     "cursor-pointer transition-colors duration-(--duration-fast) hover:bg-accent/50 disabled:cursor-not-allowed disabled:opacity-40",
     "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
   )
-  const isButton = !href && (buttonProps.onClick != null || buttonProps.type != null)
+
+  let control: React.ReactNode
+  if (href) {
+    control = (
+      <Link href={href} className={interactive}>
+        {inner}
+      </Link>
+    )
+  } else if (isButton) {
+    const { onClick, "aria-disabled": ariaDisabled, ...rest } = buttonProps
+    const blocked = ariaDisabled === true || ariaDisabled === "true"
+    control = (
+      <button
+        type="button"
+        {...rest}
+        aria-disabled={busy || blocked || undefined}
+        aria-busy={busy || undefined}
+        data-pending={busy || undefined}
+        // Not `disabled`: focus stays on the row while it waits. (No
+        // wrapper otherwise, so a server-rendered submit row stays valid.)
+        onClick={busy || blocked ? preventClick : onClick}
+        className={cn(
+          interactive,
+          busy && "cursor-progress hover:bg-transparent",
+          blocked && !busy && "cursor-not-allowed opacity-40 hover:bg-transparent"
+        )}
+      >
+        {inner}
+      </button>
+    )
+  } else {
+    control = <div className={rowClass}>{inner}</div>
+  }
 
   return (
     <li
@@ -351,17 +483,7 @@ function MenuRow({
         "not-first:has-data-[slot=menu-row-icon]:before:left-12"
       )}
     >
-      {href ? (
-        <Link href={href} className={interactive}>
-          {inner}
-        </Link>
-      ) : isButton ? (
-        <button type="button" className={interactive} {...buttonProps}>
-          {inner}
-        </button>
-      ) : (
-        <div className={rowClass}>{inner}</div>
-      )}
+      {control}
     </li>
   )
 }

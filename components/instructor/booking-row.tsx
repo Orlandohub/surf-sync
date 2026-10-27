@@ -17,7 +17,6 @@ import {
   type InstructorBooking,
 } from "@/components/instructor/booking-groups";
 import { formatDayTimeRange, type IsoDate } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 /**
  * One booking in the instructor's lists (Início and Aulas), on ItemRow:
@@ -71,9 +70,7 @@ export function InstructorBookingRow({
   ) : view === "upcoming" ? (
     <CancelAction booking={booking} when={when} />
   ) : status === "expired" ? (
-    <div className="flex justify-end">
-      <DeclineAction booking={booking} when={when} list="history" />
-    </div>
+    <DeclineAction booking={booking} when={when} list="history" />
   ) : undefined;
 
   return (
@@ -92,18 +89,11 @@ export function InstructorBookingRow({
           </StatusBadge>
         )
       }
+      note={
+        // Início's previews: two lines, line breaks folded so they hold more.
+        note && clampNote ? <span className="line-clamp-2 whitespace-normal">{note}</span> : note
+      }
       actions={rowActions}
-    >
-      {note && (
-        <span
-          className={cn(
-            "basis-full text-meta text-muted-foreground",
-            clampNote ? "line-clamp-2" : "break-words whitespace-pre-line",
-          )}
-        >
-          {note}
-        </span>
-      )}
-    </ItemRow>
+    />
   );
 }

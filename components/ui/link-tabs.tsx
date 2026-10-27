@@ -1,9 +1,12 @@
+"use client"
+
 import * as React from "react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
   StableLabel,
   tabsListClassName,
+  tabsScrollClassName,
   tabsTriggerClassName,
 } from "@/components/ui/tab-styles"
 
@@ -11,7 +14,7 @@ import {
  * surfsync DS (COMPONENTS.md "Tabs") — underline tabs driven by the URL.
  * Same look as <Tabs>, but each tab is a link, so the selection survives
  * reloads, can be shared, and lets a Server Component filter the data.
- * Server-component friendly (no client JS of its own).
+ * Props are plain data, so a Server Component can render it.
  *
  *   // app/instructor/bookings/page.tsx
  *   const tab = (await searchParams).tab === "history" ? "history" : "upcoming"
@@ -26,6 +29,11 @@ import {
  *
  * The page decides which tab is active (`value`) — from searchParams or the
  * pathname. Links keep the scroll position by default (`scroll={false}`).
+ *
+ * When the tabs don't fit (count badges on a 360px phone, 200% text) the
+ * strip scrolls sideways on its own; the page never does. The active tab
+ * is scrolled into view on load and on every change, and a tab reached
+ * with Tab scrolls into view as usual. No overflow class needed.
  */
 type LinkTabItem = {
   value: string
@@ -51,9 +59,23 @@ function LinkTabs({
   scroll?: boolean
   className?: string
 }) {
+  const navRef = React.useRef<HTMLElement>(null)
+
+  // Bring the active tab into the strip's view — sideways only, so the
+  // page itself never scrolls.
+  React.useEffect(() => {
+    const nav = navRef.current
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]')
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return
+    const strip = nav.getBoundingClientRect()
+    const tab = active.getBoundingClientRect()
+    if (tab.left < strip.left) nav.scrollLeft -= strip.left - tab.left
+    else if (tab.right > strip.right) nav.scrollLeft += tab.right - strip.right
+  }, [value])
+
   return (
-    <nav aria-label={label} data-slot="link-tabs" className={className}>
-      <ul className={tabsListClassName}>
+    <nav ref={navRef} aria-label={label} data-slot="link-tabs" className={cn(tabsScrollClassName, className)}>
+      <ul className={cn(tabsListClassName, "min-w-max")}>
         {items.map((item) => {
           const active = item.value === value
           return (

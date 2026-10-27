@@ -15,7 +15,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { BookingRow } from "@/components/school/booking-row";
 import { SchoolNotifications } from "@/components/school/school-notifications";
 import { groupBookings, type BookingTab } from "@/components/school/booking-groups";
-import { TABS_SCROLL } from "@/components/school/tabs-scroll";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
@@ -93,7 +92,6 @@ export default async function SchoolBookingsPage({
           <LinkTabs
             label={t("tabs.label")}
             value={tab}
-            className={TABS_SCROLL}
             items={[
               { value: "pending", href: TAB_HREF.pending, label: t("tabs.pending"), badge: count(groups.pending.length) },
               { value: "upcoming", href: TAB_HREF.upcoming, label: t("tabs.upcoming") },

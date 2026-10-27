@@ -186,8 +186,8 @@ export function AcceptAction({ booking, when }: ActionProps) {
 }
 
 /**
- * Cancelar aula: outline, behind a confirmation. Kept compact on phones
- * (ItemRow stretches its actions), so a list of lessons isn't a column of
+ * Cancelar aula: outline, behind a confirmation. A lone action, so ItemRow
+ * keeps it compact on phones: a list of lessons isn't a column of
  * full-width destructive buttons.
  */
 export function CancelAction({ booking, when }: ActionProps) {
@@ -197,28 +197,26 @@ export function CancelAction({ booking, when }: ActionProps) {
   const day = formatRelativeDay(booking.bookingDate, { lowercase: true });
 
   return (
-    <div className="flex justify-end">
-      <ConfirmDialog
-        trigger={
-          <Button ref={anchorRef} variant="outline" size="sm">
-            {t("cancel.action")}
-            <span className="sr-only"> {t("lessonContext", { school: booking.schoolName, when })}</span>
-          </Button>
-        }
-        title={t("cancel.title", { day })}
-        description={t("cancel.description")}
-        cancelLabel={t("cancel.keep")}
-        confirmLabel={t("cancel.confirm")}
-        pendingLabel={t("cancel.pending")}
-        tone="destructive"
-        onConfirm={async () => {
-          const res = await cancelBookingAction(booking.id);
-          plan();
-          if (res.ok) toast(t("cancel.done"));
-          else toast.error(res.error);
-          refresh();
-        }}
-      />
-    </div>
+    <ConfirmDialog
+      trigger={
+        <Button ref={anchorRef} variant="outline" size="sm">
+          {t("cancel.action")}
+          <span className="sr-only"> {t("lessonContext", { school: booking.schoolName, when })}</span>
+        </Button>
+      }
+      title={t("cancel.title", { day })}
+      description={t("cancel.description")}
+      cancelLabel={t("cancel.keep")}
+      confirmLabel={t("cancel.confirm")}
+      pendingLabel={t("cancel.pending")}
+      tone="destructive"
+      onConfirm={async () => {
+        const res = await cancelBookingAction(booking.id);
+        plan();
+        if (res.ok) toast(t("cancel.done"));
+        else toast.error(res.error);
+        refresh();
+      }}
+    />
   );
 }

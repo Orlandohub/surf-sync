@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import {
   IdCard,
   KeyRound,
-  LoaderCircle,
   LogOut,
   Mail,
   MailCheck,
@@ -18,7 +17,6 @@ import {
   UserRound,
 } from "lucide-react";
 import { authClient } from "@/lib/auth/client";
-import { cn } from "@/lib/utils";
 import { daysFromToday, formatDate, formatTime, lisbonDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -69,14 +67,6 @@ const DEVICE_ICON: Record<DeviceKind, IconComponent> = {
   unknown: MonitorSmartphone,
 };
 
-/**
- * A row's leading icon while its action runs (MenuRow has no pending
- * state, and its `value` slot only takes text).
- */
-const PendingIcon: IconComponent = ({ className, ...props }) => (
-  <LoaderCircle {...props} className={cn(className, "animate-spin")} />
-);
-
 /** "27 de outubro" from a timestamp (Lisbon calendar day). */
 function dayOf(at: Date | string): string {
   return formatDate(lisbonDate(at));
@@ -122,16 +112,16 @@ export function AccountSettings({
   const sessionsListRef = React.useRef<HTMLUListElement>(null);
 
   /**
-   * Revoking removes the row that held focus (the row's "Terminar", or the
-   * "Terminar outras sessões" row once none remain), which would drop
-   * focus to <body>. Land it on the sessions list instead — after `delay`
-   * when a dialog is closing and returns focus first.
+   * Revoking a session removes the row that held focus (its "Terminar"),
+   * which would drop focus to <body>. Land it on the sessions list
+   * instead. (The confirm dialog does the same through `finalFocus` when
+   * "Terminar outras sessões" disappears with the last other session.)
    */
-  function keepFocusInSessions(delay = 0) {
+  function keepFocusInSessions() {
     window.setTimeout(() => {
       const active = document.activeElement;
       if (!active || active === document.body || !active.isConnected) sessionsListRef.current?.focus();
-    }, delay);
+    }, 0);
   }
 
   const load = React.useCallback(async () => {
@@ -234,9 +224,6 @@ export function AccountSettings({
     }
     toast(t("sessions.othersRevoked"));
     await reload();
-    // The dialog's exit (duration-base) ends by returning focus to a row
-    // that no longer exists.
-    keepFocusInSessions(400);
   }
 
   async function signOutEverywhere() {
@@ -303,12 +290,11 @@ export function AccountSettings({
                 disabled button would drop keyboard focus to the page. */}
             <MenuGroup>
               <MenuRow
-                icon={resend.pending ? PendingIcon : MailCheck}
+                icon={MailCheck}
                 label={t("account.resend")}
                 onClick={() => void resend.send()}
+                pending={resend.pending}
                 aria-disabled={resend.blocked || undefined}
-                aria-busy={resend.pending || undefined}
-                className="aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:hover:bg-transparent"
               />
             </MenuGroup>
             <ResendStatus state={resend} />
@@ -374,14 +360,22 @@ export function AccountSettings({
               const Icon = DEVICE_ICON[describeDevice(s.userAgent).kind];
               const when = startedWhen(s.createdAt);
               return (
-                <SessionItem
+                <MenuRow
                   key={s.id}
                   icon={Icon}
-                  title={device}
-                  badge={current ? <Badge>{t("sessions.current")}</Badge> : null}
-                  meta={[t("sessions.started", { when }), t("sessions.expires", { date: dayOf(s.expiresAt) })]}
-                  action={
-                    current ? null : (
+                  label={device}
+                  description={
+                    // Two facts that wrap as whole units ("Iniciada hoje às
+                    // 14:30 ·" / "expira a 3 de novembro").
+                    <span className="flex flex-wrap gap-x-1">
+                      <span>{t("sessions.started", { when })} ·</span>
+                      <span>{t("sessions.expires", { date: dayOf(s.expiresAt) })}</span>
+                    </span>
+                  }
+                  trailing={
+                    current ? (
+                      <Badge>{t("sessions.current")}</Badge>
+                    ) : (
                       <Button
                         variant="outline"
                         size="sm"
@@ -427,11 +421,11 @@ export function AccountSettings({
       <div className="flex flex-col gap-3">
         <MenuGroup>
           <MenuRow
-            icon={signingOut ? PendingIcon : LogOut}
+            icon={LogOut}
             label={t("signOut")}
             destructive
             onClick={() => void signOut()}
-            aria-busy={signingOut || undefined}
+            pending={signingOut}
           />
         </MenuGroup>
         {signOutError && <FieldError>{signOutError}</FieldError>}
@@ -453,6 +447,8 @@ export function AccountSettings({
         pendingLabel={t("sessions.revoking")}
         onConfirm={confirmKind === "all" ? signOutEverywhere : revokeOthers}
         error={confirmError}
+        // Revoking the others removes "Terminar outras sessões" itself.
+        finalFocus={sessionsListRef}
       />
 
       <ChangePasswordDialog
@@ -477,45 +473,6 @@ function Stacked({ label, value, badge }: { label: string; value: string; badge?
       </span>
       <span className="truncate text-body text-foreground">{value}</span>
     </span>
-  );
-}
-
-/**
- * One session in the list. MenuRow has no meta line or action slot, so
- * this mirrors its anatomy (inset divider, 20px muted icon, card padding)
- * with a second line and a trailing button.
- */
-function SessionItem({
-  icon: Icon,
-  title,
-  badge,
-  meta,
-  action,
-}: {
-  icon: IconComponent;
-  title: string;
-  badge?: React.ReactNode;
-  /** Two facts; they wrap as whole units ("Iniciada a 27 de outubro ·" / "expira a …"). */
-  meta: [string, string];
-  action?: React.ReactNode;
-}) {
-  return (
-    <li className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-12 not-first:before:h-px not-first:before:bg-border">
-      <div className="flex min-h-16 items-center gap-3 px-card py-3">
-        <Icon aria-hidden className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.75} />
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="text-body text-foreground">{title}</span>
-            {badge}
-          </span>
-          <span className="flex flex-wrap gap-x-1 text-meta text-muted-foreground tabular-nums">
-            <span>{meta[0]} ·</span>
-            <span>{meta[1]}</span>
-          </span>
-        </div>
-        {action && <div className="shrink-0">{action}</div>}
-      </div>
-    </li>
   );
 }
 

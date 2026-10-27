@@ -11,6 +11,19 @@ import * as React from "react"
 export const tabsListClassName =
   "relative flex h-11 w-full items-stretch border-b border-border md:gap-2"
 
+/**
+ * Scroll container around a tab list, so tabs that don't fit (count
+ * badges at 360px, larger text) scroll sideways inside the strip instead
+ * of widening the page. The list inside also gets `min-w-max`: full width
+ * while the tabs fit, as wide as they need once they don't.
+ * `contain-inline-size` keeps the tabs' width out of the parent's sizing,
+ * so a grid or flex parent doesn't grow to fit them (the strip scrolls
+ * instead). Triggers draw their focus ring inset and the indicator sits
+ * on the list's own border, so the clipping edge cuts neither.
+ */
+export const tabsScrollClassName =
+  "w-full min-w-0 contain-inline-size overflow-x-auto overflow-y-hidden overscroll-x-contain"
+
 /** Shared look for one tab — `data-active` (client) or aria-current (links). */
 export const tabsTriggerClassName =
   "relative inline-flex flex-1 items-center justify-center gap-1.5 px-3 text-label font-medium whitespace-nowrap text-muted-foreground outline-none select-none md:flex-none md:px-4 " +

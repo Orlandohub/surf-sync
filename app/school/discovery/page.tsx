@@ -18,7 +18,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { DiscoveryFilters } from "@/components/school/discovery-filters";
 import { InstructorRow } from "@/components/school/instructor-row";
 import { discoveryHref, hasFilters, type DiscoveryQuery } from "@/components/school/discovery-query";
-import { TABS_SCROLL } from "@/components/school/tabs-scroll";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
@@ -73,7 +72,6 @@ export default async function DiscoveryPage({
         <LinkTabs
           label={t("views.label")}
           value={query.view ?? "all"}
-          className={TABS_SCROLL}
           items={[
             { value: "all", href: discoveryHref({ ...query, view: undefined }), label: t("views.all") },
             {
