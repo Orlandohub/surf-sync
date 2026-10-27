@@ -1,15 +1,20 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { saveProfileAction } from "@/lib/actions/instructor";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError } from "@/components/ui/field";
+import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ChipToggleGroup } from "@/components/ui/chip-toggle-group";
-import { toast } from "@/components/ui/toast";
+import {
+  CLEARS_SAVE_BAR,
+  PinnedSaveBar,
+  toastAboveSaveBar,
+} from "@/components/instructor/pinned-save-bar";
+import { cn } from "@/lib/utils";
 
 const LEVELS = ["beginner", "intermediate", "advanced", "expert"] as const;
 export type Level = (typeof LEVELS)[number];
@@ -18,18 +23,25 @@ type Errors = Partial<Record<"displayName" | "level" | "zones", string>>;
 
 /**
  * Perfil form: name, bio, level (one of), zones (any of). Inline errors
- * say what to fix; "Guardar alterações" is the screen's one primary,
- * pinned above the tab bar on phones. A first-time profile gets a toast
- * action straight to the next onboarding step.
+ * say what to fix; the save button is the screen's one primary, pinned
+ * above the tab bar on phones. `aside` (the Perfil menu) sits beside the
+ * form on desktop and between the form and the pinned bar on phones, so
+ * the bar stays pinned to the end of the screen. A first-time profile
+ * says "Guardar perfil" and its toast goes straight to the next step.
  */
 export function ProfileForm({
   initial,
   locations,
   hasAvailability,
+  isNew,
+  aside,
 }: {
   initial: { displayName: string; bio: string; level: Level | null; locationIds: string[] };
   locations: { id: string; name: string }[];
   hasAvailability: boolean;
+  /** No profile saved yet. */
+  isNew: boolean;
+  aside?: React.ReactNode;
 }) {
   const t = useTranslations("InstructorProfilePage");
   const router = useRouter();
@@ -43,6 +55,7 @@ export function ProfileForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const formId = useId();
 
   function clear(field: keyof Errors) {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -82,8 +95,8 @@ export function ProfileForm({
       setFormError(res.error);
       return;
     }
-    toast(
-      t("form.saved"),
+    toastAboveSaveBar(
+      isNew ? t("form.created") : t("form.saved"),
       hasAvailability
         ? undefined
         : {
@@ -97,87 +110,99 @@ export function ProfileForm({
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} noValidate className="flex flex-col gap-section">
-      <section
-        aria-labelledby="os-teus-dados"
-        className="flex flex-col gap-6 rounded-card border bg-card p-card shadow-card sm:p-6"
+    <div className="grid items-start gap-section lg:grid-cols-3">
+      <form
+        id={formId}
+        ref={formRef}
+        onSubmit={handleSubmit}
+        noValidate
+        className={cn("lg:col-span-2", CLEARS_SAVE_BAR)}
       >
-        <div className="flex flex-col gap-1">
-          <h2 id="os-teus-dados" className="text-title-sm text-foreground">
-            {t("form.title")}
-          </h2>
-          <p className="text-meta text-muted-foreground">{t("form.description")}</p>
-        </div>
-
-        <Field
-          label={t("form.displayName")}
-          helper={t("form.displayNameHelper")}
-          error={errors.displayName}
+        <section
+          aria-labelledby="os-teus-dados"
+          className="flex flex-col gap-6 rounded-card border bg-card p-card shadow-card sm:p-6"
         >
-          <Input
-            name="displayName"
-            autoComplete="name"
-            value={displayName}
-            onChange={(e) => {
-              setDisplayName(e.target.value);
-              clear("displayName");
-            }}
-            maxLength={80}
-            required
-          />
-        </Field>
+          <div className="flex flex-col gap-1">
+            <h2 id="os-teus-dados" className="text-title-sm text-foreground">
+              {t("form.title")}
+            </h2>
+            <p className="text-meta text-muted-foreground">{t("form.description")}</p>
+          </div>
 
-        <Field label={t("form.bio")} helper={t("form.bioHelper")}>
-          <Textarea
-            name="bio"
-            value={bio}
-            onChange={(e) => {
-              setBio(e.target.value);
-              setFormError(null);
-            }}
-            maxLength={2000}
-            rows={4}
-          />
-        </Field>
+          <Field
+            label={t("form.displayName")}
+            helper={t("form.displayNameHelper")}
+            error={errors.displayName}
+          >
+            <Input
+              name="displayName"
+              autoComplete="name"
+              value={displayName}
+              onChange={(e) => {
+                setDisplayName(e.target.value);
+                clear("displayName");
+              }}
+              maxLength={80}
+              required
+            />
+          </Field>
 
-        <Field label={t("form.level")} group error={errors.level}>
-          <ChipToggleGroup<Level>
-            multiple={false}
-            required
-            options={LEVELS.map((value) => ({ value, label: t(`levels.${value}`) }))}
-            value={level}
-            onValueChange={(next) => {
-              setLevel(next);
-              clear("level");
-            }}
-          />
-        </Field>
+          <Field label={t("form.bio")} helper={t("form.bioHelper")}>
+            <Textarea
+              name="bio"
+              value={bio}
+              onChange={(e) => {
+                setBio(e.target.value);
+                setFormError(null);
+              }}
+              maxLength={2000}
+              rows={4}
+            />
+          </Field>
 
-        <Field label={t("form.zones")} group helper={t("form.zonesHelper")} error={errors.zones}>
-          <ChipToggleGroup
-            options={locations.map((l) => ({ value: l.id, label: l.name }))}
-            value={zones}
-            onValueChange={(next) => {
-              setZones(next);
-              clear("zones");
-            }}
-          />
-        </Field>
-      </section>
+          <Field label={t("form.level")} group error={errors.level}>
+            <ChipToggleGroup<Level>
+              multiple={false}
+              required
+              options={LEVELS.map((value) => ({ value, label: t(`levels.${value}`) }))}
+              value={level}
+              onValueChange={(next) => {
+                setLevel(next);
+                clear("level");
+              }}
+            />
+          </Field>
+
+          <Field label={t("form.zones")} group helper={t("form.zonesHelper")} error={errors.zones}>
+            <ChipToggleGroup
+              options={locations.map((l) => ({ value: l.id, label: l.name }))}
+              value={zones}
+              onValueChange={(next) => {
+                setZones(next);
+                clear("zones");
+              }}
+            />
+          </Field>
+        </section>
+      </form>
+
+      {aside && (
+        <div className={cn("lg:col-start-3 lg:row-start-1", CLEARS_SAVE_BAR)}>{aside}</div>
+      )}
 
       {/* The screen's one primary, pinned above the tab bar on phones. */}
-      <div className="sticky bottom-(--bottom-chrome) z-10 -mx-gutter flex flex-col gap-3 border-t bg-background px-gutter pt-3 pb-4 md:static md:mx-0 md:flex-row md:items-center md:justify-end md:border-0 md:p-0">
-        {formError && <FieldError className="md:mr-auto">{formError}</FieldError>}
+      <PinnedSaveBar error={formError} className="lg:col-span-2">
         <Button
           type="submit"
+          form={formId}
           size="lg"
           pending={saving || refreshing}
           pendingLabel={t("form.saving")}
           className="md:h-11 md:w-auto"
         >
-          {t("form.save")}
+          {isNew ? t("form.create") : t("form.save")}
         </Button>
-      </div>
-    </form>
+      </PinnedSaveBar>
+    </div>
   );
 }

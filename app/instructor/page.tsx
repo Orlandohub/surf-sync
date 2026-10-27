@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { CalendarCheck } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getInstructorOnboarding } from "@/lib/services/instructor";
@@ -35,8 +35,9 @@ export default async function InstructorHomePage() {
   if (!session) redirect("/sign-in");
   if (session.user.type !== "instructor") redirect("/");
 
-  const [t, onboarding, bookings] = await Promise.all([
+  const [t, format, onboarding, bookings] = await Promise.all([
     getTranslations("InstructorHomePage"),
+    getFormatter(),
     getInstructorOnboarding(session.user.id),
     listInstructorBookings(session.user.id),
   ]);
@@ -54,10 +55,16 @@ export default async function InstructorHomePage() {
   );
 
   if (onboardingOpen) {
+    // Same container as every other tab (content starts under the logo);
+    // the checklist itself keeps a readable width.
     return (
-      <PageContainer width="narrow">
+      <PageContainer>
         {header}
-        <OnboardingChecklist onboarding={onboarding} />
+        <OnboardingChecklist
+          onboarding={onboarding}
+          email={session.user.email}
+          className="lg:max-w-2xl"
+        />
       </PageContainer>
     );
   }
@@ -66,13 +73,16 @@ export default async function InstructorHomePage() {
   const all = bookings.map(toInstructorBooking);
   const { requests, upcoming } = groupInstructorBookings(all, today);
   const stats = monthStats(all, today);
-  const hours = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 1 }).format(stats.hours);
+  const hours = format.number(stats.hours, { maximumFractionDigits: 1 });
+  // The availability nudge is for instructors who've been taking lessons a
+  // while, not someone who set their days a moment ago to activate.
+  const showBanner = status === "active" && bookings.length > 0;
 
   return (
     <PageContainer>
       {header}
 
-      {status === "inactive" && <PausedNotice />}
+      {status === "inactive" && <PausedNotice hasAvailability={onboarding.hasAvailability} />}
 
       <div className="grid items-start gap-section lg:grid-cols-3">
         <div className="flex flex-col gap-section lg:col-span-2">
@@ -118,6 +128,7 @@ export default async function InstructorHomePage() {
                       today={today}
                       view="upcoming"
                       actions={false}
+                      clampNote
                     />
                   </li>
                 ))}
@@ -133,24 +144,24 @@ export default async function InstructorHomePage() {
           </section>
         </div>
 
-        <div className="flex flex-col gap-section">
-          <section aria-labelledby="estatisticas" className="flex flex-col gap-3">
-            <SectionHeading id="estatisticas" title={t("stats.title")} />
-            <div className="grid grid-cols-2 gap-stack">
-              <StatTile value={stats.lessons} label={t("stats.lessons")} />
-              <StatTile value={hours} label={t("stats.hours")} />
-            </div>
-          </section>
+        <section aria-labelledby="estatisticas" className="flex flex-col gap-3">
+          <SectionHeading id="estatisticas" title={t("stats.title")} />
+          <div className="grid grid-cols-2 gap-stack">
+            <StatTile value={stats.lessons} label={t("stats.lessons")} />
+            <StatTile value={hours} label={t("stats.hours")} />
+          </div>
+        </section>
 
-          {status === "active" && (
-            <ActionBanner
-              href="/instructor/availability"
-              icon={CalendarWave}
-              title={t("banner.title")}
-              description={t("banner.description")}
-            />
-          )}
-        </div>
+        {/* At the end, after the person's own data (under the main column on desktop). */}
+        {showBanner && (
+          <ActionBanner
+            className="lg:col-span-2"
+            href="/instructor/availability"
+            icon={CalendarWave}
+            title={t("banner.title")}
+            description={t("banner.description")}
+          />
+        )}
       </div>
     </PageContainer>
   );

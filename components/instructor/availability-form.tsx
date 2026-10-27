@@ -1,17 +1,22 @@
 "use client";
 
-import { useId, useState, useTransition } from "react";
+import { useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Info } from "lucide-react";
 import { saveAvailabilityAction, setPausedAction } from "@/lib/actions/instructor";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
+import { cn } from "@/lib/utils";
 import { SwitchRow } from "@/components/ui/switch";
 import { DayChips } from "@/components/ui/chip-toggle-group";
 import { TimeSelect } from "@/components/ui/time-select";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { toast } from "@/components/ui/toast";
+import {
+  CLEARS_SAVE_BAR,
+  PinnedSaveBar,
+  toastAboveSaveBar,
+} from "@/components/instructor/pinned-save-bar";
 import { DAY_KEYS, formatSlot, weekdayName, type DayKey } from "@/lib/format";
 import type { InstructorOnboarding } from "@/lib/services/instructor";
 
@@ -24,6 +29,10 @@ const DEFAULT_WINDOW: Window = { start: "09:00", end: "17:00" };
  * 24 h start–end window per chosen day. A form screen, so nothing applies
  * until "Guardar alterações": the weekly template is saved first, then the
  * pause/reactivate change (reactivating needs availability to exist).
+ *
+ * By status: active/inactive get the switch; incomplete is activated by
+ * its first save (service rule), so it needs a day and says so;
+ * pending_review/suspended can't toggle and save the hours only.
  */
 export function AvailabilityForm({
   availability,
@@ -50,9 +59,13 @@ export function AvailabilityForm({
     return out;
   });
   const canToggle = status === "active" || status === "inactive";
-  const [active, setActive] = useState(status === "active");
+  // The first save of an incomplete profile activates it (service rule).
+  const activates = status === "incomplete";
+  const savedActive = status === "active";
+  const [active, setActive] = useState(savedActive);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const selected = DAY_KEYS.filter((d) => days.includes(d));
   const invalid = new Set(selected.filter((d) => windows[d].end <= windows[d].start));
@@ -62,23 +75,35 @@ export function AvailabilityForm({
     setFormError(null);
   }
 
+  /** Takes the person to what needs fixing, centred clear of the pinned bar. */
+  function focusFirst(selector: string) {
+    requestAnimationFrame(() => {
+      const control = formRef.current?.querySelector<HTMLElement>(selector);
+      control?.focus({ preventScroll: true });
+      control?.scrollIntoView({ block: "center" });
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
     if (invalid.size > 0) {
       setFormError(t("errors.invalid"));
+      focusFirst("select[aria-invalid=true]");
       return;
     }
-    if (selected.length === 0) {
-      // Reactivating, or a first save (which activates), needs at least one day.
-      if (!canToggle) {
-        setFormError(t("errors.activateNeedsDays"));
-        return;
-      }
-      if (active && status === "inactive") {
-        setFormError(t("errors.reactivateNeedsDays"));
-        return;
-      }
+    // Being visible (or becoming visible) needs at least one day: the first
+    // save that activates, reactivating, and staying active.
+    if (selected.length === 0 && (activates || (canToggle && active))) {
+      setFormError(
+        activates
+          ? t("errors.activateNeedsDays")
+          : savedActive
+            ? t("errors.activeNeedsDays")
+            : t("errors.reactivateNeedsDays"),
+      );
+      focusFirst("[data-slot=chip-toggle-group] button");
+      return;
     }
 
     setSaving(true);
@@ -94,7 +119,7 @@ export function AvailabilityForm({
       setFormError(saved.error);
       return;
     }
-    if (canToggle && active !== (status === "active")) {
+    if (canToggle && active !== savedActive) {
       const toggled = await setPausedAction(!active);
       if (!toggled.ok) {
         setSaving(false);
@@ -104,13 +129,18 @@ export function AvailabilityForm({
       }
     }
     setSaving(false);
-    toast(t("saved"));
+    toastAboveSaveBar(activates ? t("activated") : t("saved"));
     startTransition(() => router.refresh());
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-section">
-      <div className="grid items-start gap-section lg:grid-cols-2">
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      noValidate
+      className="flex flex-col gap-section"
+    >
+      <div className={cn("grid items-start gap-section lg:grid-cols-2", CLEARS_SAVE_BAR)}>
         <div className="flex flex-col gap-section">
           <section aria-labelledby="visibilidade" className="flex flex-col gap-3">
             <SectionHeading id="visibilidade" title={t("active.title")} />
@@ -118,7 +148,17 @@ export function AvailabilityForm({
               {canToggle ? (
                 <SwitchRow
                   label={t("active.label")}
-                  description={active ? t("active.on") : t("active.off")}
+                  // The saved state, or what saving will do while it differs:
+                  // nothing applies before "Guardar alterações".
+                  description={
+                    active === savedActive
+                      ? active
+                        ? t("active.on")
+                        : t("active.off")
+                      : active
+                        ? t("active.willActivate")
+                        : t("active.willPause")
+                  }
                   checked={active}
                   onCheckedChange={(checked) => {
                     setActive(checked);
@@ -128,7 +168,11 @@ export function AvailabilityForm({
               ) : (
                 <p className="flex min-h-13 items-center gap-3 py-3 text-body text-muted-foreground">
                   <Info aria-hidden className="size-5 shrink-0" strokeWidth={1.75} />
-                  {t("active.incomplete")}
+                  {status === "pending_review"
+                    ? t("active.pending_review")
+                    : status === "suspended"
+                      ? t("active.suspended")
+                      : t("active.incomplete")}
                 </p>
               )}
             </div>
@@ -176,8 +220,7 @@ export function AvailabilityForm({
       </div>
 
       {/* The screen's one primary, pinned above the tab bar on phones. */}
-      <div className="sticky bottom-(--bottom-chrome) z-10 -mx-gutter flex flex-col gap-3 border-t bg-background px-gutter pt-3 pb-4 md:static md:mx-0 md:flex-row md:items-center md:justify-end md:border-0 md:p-0">
-        {formError && <FieldError className="md:mr-auto">{formError}</FieldError>}
+      <PinnedSaveBar error={formError}>
         <Button
           type="submit"
           size="lg"
@@ -185,9 +228,9 @@ export function AvailabilityForm({
           pendingLabel={t("saving")}
           className="md:h-11 md:w-auto"
         >
-          {t("save")}
+          {activates ? t("saveActivate") : t("save")}
         </Button>
-      </div>
+      </PinnedSaveBar>
     </form>
   );
 }

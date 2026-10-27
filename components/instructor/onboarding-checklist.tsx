@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ArrowRight, Check, ChevronRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { ResendVerification } from "@/components/instructor/resend-verification";
 import type { InstructorOnboarding, OnboardingStep } from "@/lib/services/instructor";
 
 const STEP_HREF: Partial<Record<OnboardingStep["key"], string>> = {
@@ -10,23 +11,48 @@ const STEP_HREF: Partial<Record<OnboardingStep["key"], string>> = {
   set_availability: "/instructor/availability",
 };
 
+type StepState = "done" | "current" | "inbox" | "later";
+
 /**
  * Início for a brand-new instructor: the three activation steps with
- * progress. Done steps show a check; the current step is a link (and the
- * view's one primary action); later steps wait, muted, until it's done.
+ * progress. The current step is the first one still to do that can be done
+ * here (profile, then availability); its button is the view's one
+ * primary. Verifying the email happens in the inbox and never blocks the
+ * other steps (the services don't require it), so its row offers
+ * "Reenviar email" instead. Steps that need an earlier one wait, muted.
  */
-export function OnboardingChecklist({ onboarding }: { onboarding: InstructorOnboarding }) {
+export function OnboardingChecklist({
+  onboarding,
+  email,
+  className,
+}: {
+  onboarding: InstructorOnboarding;
+  email: string;
+  className?: string;
+}) {
   const t = useTranslations("InstructorHomePage.onboarding");
   const steps = onboarding.steps;
   const done = steps.filter((s) => s.done).length;
-  const current = steps.find((s) => !s.done);
+  const current = steps.find((s) => !s.done && STEP_HREF[s.key]);
   const currentHref = current ? STEP_HREF[current.key] : undefined;
   const progress = t("progress", { done, total: steps.length });
+
+  const stateOf = (step: OnboardingStep): StepState =>
+    step.done
+      ? "done"
+      : step.key === current?.key
+        ? "current"
+        : step.key === "verify_email"
+          ? "inbox"
+          : "later";
 
   return (
     <section
       aria-labelledby="ativar-perfil"
-      className="flex flex-col overflow-hidden rounded-card border bg-card shadow-card"
+      className={cn(
+        "flex flex-col overflow-hidden rounded-card border bg-card shadow-card",
+        className,
+      )}
     >
       <div className="flex flex-col gap-4 p-card sm:p-6">
         <div className="flex flex-col gap-1">
@@ -40,10 +66,11 @@ export function OnboardingChecklist({ onboarding }: { onboarding: InstructorOnbo
         <div className="flex flex-col gap-2">
           <div
             role="progressbar"
-            aria-label={progress}
+            aria-labelledby="ativar-perfil"
             aria-valuemin={0}
             aria-valuemax={steps.length}
             aria-valuenow={done}
+            aria-valuetext={progress}
             className="h-1.5 w-full overflow-hidden rounded-full bg-muted"
           >
             <div
@@ -59,23 +86,29 @@ export function OnboardingChecklist({ onboarding }: { onboarding: InstructorOnbo
 
       <ol role="list" className="border-t">
         {steps.map((step, i) => {
-          const isCurrent = step.key === current?.key;
-          const href = isCurrent ? STEP_HREF[step.key] : undefined;
-          const state = step.done ? "done" : isCurrent ? "current" : "later";
-          const body = (
-            <>
+          const state = stateOf(step);
+          return (
+            <li
+              key={step.key}
+              aria-current={state === "current" ? "step" : undefined}
+              className={cn(
+                "relative flex min-h-18 items-start gap-3 px-card py-4 sm:px-6",
+                "not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border sm:not-first:before:left-18",
+              )}
+            >
               <span
                 aria-hidden
                 className={cn(
                   "flex size-9 shrink-0 items-center justify-center rounded-full text-label tabular-nums",
                   state === "done" && "bg-tint text-tint-foreground",
                   state === "current" && "bg-primary text-primary-foreground",
-                  state === "later" && "border border-border text-muted-foreground",
+                  (state === "inbox" || state === "later") &&
+                    "border border-border text-muted-foreground",
                 )}
               >
                 {step.done ? <Check className="size-5" strokeWidth={1.75} /> : i + 1}
               </span>
-              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="flex min-h-9 min-w-0 flex-1 flex-col justify-center gap-0.5">
                 <span
                   className={cn(
                     "text-label",
@@ -85,40 +118,16 @@ export function OnboardingChecklist({ onboarding }: { onboarding: InstructorOnbo
                   {t(`steps.${step.key}.title`)}
                 </span>
                 <span className="text-meta text-muted-foreground">
-                  {t(`steps.${step.key}.${step.done ? "doneDescription" : "description"}`)}
+                  {state === "done"
+                    ? t(`steps.${step.key}.doneDescription`)
+                    : t(`steps.${step.key}.description`, { email })}
                 </span>
+                {state === "inbox" && <ResendVerification email={email} />}
               </span>
-              {step.done ? (
-                <span className="shrink-0 text-meta text-muted-foreground">{t("done")}</span>
-              ) : href ? (
-                <ChevronRight
-                  aria-hidden
-                  className="size-5 shrink-0 text-muted-foreground"
-                  strokeWidth={1.75}
-                />
-              ) : null}
-            </>
-          );
-          const rowClass = "flex min-h-18 items-center gap-3 px-card py-3 sm:px-6";
-          return (
-            <li
-              key={step.key}
-              aria-current={isCurrent ? "step" : undefined}
-              className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border sm:not-first:before:left-18"
-            >
-              {href ? (
-                <Link
-                  href={href}
-                  className={cn(
-                    rowClass,
-                    "transition-colors duration-(--duration-fast) hover:bg-accent/50",
-                    "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-                  )}
-                >
-                  {body}
-                </Link>
-              ) : (
-                <div className={rowClass}>{body}</div>
+              {step.done && (
+                <span className="flex min-h-9 shrink-0 items-center text-meta text-muted-foreground">
+                  {t("done")}
+                </span>
               )}
             </li>
           );

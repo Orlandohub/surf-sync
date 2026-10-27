@@ -1,37 +1,18 @@
-"use client";
-
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Pause } from "lucide-react";
-import { setPausedAction } from "@/lib/actions/instructor";
-import { Button } from "@/components/ui/button";
-import { FieldError } from "@/components/ui/field";
-import { toast } from "@/components/ui/toast";
+import { ArrowRight, Pause } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { ReactivateButton } from "@/components/instructor/reactivate-button";
 
 /**
- * Início when the instructor paused their profile: what that means and
- * "Reativar perfil" (the view's one primary). Applies immediately.
+ * Início when the instructor paused their profile: what that means and the
+ * view's one primary. With availability left that's "Reativar perfil"
+ * (applies immediately); with no days left, reactivating can't work yet,
+ * so it says so and links to Disponibilidade.
  */
-export function PausedNotice() {
+export function PausedNotice({ hasAvailability }: { hasAvailability: boolean }) {
   const t = useTranslations("InstructorHomePage.paused");
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [refreshing, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-
-  async function reactivate() {
-    setBusy(true);
-    setError(null);
-    const res = await setPausedAction(false);
-    setBusy(false);
-    if (!res.ok) {
-      setError(res.error);
-      return;
-    }
-    toast(t("done"));
-    startTransition(() => router.refresh());
-  }
 
   return (
     <section
@@ -45,17 +26,24 @@ export function PausedNotice() {
         <h2 id="perfil-pausado" className="text-title-sm text-foreground">
           {t("title")}
         </h2>
-        <p className="text-body text-muted-foreground">{t("description")}</p>
-        {error && <FieldError className="mt-1">{error}</FieldError>}
+        <p className="text-body text-muted-foreground">
+          {hasAvailability ? t("description") : t("descriptionNoDays")}
+        </p>
       </div>
-      <Button
-        pending={busy || refreshing}
-        pendingLabel={t("reactivating")}
-        onClick={reactivate}
-        className="max-sm:h-13 max-sm:w-full"
-      >
-        {t("reactivate")}
-      </Button>
+      {hasAvailability ? (
+        <ReactivateButton
+          className="max-sm:items-stretch sm:max-w-xs sm:items-end"
+          buttonClassName="max-sm:h-13"
+        />
+      ) : (
+        <Link
+          href="/instructor/availability"
+          className={cn(buttonVariants(), "max-sm:h-13 max-sm:w-full")}
+        >
+          {t("setAvailability")}
+          <ArrowRight aria-hidden strokeWidth={1.75} />
+        </Link>
+      )}
     </section>
   );
 }

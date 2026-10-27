@@ -45,15 +45,16 @@ export default async function InstructorProfilePage() {
       <header className="flex items-center gap-4 sm:gap-5">
         <Avatar name={name} size={88} />
         <div className="flex min-w-0 flex-col gap-2">
-          <h1 className="flex items-center gap-2 text-headline text-foreground">
-            <span className="min-w-0 truncate">{name || t("title")}</span>
+          {/* The h1 is the name only; the verified mark is announced next to it. */}
+          <div className="flex min-w-0 items-center gap-2">
+            <h1 className="min-w-0 truncate text-headline text-foreground">{name || t("title")}</h1>
             {verified && (
-              <>
-                <BadgeCheck aria-hidden className="size-5 shrink-0 text-primary" strokeWidth={1.75} />
+              <span className="flex shrink-0 items-center">
+                <BadgeCheck aria-hidden className="size-5 text-primary" strokeWidth={1.75} />
                 <span className="sr-only">{t("verified")}</span>
-              </>
+              </span>
             )}
-          </h1>
+          </div>
           {profile ? (
             <div className="flex flex-wrap items-center gap-1.5">
               <Badge>{t(`levels.${profile.experienceLevel}`)}</Badge>
@@ -67,34 +68,28 @@ export default async function InstructorProfilePage() {
         </div>
       </header>
 
-      <div className="grid items-start gap-section lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <ProfileForm
-            initial={{
-              displayName: name,
-              bio: profile?.bio ?? "",
-              level: profile?.experienceLevel ?? null,
-              locationIds: data.selectedLocationIds,
-            }}
-            locations={data.locations.map((l) => ({ id: l.id, name: l.name }))}
-            hasAvailability={days > 0}
-          />
-        </div>
-
-        <MenuGroup label={t("menu.label")}>
-          <MenuRow
-            icon={CalendarWave}
-            label={t("menu.availability")}
-            value={t("menu.availabilityValue", { count: days })}
-            href="/instructor/availability"
-          />
-          <MenuRow
-            icon={CircleUserRound}
-            label={t("menu.account")}
-            href="/account"
-          />
-        </MenuGroup>
-      </div>
+      <ProfileForm
+        initial={{
+          displayName: name,
+          bio: profile?.bio ?? "",
+          level: profile?.experienceLevel ?? null,
+          locationIds: data.selectedLocationIds,
+        }}
+        locations={data.locations.map((l) => ({ id: l.id, name: l.name }))}
+        hasAvailability={days > 0}
+        isNew={!profile}
+        aside={
+          <MenuGroup label={t("menu.label")}>
+            <MenuRow
+              icon={CalendarWave}
+              label={t("menu.availability")}
+              value={t("menu.availabilityValue", { count: days })}
+              href="/instructor/availability"
+            />
+            <MenuRow icon={CircleUserRound} label={t("menu.account")} href="/account" />
+          </MenuGroup>
+        }
+      />
     </PageContainer>
   );
 }

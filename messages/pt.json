@@ -216,7 +216,7 @@
       "steps": {
         "verify_email": {
           "title": "Verificar email",
-          "description": "Abre o link que te enviámos por email.",
+          "description": "Abre o link que enviámos para {email}.",
           "doneDescription": "O teu email está confirmado."
         },
         "complete_profile": {
@@ -229,14 +229,22 @@
           "description": "Os dias e as horas em que podes dar aulas.",
           "doneDescription": "Dias e horas guardados."
         }
+      },
+      "resend": {
+        "action": "Reenviar email",
+        "sending": "A enviar…",
+        "sent": "Enviámos um novo link para {email}.",
+        "error": "Não foi possível enviar o email. Tenta novamente daqui a pouco."
       }
     },
     "paused": {
       "title": "O teu perfil está pausado",
       "description": "As escolas não te encontram na pesquisa nem te podem pedir aulas.",
+      "descriptionNoDays": "Não tens dias definidos. Escolhe pelo menos um dia para voltares a aparecer na pesquisa.",
       "reactivate": "Reativar perfil",
       "reactivating": "A reativar…",
-      "done": "Perfil reativado."
+      "done": "Perfil reativado.",
+      "setAvailability": "Definir disponibilidade"
     },
     "requests": {
       "title": "Pedidos por responder",
@@ -266,7 +274,11 @@
       "label": "Ativo",
       "on": "Visível para as escolas na pesquisa.",
       "off": "Pausado: não apareces na pesquisa.",
-      "incomplete": "O teu perfil fica ativo assim que guardares a disponibilidade."
+      "willActivate": "Ao guardares, voltas a aparecer na pesquisa.",
+      "willPause": "Ao guardares, deixas de aparecer na pesquisa.",
+      "incomplete": "O teu perfil fica ativo assim que guardares a disponibilidade.",
+      "pending_review": "O teu perfil está em revisão. Podes ir atualizando os teus horários.",
+      "suspended": "O teu perfil está suspenso. Podes atualizar os teus horários, mas não apareces na pesquisa."
     },
     "days": {
       "label": "Dias da semana",
@@ -280,12 +292,15 @@
       "endBeforeStart": "A hora de fim tem de ser depois do início."
     },
     "save": "Guardar alterações",
+    "saveActivate": "Guardar e ativar perfil",
     "saving": "A guardar…",
     "saved": "Alterações guardadas.",
+    "activated": "Perfil ativado. Já apareces na pesquisa.",
     "errors": {
       "invalid": "Corrige os horários assinalados para guardares.",
       "activateNeedsDays": "Escolhe pelo menos um dia para ativares o perfil.",
-      "reactivateNeedsDays": "Escolhe pelo menos um dia para reativares o perfil."
+      "reactivateNeedsDays": "Escolhe pelo menos um dia para reativares o perfil.",
+      "activeNeedsDays": "Escolhe pelo menos um dia. Para deixares de aparecer na pesquisa, desliga Ativo."
     },
     "needsProfile": {
       "title": "Primeiro, completa o teu perfil",
@@ -324,8 +339,10 @@
       "zonesHelper": "As praias onde dás aulas.",
       "zonesError": "Escolhe pelo menos uma zona.",
       "save": "Guardar alterações",
+      "create": "Guardar perfil",
       "saving": "A guardar…",
       "saved": "Alterações guardadas.",
+      "created": "Perfil guardado.",
       "nextStep": "Definir disponibilidade"
     },
     "menu": {
@@ -463,9 +480,13 @@
         "title": "Ainda sem histórico",
         "description": "As aulas passadas, recusadas e canceladas ficam aqui."
       },
-      "inactive": {
-        "description": "O teu perfil não está ativo, por isso as escolas ainda não te encontram.",
-        "action": "Ver o que falta"
+      "off": {
+        "paused": "O teu perfil está pausado, por isso as escolas não te encontram na pesquisa.",
+        "review": "O teu perfil está em revisão. Quando for aprovado, as escolas podem pedir-te aulas.",
+        "suspended": "O teu perfil está suspenso, por isso as escolas não te encontram na pesquisa.",
+        "setup": "O teu perfil ainda não está ativo, por isso as escolas não te encontram na pesquisa.",
+        "setupAction": "Ver o que falta",
+        "setAvailability": "Definir disponibilidade"
       }
     },
     "notifications": {
@@ -476,11 +497,9 @@
       "markAllFailed": "Não foi possível marcar como lidas. Verifica a ligação e tenta novamente.",
       "types": {
         "booking_requested": "<strong>{school}</strong> pediu uma aula para {day}.",
-        "booking_accepted": "Aceitaste a aula de {day} com <strong>{school}</strong>.",
-        "booking_declined": "Recusaste o pedido de <strong>{school}</strong> para {day}.",
+        "booking_requested_at": "<strong>{school}</strong> pediu uma aula para {day} · {time}.",
         "booking_cancelled": "<strong>{school}</strong> cancelou a aula de {day}.",
-        "verification_approved": "A tua identidade foi verificada.",
-        "verification_rejected": "Não foi possível verificar a tua identidade.",
+        "booking_cancelled_at": "<strong>{school}</strong> cancelou a aula de {day} · {time}.",
         "other": "Tens uma nova notificação."
       },
       "empty": "Sem notificações. Avisamos-te aqui quando uma escola te pedir ou cancelar uma aula."
@@ -498,6 +517,8 @@
     "requestedBy": "Pedido por {name}",
     "noteFrom": "{name}: {note}",
     "declineReason": "Motivo: {reason}",
+    "requestContext": "pedido de {school}, {when}",
+    "lessonContext": "com {school}, {when}",
     "accept": {
       "action": "Aceitar",
       "pending": "A aceitar…",
@@ -522,6 +543,20 @@
       "confirm": "Cancelar aula",
       "pending": "A cancelar…",
       "done": "Aula cancelada."
+    },
+    "months": {
+      "jan": "jan",
+      "feb": "fev",
+      "mar": "mar",
+      "apr": "abr",
+      "may": "mai",
+      "jun": "jun",
+      "jul": "jul",
+      "aug": "ago",
+      "sep": "set",
+      "oct": "out",
+      "nov": "nov",
+      "dec": "dez"
     }
   }
 }

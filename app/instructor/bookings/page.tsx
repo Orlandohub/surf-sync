@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { InstructorBookingRow } from "@/components/instructor/booking-row";
+import { ReactivateButton } from "@/components/instructor/reactivate-button";
 import { NotificationsPanel } from "@/components/instructor/notifications-panel";
 import {
   groupInstructorBookings,
@@ -29,6 +30,9 @@ const TABS = ["requests", "upcoming", "history"] as const;
 type Tab = (typeof TABS)[number];
 
 const EMPTY_ICON = { requests: Inbox, upcoming: CalendarCheck, history: History } as const;
+
+/** Why nothing can arrive: paused, under review, suspended, or not set up yet. */
+type OffReason = "paused" | "review" | "suspended" | "setup";
 
 export default async function InstructorBookingsPage({
   searchParams,
@@ -59,8 +63,18 @@ export default async function InstructorBookingsPage({
       : "upcoming";
   const list = groups[tab];
   const view = tab === "requests" ? "request" : tab === "upcoming" ? "upcoming" : "history";
-  // Nothing can arrive while the profile is off: say so, and point to Início.
-  const inactiveEmpty = onboarding.profileStatus !== "active" && tab !== "history";
+  // Nothing can arrive while the profile is off: say why, and what to do.
+  const status = onboarding.profileStatus;
+  const offReason: OffReason | null =
+    tab === "history" || status === "active"
+      ? null
+      : status === "inactive"
+        ? "paused"
+        : status === "pending_review"
+          ? "review"
+          : status === "suspended"
+            ? "suspended"
+            : "setup";
 
   return (
     <PageContainer>
@@ -95,12 +109,21 @@ export default async function InstructorBookingsPage({
               icon={EMPTY_ICON[tab]}
               title={t(`empty.${tab}.title`)}
               description={
-                inactiveEmpty ? t("empty.inactive.description") : t(`empty.${tab}.description`)
+                offReason ? t(`empty.off.${offReason}`) : t(`empty.${tab}.description`)
               }
               action={
-                inactiveEmpty ? (
+                offReason === "paused" ? (
+                  onboarding.hasAvailability ? (
+                    <ReactivateButton />
+                  ) : (
+                    <Link href="/instructor/availability" className={buttonVariants()}>
+                      {t("empty.off.setAvailability")}
+                      <ArrowRight aria-hidden strokeWidth={1.75} />
+                    </Link>
+                  )
+                ) : offReason === "setup" ? (
                   <Link href="/instructor" className={buttonVariants()}>
-                    {t("empty.inactive.action")}
+                    {t("empty.off.setupAction")}
                     <ArrowRight aria-hidden strokeWidth={1.75} />
                   </Link>
                 ) : undefined

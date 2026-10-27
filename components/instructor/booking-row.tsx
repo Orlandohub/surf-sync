@@ -1,16 +1,6 @@
-"use client";
-
-import { useState, useTransition } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { CalendarClock, Check } from "lucide-react";
-import { respondBookingAction, cancelBookingAction } from "@/lib/actions/booking";
+import { CalendarClock } from "lucide-react";
 import { ItemRow } from "@/components/ui/list-row";
-import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/dialog";
-import { Field } from "@/components/ui/field";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/toast";
 import {
   StatusBadge,
   bookingStatusIcon,
@@ -18,35 +8,51 @@ import {
 } from "@/components/brand/status-badge";
 import { DateTile } from "@/components/instructor/date-tile";
 import {
+  AcceptAction,
+  CancelAction,
+  DeclineAction,
+} from "@/components/instructor/booking-actions";
+import {
   displayStatus,
   type InstructorBooking,
 } from "@/components/instructor/booking-groups";
-import { formatDayTimeRange, formatRelativeDay, type IsoDate } from "@/lib/format";
+import { formatDayTimeRange, type IsoDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 /**
  * One booking in the instructor's lists (Início and Aulas), on ItemRow:
  * date tile · school · "Sábado · 10:00–12:00" · status · the school's note.
+ * A server component; only the actions (booking-actions.tsx) run on the
+ * client.
  *
  * - `request`: Recusar (outline, opens a confirmation with an optional
  *   reason) · Aceitar (tonal). Never filled: a list can hold several
  *   requests and the view keeps one filled primary at most.
- * - `upcoming`: Cancelar aula (outline, confirmation).
- * - `history` / `actions={false}`: read-only.
+ * - `upcoming`: Cancelar aula (outline, compact, confirmation).
+ * - `history`: read-only, except a request nobody answered whose day has
+ *   passed ("Sem resposta"), which can still be declined.
+ * - `actions={false}`: read-only (Início's lesson previews).
+ *
+ * The note is the school's request (meeting point, group, languages): it
+ * is shown in full wherever the instructor decides. `clampNote` keeps
+ * Início's read-only previews short; the full text is one tap away in Aulas.
  */
 export function InstructorBookingRow({
   booking,
   today,
   view,
   actions = true,
+  clampNote = false,
 }: {
   booking: InstructorBooking;
   today: IsoDate;
   view: "request" | "upcoming" | "history";
   actions?: boolean;
+  clampNote?: boolean;
 }) {
   const t = useTranslations("InstructorBookingRow");
   const status = displayStatus(booking, today);
-  const muted = view === "history";
+  const when = formatDayTimeRange(booking.bookingDate, booking.startTime, booking.endTime);
 
   const note =
     view === "request"
@@ -57,11 +63,24 @@ export function InstructorBookingRow({
         ? t("declineReason", { reason: booking.declineReason })
         : booking.notes;
 
+  const rowActions = !actions ? undefined : view === "request" ? (
+    <>
+      <DeclineAction booking={booking} when={when} />
+      <AcceptAction booking={booking} when={when} />
+    </>
+  ) : view === "upcoming" ? (
+    <CancelAction booking={booking} when={when} />
+  ) : status === "expired" ? (
+    <div className="flex justify-end">
+      <DeclineAction booking={booking} when={when} list="history" />
+    </div>
+  ) : undefined;
+
   return (
     <ItemRow
-      leading={<DateTile date={booking.bookingDate} muted={muted} />}
+      leading={<DateTile date={booking.bookingDate} muted={view === "history"} />}
       title={booking.schoolName}
-      description={formatDayTimeRange(booking.bookingDate, booking.startTime, booking.endTime)}
+      description={when}
       status={
         status === "expired" ? (
           <StatusBadge tone="neutral" icon={CalendarClock}>
@@ -73,154 +92,18 @@ export function InstructorBookingRow({
           </StatusBadge>
         )
       }
-      actions={
-        actions && view === "request" ? (
-          <RequestActions booking={booking} />
-        ) : actions && view === "upcoming" ? (
-          <CancelAction booking={booking} />
-        ) : undefined
-      }
+      actions={rowActions}
     >
       {note && (
-        <span className="line-clamp-2 basis-full text-meta text-muted-foreground">{note}</span>
+        <span
+          className={cn(
+            "basis-full text-meta text-muted-foreground",
+            clampNote ? "line-clamp-2" : "break-words whitespace-pre-line",
+          )}
+        >
+          {note}
+        </span>
       )}
     </ItemRow>
-  );
-}
-
-/**
- * Re-renders the page with fresh data. On Aulas without an explicit tab the
- * default tab depends on the data (Pedidos while there are requests), so
- * the current tab is pinned in the URL first: answering the last request
- * keeps you on Pedidos instead of jumping to Próximas.
- */
-function useRefresh(tab: "requests" | "upcoming") {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const [refreshing, startTransition] = useTransition();
-  const refresh = () =>
-    startTransition(() => {
-      if (pathname === "/instructor/bookings" && !searchParams.has("tab")) {
-        router.replace(`/instructor/bookings?tab=${tab}`, { scroll: false });
-      } else {
-        router.refresh();
-      }
-    });
-  return { refreshing, refresh };
-}
-
-function RequestActions({ booking }: { booking: InstructorBooking }) {
-  const t = useTranslations("InstructorBookingRow");
-  const { refreshing, refresh } = useRefresh("requests");
-  const [accepting, setAccepting] = useState(false);
-  const [accepted, setAccepted] = useState(false);
-  const [reason, setReason] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const day = formatRelativeDay(booking.bookingDate, { lowercase: true });
-
-  async function accept() {
-    setAccepting(true);
-    const res = await respondBookingAction(booking.id, true);
-    setAccepting(false);
-    if (!res.ok) {
-      // Nothing to correct inline (e.g. the request was already answered).
-      toast.error(res.error);
-      refresh();
-      return;
-    }
-    // Stays pending until the refreshed list moves the row to Próximas.
-    setAccepted(true);
-    toast(t("accept.done"));
-    refresh();
-  }
-
-  return (
-    <>
-      <ConfirmDialog
-        trigger={
-          <Button variant="outline" size="sm" disabled={accepting || accepted}>
-            {t("decline.action")}
-          </Button>
-        }
-        title={t("decline.title", { day })}
-        description={t("decline.description")}
-        cancelLabel={t("decline.keep")}
-        confirmLabel={t("decline.confirm")}
-        pendingLabel={t("decline.pending")}
-        tone="destructive"
-        error={error}
-        onOpenChange={(open) => {
-          if (!open) {
-            setError(null);
-            setReason("");
-          }
-        }}
-        onConfirm={async () => {
-          const res = await respondBookingAction(booking.id, false, reason.trim() || undefined);
-          if (!res.ok) {
-            setError(res.error);
-            return false;
-          }
-          toast(t("decline.done"));
-          refresh();
-        }}
-      >
-        <Field label={t("decline.reason")} helper={t("decline.reasonHelper")}>
-          <Textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            maxLength={500}
-            rows={3}
-          />
-        </Field>
-      </ConfirmDialog>
-      <Button
-        variant="secondary"
-        size="sm"
-        pending={accepting || (accepted && refreshing)}
-        pendingLabel={t("accept.pending")}
-        onClick={accept}
-      >
-        <Check aria-hidden strokeWidth={1.75} />
-        {t("accept.action")}
-      </Button>
-    </>
-  );
-}
-
-function CancelAction({ booking }: { booking: InstructorBooking }) {
-  const t = useTranslations("InstructorBookingRow");
-  const { refresh } = useRefresh("upcoming");
-  const [error, setError] = useState<string | null>(null);
-  const day = formatRelativeDay(booking.bookingDate, { lowercase: true });
-
-  return (
-    <ConfirmDialog
-      trigger={
-        <Button variant="outline" size="sm">
-          {t("cancel.action")}
-        </Button>
-      }
-      title={t("cancel.title", { day })}
-      description={t("cancel.description")}
-      cancelLabel={t("cancel.keep")}
-      confirmLabel={t("cancel.confirm")}
-      pendingLabel={t("cancel.pending")}
-      tone="destructive"
-      error={error}
-      onOpenChange={(open) => {
-        if (!open) setError(null);
-      }}
-      onConfirm={async () => {
-        const res = await cancelBookingAction(booking.id);
-        if (!res.ok) {
-          setError(res.error);
-          return false;
-        }
-        toast(t("cancel.done"));
-        refresh();
-      }}
-    />
   );
 }

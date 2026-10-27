@@ -10,8 +10,10 @@ import { toast } from "@/components/ui/toast";
 /**
  * "Marcar tudo como lido" — a quiet text action in the Notificações
  * heading. Refreshes the route so the dots and the nav's unread badge clear.
+ * The button disappears once everything is read, so focus moves to the
+ * section heading (`headingId`) instead of falling back to the page.
  */
-export function MarkAllReadButton() {
+export function MarkAllReadButton({ headingId }: { headingId: string }) {
   const t = useTranslations("InstructorBookingsPage.notifications");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -24,6 +26,11 @@ export function MarkAllReadButton() {
     if (!res.ok) {
       toast.error(t("markAllFailed"));
       return;
+    }
+    const heading = document.getElementById(headingId);
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus();
     }
     startTransition(() => router.refresh());
   }
