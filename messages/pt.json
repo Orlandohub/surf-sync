@@ -197,65 +197,143 @@
       "generic": "Não foi possível alterar a palavra-passe. Tente novamente."
     }
   },
-  "InstructorDashboardPage": {
-    "title": "Painel do instrutor",
+  "InstructorHomePage": {
+    "title": "Início",
+    "greeting": "Olá, {name} 👋",
+    "greetingNoName": "Olá 👋",
     "status": {
-      "active": "Perfil ativo — visível para escolas na pesquisa.",
-      "inactive": "Perfil pausado — não aparece na pesquisa. Reativa quando quiseres voltar.",
-      "incomplete": "Completa os passos abaixo para ativar o teu perfil."
+      "active": "Perfil ativo · visível para as escolas",
+      "inactive": "Perfil pausado · não apareces na pesquisa",
+      "pending_review": "Perfil em revisão · ainda não apareces na pesquisa",
+      "suspended": "Perfil suspenso · não apareces na pesquisa",
+      "incomplete": "Perfil por ativar · ainda não apareces na pesquisa"
     },
-    "viewBookings": "As tuas aulas",
-    "steps": {
-      "1": "Passo 1",
-      "2": "Passo 2",
-      "3": "Passo 3"
+    "onboarding": {
+      "title": "Ativa o teu perfil",
+      "description": "{remaining, plural, one {Falta # passo para as escolas te encontrarem na pesquisa.} other {Faltam # passos para as escolas te encontrarem na pesquisa.}}",
+      "progress": "{done} de {total} passos concluídos",
+      "done": "Concluído",
+      "steps": {
+        "verify_email": {
+          "title": "Verificar email",
+          "description": "Abre o link que te enviámos por email.",
+          "doneDescription": "O teu email está confirmado."
+        },
+        "complete_profile": {
+          "title": "Completar perfil",
+          "description": "O teu nome, nível e as zonas onde dás aulas.",
+          "doneDescription": "Nome, nível e zonas guardados."
+        },
+        "set_availability": {
+          "title": "Definir disponibilidade",
+          "description": "Os dias e as horas em que podes dar aulas.",
+          "doneDescription": "Dias e horas guardados."
+        }
+      }
     },
-    "stepLabels": {
-      "verify_email": "Verificar email",
-      "complete_profile": "Completar perfil",
-      "set_availability": "Definir disponibilidade"
+    "paused": {
+      "title": "O teu perfil está pausado",
+      "description": "As escolas não te encontram na pesquisa nem te podem pedir aulas.",
+      "reactivate": "Reativar perfil",
+      "reactivating": "A reativar…",
+      "done": "Perfil reativado."
     },
-    "profile": {
-      "title": "O teu perfil",
-      "description": "Nome apresentado às escolas, bio, experiência e zonas onde dá aulas.",
-      "displayName": "Nome apresentado às escolas",
-      "bio": "Bio",
-      "experience": "Nível de experiência",
-      "locations": "Zonas",
-      "save": "Guardar perfil",
-      "saving": "A guardar...",
-      "saved": "Perfil guardado."
+    "requests": {
+      "title": "Pedidos por responder",
+      "viewAll": "Ver todos"
     },
-    "availability": {
-      "title": "Disponibilidade semanal",
-      "description": "O template recorrente de disponibilidade por dia da semana.",
-      "save": "Guardar disponibilidade",
-      "saving": "A guardar...",
-      "saved": "Disponibilidade guardada."
+    "upcoming": {
+      "title": "Próximas aulas",
+      "viewAll": "Ver todas",
+      "emptyTitle": "Sem aulas marcadas",
+      "emptyDescription": "Quando aceitares o pedido de uma escola, a aula aparece aqui."
+    },
+    "stats": {
+      "title": "Estatísticas",
+      "lessons": "Aulas este mês",
+      "hours": "Horas este mês"
+    },
+    "banner": {
+      "title": "Revê a tua disponibilidade",
+      "description": "Só recebes pedidos nos dias e horas que definires."
+    }
+  },
+  "InstructorAvailabilityPage": {
+    "title": "Disponibilidade",
+    "description": "Os dias e as horas em que as escolas te podem pedir aulas.",
+    "active": {
+      "title": "Visibilidade",
+      "label": "Ativo",
+      "on": "Visível para as escolas na pesquisa.",
+      "off": "Pausado: não apareces na pesquisa.",
+      "incomplete": "O teu perfil fica ativo assim que guardares a disponibilidade."
     },
     "days": {
-      "mon": "Segunda",
-      "tue": "Terça",
-      "wed": "Quarta",
-      "thu": "Quinta",
-      "fri": "Sexta",
-      "sat": "Sábado",
-      "sun": "Domingo"
+      "label": "Dias da semana",
+      "none": "Sem dias escolhidos, as escolas não te podem pedir aulas."
     },
-    "experience": {
+    "hours": {
+      "title": "Horários",
+      "empty": "Escolhe os dias da semana para definires as horas.",
+      "start": "{day}: início",
+      "end": "{day}: fim",
+      "endBeforeStart": "A hora de fim tem de ser depois do início."
+    },
+    "save": "Guardar alterações",
+    "saving": "A guardar…",
+    "saved": "Alterações guardadas.",
+    "errors": {
+      "invalid": "Corrige os horários assinalados para guardares.",
+      "activateNeedsDays": "Escolhe pelo menos um dia para ativares o perfil.",
+      "reactivateNeedsDays": "Escolhe pelo menos um dia para reativares o perfil."
+    },
+    "needsProfile": {
+      "title": "Primeiro, completa o teu perfil",
+      "description": "As escolas precisam de saber quem és antes de verem a tua disponibilidade.",
+      "action": "Completar perfil"
+    }
+  },
+  "InstructorProfilePage": {
+    "title": "Perfil",
+    "verified": "Identidade verificada",
+    "newProfile": "Completa o teu perfil para as escolas te encontrarem.",
+    "status": {
+      "active": "Ativo",
+      "inactive": "Pausado",
+      "incomplete": "Por ativar",
+      "pending_review": "Em revisão",
+      "suspended": "Suspenso"
+    },
+    "levels": {
       "beginner": "Iniciante",
       "intermediate": "Intermédio",
       "advanced": "Avançado",
       "expert": "Especialista"
     },
-    "pause": {
-      "title": "Pausar perfil",
-      "description": "Perfil pausado deixa de aparecer nos resultados de pesquisa das escolas.",
-      "pause": "Pausar perfil",
-      "reactivate": "Reativar perfil",
-      "notAvailable": "Disponível após completar perfil e disponibilidade."
+    "form": {
+      "title": "Os teus dados",
+      "description": "É assim que as escolas te veem na pesquisa.",
+      "displayName": "Nome",
+      "displayNameHelper": "O nome que as escolas veem.",
+      "displayNameError": "Indica o teu nome, com pelo menos 2 letras.",
+      "bio": "Sobre ti",
+      "bioHelper": "Certificações, anos de experiência, línguas que falas.",
+      "level": "Nível",
+      "levelError": "Escolhe o teu nível.",
+      "zones": "Zonas",
+      "zonesHelper": "As praias onde dás aulas.",
+      "zonesError": "Escolhe pelo menos uma zona.",
+      "save": "Guardar alterações",
+      "saving": "A guardar…",
+      "saved": "Alterações guardadas.",
+      "nextStep": "Definir disponibilidade"
     },
-    "eyebrow": "Instrutor"
+    "menu": {
+      "label": "Mais",
+      "availability": "Disponibilidade",
+      "availabilityValue": "{count, plural, =0 {Por definir} one {# dia} other {# dias}}",
+      "account": "Conta"
+    }
   },
   "SchoolDashboardPage": {
     "title": "Escola",
@@ -364,34 +442,86 @@
     "eyebrow": "Reservas"
   },
   "InstructorBookingsPage": {
-    "title": "As tuas aulas",
-    "subtitle": "Pedidos de escolas e reservas confirmadas.",
-    "accept": "Aceitar",
-    "decline": "Recusar",
-    "confirmDecline": "Confirmar recusa",
-    "declineReason": "Motivo (opcional, visível para a escola)",
-    "back": "Voltar",
-    "cancel": "Cancelar",
-    "empty": "Ainda sem pedidos. Completa o perfil para as escolas te encontrarem.",
-    "requestedBy": "pedido por {name}",
-    "status": {
-      "requested": "Novo pedido",
-      "accepted": "Confirmada",
-      "declined": "Recusada",
-      "cancelled": "Cancelada",
-      "completed": "Concluída"
+    "title": "Aulas",
+    "description": "Pedidos das escolas e as tuas aulas marcadas.",
+    "tabs": {
+      "label": "Aulas",
+      "requests": "Pedidos",
+      "upcoming": "Próximas",
+      "history": "Histórico"
+    },
+    "empty": {
+      "requests": {
+        "title": "Sem pedidos por responder",
+        "description": "Quando uma escola te pedir uma aula, o pedido aparece aqui."
+      },
+      "upcoming": {
+        "title": "Ainda não tens aulas marcadas",
+        "description": "Quando aceitares um pedido, a aula aparece aqui."
+      },
+      "history": {
+        "title": "Ainda sem histórico",
+        "description": "As aulas passadas, recusadas e canceladas ficam aqui."
+      },
+      "inactive": {
+        "description": "O teu perfil não está ativo, por isso as escolas ainda não te encontram.",
+        "action": "Ver o que falta"
+      }
     },
     "notifications": {
       "title": "Notificações",
-      "unread": "{count, plural, =0 {Sem novidades} one {# não lida} other {# não lidas}}",
-      "markAll": "Marcar tudo como lido"
+      "unread": "{count, plural, =0 {Tudo lido} one {# não lida} other {# não lidas}}",
+      "markAll": "Marcar tudo como lido",
+      "marking": "A marcar…",
+      "markAllFailed": "Não foi possível marcar como lidas. Verifica a ligação e tenta novamente.",
+      "types": {
+        "booking_requested": "<strong>{school}</strong> pediu uma aula para {day}.",
+        "booking_accepted": "Aceitaste a aula de {day} com <strong>{school}</strong>.",
+        "booking_declined": "Recusaste o pedido de <strong>{school}</strong> para {day}.",
+        "booking_cancelled": "<strong>{school}</strong> cancelou a aula de {day}.",
+        "verification_approved": "A tua identidade foi verificada.",
+        "verification_rejected": "Não foi possível verificar a tua identidade.",
+        "other": "Tens uma nova notificação."
+      },
+      "empty": "Sem notificações. Avisamos-te aqui quando uma escola te pedir ou cancelar uma aula."
+    }
+  },
+  "InstructorBookingRow": {
+    "status": {
+      "requested": "Por responder",
+      "accepted": "Confirmada",
+      "declined": "Recusada",
+      "cancelled": "Cancelada",
+      "completed": "Concluída",
+      "expired": "Sem resposta"
     },
-    "notificationTypes": {
-      "booking_requested": "{school} pediu uma aula para {date}",
-      "booking_accepted": "Confirmou a aula de {date}",
-      "booking_declined": "Recusou a aula de {date}",
-      "booking_cancelled": "Reserva de {date} cancelada"
+    "requestedBy": "Pedido por {name}",
+    "noteFrom": "{name}: {note}",
+    "declineReason": "Motivo: {reason}",
+    "accept": {
+      "action": "Aceitar",
+      "pending": "A aceitar…",
+      "done": "Pedido aceite."
     },
-    "eyebrow": "Agenda"
+    "decline": {
+      "action": "Recusar",
+      "title": "Recusar o pedido de {day}?",
+      "description": "A escola é avisada de que não podes dar esta aula.",
+      "reason": "Motivo (opcional)",
+      "reasonHelper": "A escola vê este motivo.",
+      "keep": "Manter pedido",
+      "confirm": "Recusar pedido",
+      "pending": "A recusar…",
+      "done": "Pedido recusado."
+    },
+    "cancel": {
+      "action": "Cancelar aula",
+      "title": "Cancelar a aula de {day}?",
+      "description": "A escola é avisada e a aula sai da tua agenda.",
+      "keep": "Manter aula",
+      "confirm": "Cancelar aula",
+      "pending": "A cancelar…",
+      "done": "Aula cancelada."
+    }
   }
 }
