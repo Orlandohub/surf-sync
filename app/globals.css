@@ -173,6 +173,7 @@
   --spacing-stack: 0.75rem;          /* 12 — gap between cards in a list */
   --spacing-section: 1.75rem;        /* 28 — gap between screen sections */
   --spacing-tap: 2.75rem;            /* 44 — minimum touch target (size-tap) */
+  --spacing-tabbar: 3.5rem;          /* 56 — bottom tab bar, excl. safe area (h-tabbar) */
 
   /* ---------------- Radius ----------------
      Hierarchy: chip < thumb < control < card < sheet < panel.
@@ -264,6 +265,7 @@
   --sand-soft-foreground: var(--color-sand-800);
   --inverse: var(--color-atlantic-950);            /* dark panels in light UI */
   --inverse-foreground: var(--color-atlantic-50);
+  --inverse-primary: var(--color-ocean-300);       /* action on inverse (toast link) */
 
   --success: var(--color-success-700);
   --success-foreground: var(--color-white);
@@ -359,6 +361,7 @@
   --sand-soft-foreground: var(--color-sand-200);
   --inverse: var(--color-atlantic-50);
   --inverse-foreground: var(--color-atlantic-950);
+  --inverse-primary: var(--color-ocean-700);
 
   --success: var(--color-success-300);
   --success-foreground: var(--color-success-950);
@@ -438,6 +441,7 @@
   --color-sand-soft-foreground: var(--sand-soft-foreground);
   --color-inverse: var(--inverse);
   --color-inverse-foreground: var(--inverse-foreground);
+  --color-inverse-primary: var(--inverse-primary);
 
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
@@ -547,6 +551,38 @@
   ::selection {
     background: var(--tint);
     color: var(--tint-foreground);
+  }
+
+  /* App shell chrome (components/shell). Read these, never hard-code the
+     bar heights:
+       --top-chrome     height of the sticky top bar → sticky sub-headers
+                        use top-(--top-chrome); anchor targets use
+                        scroll-mt-(--top-chrome). (Not scroll-padding on
+                        <html>: it makes focusing the sticky bar's own
+                        links scroll the page.)
+       --bottom-chrome  space the fixed bottom chrome takes: the mobile tab
+                        bar (+ home-indicator inset) when it is rendered,
+                        else just the inset. The layout pads <body> with it;
+                        bottom-pinned CTAs and toasts sit at
+                        bottom-(--bottom-chrome). */
+  :root {
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --top-chrome: 3.5rem;
+    --bottom-chrome: var(--safe-bottom);
+  }
+  @media (width >= 48rem) {
+    :root {
+      --top-chrome: 4rem;
+    }
+  }
+  @media (width < 48rem) {
+    :root:has([data-slot="tab-bar"]) {
+      --bottom-chrome: calc(var(--spacing-tabbar) + var(--safe-bottom));
+    }
+  }
+  body {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
   }
 
   @media (prefers-reduced-motion: reduce) {

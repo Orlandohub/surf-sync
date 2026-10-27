@@ -1,4 +1,33 @@
 {
+  "Metadata": {
+    "description": "A plataforma que liga escolas de surf a instrutores verificados na zona de Lisboa."
+  },
+  "Nav": {
+    "primary": "Navegação principal",
+    "home": "surfsync — início",
+    "skipToContent": "Saltar para o conteúdo",
+    "signIn": "Entrar",
+    "signUp": "Criar conta",
+    "accountMenu": "Menu da conta de {name}",
+    "account": "Conta",
+    "signOut": "Terminar sessão",
+    "signOutError": "Não foi possível terminar sessão. Verifica a ligação e tenta novamente.",
+    "instructor": {
+      "home": "Início",
+      "bookings": "Aulas",
+      "availability": "Disponibilidade",
+      "profile": "Perfil"
+    },
+    "school": {
+      "home": "Início",
+      "discovery": "Instrutores",
+      "bookings": "Reservas",
+      "account": "Conta"
+    }
+  },
+  "UI": {
+    "toastRegion": "Avisos"
+  },
   "HomePage": {
     "title": "SurfSync",
     "tagline": "Staffing de instrutores verificados para escolas de surf na zona de Lisboa.",

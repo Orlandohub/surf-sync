@@ -296,3 +296,31 @@ This is where BD Sans lives: lowercase display headings (`font-display text-disp
 ### Back-office (school dashboard)
 
 Same tokens, shadcn `Sidebar` (white, `sidebar-*` tokens). Tables: row 48 px, header `text-meta font-medium text-muted-foreground` sentence case, numbers right-aligned `tabular-nums`, row actions in a trailing `DropdownMenu` (ghost icon-sm). Density via `size="sm"` buttons — never smaller type than 13 px.
+
+---
+
+## In code
+
+Where each spec above lives. Copy goes through next-intl; dates and times through `lib/format.ts`.
+
+| Spec | Import | Notes |
+|---|---|---|
+| App bar, Bottom tab bar | `components/shell/*` (mounted in `app/layout.tsx`) | Session read on the server; tabs per user type in `nav-items.ts`. `--top-chrome` / `--bottom-chrome` CSS vars give the bar heights. |
+| Page frame | `PageContainer` — `components/shell/page-container` | `<main>`, `max-w-5xl` (or `width="narrow"` = `max-w-2xl`), `px-gutter`, `gap-section`. |
+| App bar title | `PageHeader` — `components/ui/page-header` | `text-headline` h1, description, back link, one action. No eyebrow. |
+| Section head | `SectionHeading`, `SectionLink` — `components/ui/section-heading` | `text-title-sm`; "Ver todas ›". |
+| Button | `Button`, `buttonVariants` — `components/ui/button` | `pending` prop; links styled with `buttonVariants()`. |
+| Badge / status | `Badge` — `components/ui/badge`; `StatusBadge`, `bookingStatusTone/Icon` — `components/brand/status-badge` | One booking-status → tone map for every screen. |
+| Card | `Card…` — `components/ui/card` | |
+| Lesson row, Action banner, Menu row | `LinkRow`, `RowIcon`, `ActionBanner`, `MenuGroup`, `MenuRow` — `components/ui/list-row` | |
+| Stat tile | `StatTile` — `components/ui/stat-tile` | |
+| Tabs | `Tabs…` — `components/ui/tabs` (client state); `LinkTabs` — `components/ui/link-tabs` (URL state) | Same look. |
+| Text field | `Field`, `FieldError` + `Input` / `Textarea` / `Select` / `TimeSelect` | `Field` wires label, helper, error and aria onto the control. |
+| Switch | `Switch`, `SwitchRow` — `components/ui/switch` | |
+| Day chips | `DayChips`, `ChipToggleGroup` — `components/ui/chip-toggle-group` | `name` submits hidden inputs. |
+| Avatar & stack | `Avatar`, `AvatarStack` — `components/ui/avatar` | Sizes 32 / 44 / 88 / 96. |
+| Sheet / Dialog | `ConfirmDialog`, `Dialog…` — `components/ui/dialog` | Bottom sheet < md, centred dialog ≥ md. |
+| Toast | `toast()` — `components/ui/toast` | `<Toaster />` is in the root layout. |
+| Empty state | `EmptyState` — `components/ui/empty-state` | |
+| Loading | `Skeleton`, `SkeletonRow` — `components/ui/skeleton` | |
+| Availability glyph | `CalendarWave` — `components/brand/icons` | |

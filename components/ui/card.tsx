@@ -4,7 +4,10 @@ import { cn } from "@/lib/utils"
 /**
  * surfsync DS (COMPONENTS.md) — Card.
  * White on the off-white canvas; 1px border does most of the elevation
- * work (shadow-card is near-invisible). `rounded-card p-card shadow-card`.
+ * work (shadow-card is near-invisible). `rounded-card p-card shadow-card`,
+ * stacked with `gap-stack`. Never a card inside a card: nest with a
+ * divider or a `bg-muted` inset instead. Whole-card links → <LinkRow> /
+ * <StatTile href>.
  */
 
 function Card({
@@ -86,7 +89,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "flex items-center gap-3 rounded-b-card border-t px-card py-3",
+        "-mx-card mt-auto flex items-center gap-3 rounded-b-card border-t px-card py-3 group-data-[size=sm]/card:-mx-3 group-data-[size=sm]/card:px-3",
         className
       )}
       {...props}

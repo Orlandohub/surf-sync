@@ -25,7 +25,7 @@ const twMerge = extendTailwindMerge({
       ],
       radius: ["chip", "thumb", "control", "card", "sheet", "panel"],
       shadow: ["card", "float", "overlay"],
-      spacing: ["gutter", "card", "stack", "section", "tap"],
+      spacing: ["gutter", "card", "stack", "section", "tap", "tabbar"],
       ease: ["enter", "move", "exit"],
     },
   },
