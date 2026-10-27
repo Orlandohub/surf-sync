@@ -258,110 +258,211 @@
     "eyebrow": "Instrutor"
   },
   "SchoolDashboardPage": {
-    "title": "Escola",
+    "title": "Início",
+    "address": "{address}, {city}",
     "findInstructors": "Encontrar instrutores",
-    "viewBookings": "Reservas da escola",
+    "stats": {
+      "heading": "Resumo",
+      "pending": "Pedidos pendentes",
+      "thisWeek": "Aulas esta semana",
+      "thisMonth": "Aulas este mês",
+      "saved": "Instrutores guardados"
+    },
+    "upcoming": {
+      "title": "Próximas aulas",
+      "viewAll": "Ver todas",
+      "emptyTitle": "Ainda não tens aulas marcadas",
+      "emptyDescription": "Encontra um instrutor disponível e envia o primeiro pedido.",
+      "emptyPendingDescription": "Tens pedidos à espera de resposta. Quando um instrutor aceitar, a aula aparece aqui.",
+      "viewPending": "Ver pedidos"
+    },
+    "team": {
+      "title": "Equipa",
+      "description": "Todos os membros têm as mesmas permissões.",
+      "members": "Membros da equipa",
+      "you": "Tu",
+      "joined": "Desde {date}",
+      "pendingBadge": "Convite pendente",
+      "expires": "Expira a {date}",
+      "inviteLabel": "Convidar por email",
+      "invitePlaceholder": "colega@escola.pt",
+      "inviteHelper": "A pessoa entra na equipa quando criar conta com este email.",
+      "invite": "Convidar",
+      "invited": "Convite enviado.",
+      "invalidEmail": "Indica um email válido."
+    },
     "create": {
-      "title": "Criar a tua escola",
-      "description": "Dados da escola para o perfil e contactos. Poderá convidar colegas depois.",
+      "title": "Cria a tua escola",
+      "description": "Começa pelos dados da escola. Depois podes encontrar instrutores e convidar a tua equipa.",
+      "schoolSection": "Escola",
+      "contactSection": "Contacto",
+      "locationSection": "Localização",
       "name": "Nome da escola",
-      "descriptionField": "Descrição",
+      "descriptionField": "Descrição (opcional)",
+      "descriptionHelper": "Tipo de aulas, público e há quanto tempo existe.",
       "contactEmail": "Email de contacto",
-      "contactPhone": "Telefone de contacto",
+      "contactPhone": "Telefone (opcional)",
       "address": "Morada",
       "city": "Cidade",
       "submit": "Criar escola",
-      "saving": "A criar...",
-      "saved": "Escola criada."
-    },
-    "staff": {
-      "title": "Equipa",
-      "description": "Todos os membros da equipa têm as mesmas permissões (sem papéis).",
-      "joined": "entrou a",
-      "pending": "Convites pendentes",
-      "expires": "expira a",
-      "inviteLabel": "Convidar colega por email",
-      "invite": "Convidar",
-      "inviting": "A enviar convite...",
-      "invited": "Convite enviado. A pessoa fica ligada à escola ao criar conta com esse email."
-    },
-    "eyebrow": "Escola de surf"
+      "saving": "A criar…",
+      "saved": "Escola criada.",
+      "errors": {
+        "name": "Indica o nome da escola.",
+        "contactEmail": "Indica um email válido.",
+        "address": "Indica a morada da escola.",
+        "city": "Indica a cidade."
+      }
+    }
   },
   "DiscoveryPage": {
     "title": "Encontrar instrutores",
-    "subtitle": "Pesquisa instrutores ativos por zona, experiência e disponibilidade.",
+    "description": "Instrutores ativos por zona, nível e dia da semana.",
+    "views": {
+      "label": "Instrutores",
+      "all": "Todos",
+      "saved": "Guardados"
+    },
     "filters": {
+      "label": "Filtrar instrutores",
       "location": "Zona",
-      "anyLocation": "Qualquer zona",
-      "experience": "Experiência",
-      "anyExperience": "Qualquer nível",
-      "day": "Dia disponível",
-      "anyDay": "Qualquer dia"
+      "anyLocation": "Todas",
+      "level": "Nível",
+      "anyLevel": "Todos",
+      "day": "Dia",
+      "anyDay": "Todos",
+      "reset": "Limpar filtros"
     },
-    "resultsCount": "{count, plural, =0 {Nenhum instrutor encontrado} one {# instrutor encontrado} other {# instrutores encontrados}}",
-    "noResults": "Nenhum instrutor corresponde aos filtros. Experimenta alargar a pesquisa.",
-    "bookmark": "Guardar",
-    "backToSearch": "Voltar à pesquisa",
-    "profile": {
-      "title": "Perfil do instrutor",
-      "bio": "Sobre",
-      "locations": "Zonas",
-      "availability": "Disponibilidade",
-      "none": "—"
+    "resultsCount": "{count, plural, =0 {Nenhum instrutor} one {# instrutor} other {# instrutores}}",
+    "empty": {
+      "title": "Nenhum instrutor com estes filtros",
+      "description": "Experimenta outra zona, outro nível ou outro dia."
     },
-    "experience": {
+    "emptySaved": {
+      "title": "Ainda não guardaste instrutores",
+      "description": "Guarda os instrutores com quem queres voltar a trabalhar para os teres sempre à mão.",
+      "action": "Ver todos"
+    },
+    "row": {
+      "verified": "Identidade verificada",
+      "availableOn": "Disponível: {days}.",
+      "noAvailability": "Sem disponibilidade definida."
+    },
+    "bookmark": {
+      "label": "Guardar {name}",
+      "saved": "Instrutor guardado.",
+      "removed": "Removido dos guardados.",
+      "undo": "Anular",
+      "failed": "Não foi possível guardar. Verifica a ligação e tenta novamente."
+    },
+    "levels": {
       "beginner": "Iniciante",
       "intermediate": "Intermédio",
       "advanced": "Avançado",
       "expert": "Especialista"
     },
-    "days": {
-      "mon": "Segunda",
-      "tue": "Terça",
-      "wed": "Quarta",
-      "thu": "Quinta",
-      "fri": "Sexta",
-      "sat": "Sábado",
-      "sun": "Domingo"
+    "profile": {
+      "metaTitle": "Perfil do instrutor",
+      "back": "Instrutores",
+      "about": "Sobre",
+      "availability": "Disponibilidade semanal",
+      "availabilityDescription": "Horário habitual. Os pedidos têm de caber nestes horários.",
+      "unavailable": "Indisponível",
+      "loading": "A carregar o perfil…"
     },
-    "eyebrow": "Procurar"
+    "emptyAll": {
+      "title": "Ainda não há instrutores ativos",
+      "description": "Os instrutores aparecem aqui depois de ativarem o perfil. Volta mais tarde."
+    }
   },
   "BookingRequestForm": {
-    "title": "Pedir reserva",
-    "description": "Escolhe data e horas dentro da disponibilidade semanal do instrutor.",
-    "date": "Data",
+    "title": "Pedir aula",
+    "description": "O instrutor recebe o pedido e aceita ou recusa.",
+    "date": "Dia",
+    "datePlaceholder": "Escolhe um dia",
     "start": "Início",
     "end": "Fim",
-    "notes": "Notas (opcional)",
+    "timePlaceholder": "––:––",
+    "range": "Disponível das {start} às {end}.",
+    "duration": "Duração: {duration}",
+    "notes": "Notas para o instrutor (opcional)",
+    "notesHelper": "Número de alunos, nível e material, por exemplo.",
     "submit": "Enviar pedido",
-    "submitting": "A enviar...",
-    "requested": "Pedido enviado. O instrutor foi notificado."
+    "submitting": "A enviar…",
+    "sent": "Pedido enviado.",
+    "viewBookings": "Ver reservas",
+    "errors": {
+      "date": "Escolhe um dia.",
+      "time": "A hora de fim tem de ser depois do início."
+    },
+    "noAvailability": {
+      "title": "Sem horários disponíveis",
+      "description": "Este instrutor ainda não definiu a disponibilidade semanal. Guarda-o e volta mais tarde."
+    }
   },
   "SchoolBookingsPage": {
     "title": "Reservas",
-    "subtitle": "Pedidos da tua escola e o seu estado.",
-    "cancel": "Cancelar",
-    "empty": "Ainda sem reservas. Pesquisa instrutores e pede a primeira aula.",
-    "requestedBy": "pedido por {name}",
+    "description": "Os pedidos da tua escola e as aulas marcadas.",
+    "tabs": {
+      "label": "Reservas",
+      "pending": "Pendentes",
+      "upcoming": "Próximas",
+      "history": "Histórico"
+    },
     "status": {
-      "requested": "À espera de resposta",
+      "requested": "Pendente",
       "accepted": "Confirmada",
       "declined": "Recusada",
       "cancelled": "Cancelada",
       "completed": "Concluída"
     },
+    "requestedBy": "Pedido por {name}",
+    "declineReason": "Motivo: {reason}",
+    "cancel": {
+      "lesson": "Cancelar aula",
+      "request": "Cancelar pedido",
+      "lessonAria": "Cancelar aula de {instructor} ({day})",
+      "requestAria": "Cancelar pedido a {instructor} ({day})",
+      "lessonTitle": "Cancelar a aula de {day}?",
+      "requestTitle": "Cancelar o pedido de {day}?",
+      "description": "Avisamos {instructor} do cancelamento. Esta ação não pode ser anulada.",
+      "keepLesson": "Manter aula",
+      "keepRequest": "Manter pedido",
+      "pending": "A cancelar…",
+      "lessonDone": "Aula cancelada.",
+      "requestDone": "Pedido cancelado."
+    },
+    "empty": {
+      "pending": {
+        "title": "Sem pedidos pendentes",
+        "description": "Os pedidos que enviares ficam aqui até o instrutor responder."
+      },
+      "upcoming": {
+        "title": "Ainda não tens aulas marcadas",
+        "description": "Quando um instrutor aceitar um pedido, a aula aparece aqui."
+      },
+      "history": {
+        "title": "Ainda sem histórico",
+        "description": "As aulas concluídas, recusadas e canceladas aparecem aqui."
+      },
+      "action": "Encontrar instrutores"
+    },
     "notifications": {
       "title": "Notificações",
-      "unread": "{count, plural, =0 {Sem novidades} one {# não lida} other {# não lidas}}",
-      "markAll": "Marcar tudo como lido"
-    },
-    "notificationTypes": {
-      "booking_requested": "{school} pediu {instructor} para {date}",
-      "booking_accepted": "{instructor} confirmou a aula de {date}",
-      "booking_declined": "{instructor} recusou o pedido de {date}",
-      "booking_cancelled": "Reserva de {date} cancelada"
-    },
-    "eyebrow": "Reservas"
+      "unread": "{count, plural, =0 {Tudo lido} one {# por ler} other {# por ler}}",
+      "markAll": "Marcar tudo como lido",
+      "markingAll": "A marcar…",
+      "markedAll": "Tudo marcado como lido.",
+      "empty": "Sem notificações. Quando um instrutor responder a um pedido, avisamos aqui.",
+      "types": {
+        "booking_requested": "<strong>{school}</strong> pediu uma aula a {instructor} para {day}.",
+        "booking_accepted": "<strong>{instructor}</strong> confirmou a aula de {day}.",
+        "booking_declined": "<strong>{instructor}</strong> recusou o pedido de {day}.",
+        "booking_cancelled": "<strong>{name}</strong> cancelou a aula de {day}.",
+        "booking_cancelled_anonymous": "A aula de {day} foi cancelada.",
+        "other": "Há uma atualização numa reserva."
+      }
+    }
   },
   "InstructorBookingsPage": {
     "title": "As tuas aulas",
