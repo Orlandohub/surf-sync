@@ -4,14 +4,13 @@ import * as React from "react";
 import Link from "next/link";
 import { MailCheck, School, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { RadioGroup } from "@base-ui/react/radio-group";
-import { Radio } from "@base-ui/react/radio";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/ui/page-header";
+import { Radio, RadioGroup } from "@/components/ui/radio-group";
 import { PasswordInput } from "@/components/auth/password-input";
 import { ResendVerification } from "@/components/auth/resend-verification";
 import { AuthAltLink, AuthStateIcon, authTextLinkClass } from "@/components/auth/auth-parts";
@@ -177,7 +176,6 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
                 icon={TYPE_ICON[type]}
                 title={t(`accountType.${type}.title`)}
                 description={t(`accountType.${type}.description`)}
-                onSelect={setAccountType}
               />
             ))}
           </RadioGroup>
@@ -249,34 +247,26 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
 }
 
 /**
- * One account-type choice: a large card that is a radio (Base UI renders
- * role="radio" + aria-checked, and the group handles arrow keys / roving
- * focus). Selected: teal border, tonal fill, filled icon and radio dot.
+ * One account-type choice: a large card that is a radio (role="radio" +
+ * aria-checked; the group handles arrow keys / roving focus, and Space
+ * checks the focused card). Selected: teal border, tonal fill, filled icon
+ * and radio dot.
  */
 function AccountTypeCard({
   value,
   icon: Icon,
   title,
   description,
-  onSelect,
 }: {
   value: AccountType;
   icon: IconComponent;
   title: string;
   description: string;
-  onSelect: (value: AccountType) => void;
 }) {
   const id = React.useId();
   return (
-    <Radio.Root
+    <Radio
       value={value}
-      // Base UI 1.4.1 bug: inside a RadioGroup, Space prevents the event
-      // before the radio's own click handler, which then bails out — so
-      // Space never checks the focused radio. Check it here (this handler
-      // runs first). Arrow keys already work.
-      onKeyDown={(event) => {
-        if (event.key === " ") onSelect(value);
-      }}
       aria-labelledby={`${id}-title`}
       aria-describedby={`${id}-description`}
       className={
@@ -306,6 +296,6 @@ function AccountTypeCard({
       >
         <span className="size-2.5 scale-0 rounded-full bg-primary transition-transform duration-(--duration-instant) ease-move group-data-checked:scale-100" />
       </span>
-    </Radio.Root>
+    </Radio>
   );
 }

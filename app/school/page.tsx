@@ -18,7 +18,6 @@ import { TeamSection } from "@/components/school/team-section";
 import { CreateSchoolForm } from "@/components/school/create-school-form";
 import { bookingStats, groupBookings } from "@/components/school/booking-groups";
 import { lisbonToday } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
   const t = await getTranslations("SchoolDashboardPage");
@@ -73,31 +72,27 @@ export default async function SchoolPage() {
     );
   };
 
-  const findInstructors = (
-    <Link href="/school/discovery" className={cn(buttonVariants(), "max-sm:w-full")}>
-      {t("findInstructors")}
-      <ArrowRight aria-hidden strokeWidth={1.75} />
-    </Link>
-  );
-
   return (
     <PageContainer>
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-center gap-4">
-          <Avatar name={school.name} size={88} className="max-md:hidden" />
-          <Avatar name={school.name} size={44} className="md:hidden" />
-          <div className="flex min-w-0 flex-col gap-0.5">
-            {/* tabIndex: takes focus after "Criar escola" turns the page into this. */}
-            <h1 tabIndex={-1} className="text-headline text-balance text-foreground outline-none">
-              {school.name}
-            </h1>
-            <p className="text-body text-muted-foreground">
-              {t("address", { address: school.address, city: school.city })}
-            </p>
-          </div>
-        </div>
-        {findInstructors}
-      </header>
+      {/* The h1 takes focus after "Criar escola" turns the page into this
+          (PageHeader's h1 is focusable from script). */}
+      <PageHeader
+        leading={
+          <>
+            <Avatar name={school.name} size={88} className="max-md:hidden" />
+            <Avatar name={school.name} size={44} className="md:hidden" />
+          </>
+        }
+        title={school.name}
+        description={t("address", { address: school.address, city: school.city })}
+        stackAction
+        action={
+          <Link href="/school/discovery" className={buttonVariants()}>
+            {t("findInstructors")}
+            <ArrowRight aria-hidden strokeWidth={1.75} />
+          </Link>
+        }
+      />
 
       {showStats && (
         <section aria-labelledby="resumo">

@@ -1,12 +1,11 @@
 import { cache } from "react";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ChevronLeft } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getInstructorForSchool } from "@/lib/services/discovery";
 import { findSchoolIdForUser, listVerifiedInstructorIds } from "@/lib/services/school-overview";
 import { PageContainer } from "@/components/shell/page-container";
+import { PageHeader } from "@/components/ui/page-header";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Avatar } from "@/components/ui/avatar";
 import { BookmarkToggle } from "@/components/school/bookmark-toggle";
@@ -65,37 +64,32 @@ export default async function InstructorProfilePage({
 
   return (
     <PageContainer>
-      <header className="flex flex-col gap-5">
-        <Link
-          href="/school/discovery"
-          className="tap -ml-1 inline-flex w-fit items-center gap-0.5 rounded-chip text-meta font-medium text-muted-foreground transition-colors duration-(--duration-fast) hover:text-foreground"
-        >
-          <ChevronLeft aria-hidden className="size-4" strokeWidth={1.75} />
-          {t("profile.back")}
-        </Link>
-        <div className="flex items-start gap-4 md:items-center md:gap-5">
-          <Avatar name={instructor.displayName} size={88} className="max-md:hidden" />
-          <Avatar name={instructor.displayName} size={44} className="mt-0.5 md:hidden" />
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <h1 className="flex items-center gap-2 text-headline text-balance text-foreground">
-              <span className="min-w-0">{instructor.displayName}</span>
-              {verified && <VerifiedMark className="size-5" />}
-            </h1>
-            {instructor.locations.length > 0 && (
-              <p className="text-body text-muted-foreground">{instructor.locations.join(", ")}</p>
-            )}
-            <div className="mt-1 flex">
-              <LevelBadge level={instructor.experienceLevel} />
-            </div>
-          </div>
+      <PageHeader
+        back={{ href: "/school/discovery", label: t("profile.back") }}
+        leading={
+          <>
+            <Avatar name={instructor.displayName} size={88} className="max-md:hidden" />
+            <Avatar name={instructor.displayName} size={44} className="md:hidden" />
+          </>
+        }
+        title={
+          <span className="flex items-center gap-2">
+            <span className="min-w-0">{instructor.displayName}</span>
+            {verified && <VerifiedMark className="size-5" />}
+          </span>
+        }
+        description={instructor.locations.length > 0 ? instructor.locations.join(", ") : undefined}
+        action={
           <BookmarkToggle
             instructorId={instructor.userId}
             name={instructor.displayName}
             bookmarked={instructor.bookmarked}
-            className="border border-input max-md:-mt-1"
+            className="border border-input"
           />
-        </div>
-      </header>
+        }
+      >
+        <LevelBadge level={instructor.experienceLevel} />
+      </PageHeader>
 
       <div className="flex flex-col gap-section lg:grid lg:grid-cols-5 lg:items-start lg:gap-x-8">
         <div className="flex flex-col gap-section lg:col-span-3">

@@ -56,21 +56,18 @@ export function BookingRow({
             />
           ) : undefined
         }
-      >
-        {hasDetails && (
-          <span className="flex basis-full flex-col gap-1 pt-0.5">
-            {b.declineReason && (
-              <span className="text-meta text-foreground">{t("declineReason", { reason: b.declineReason })}</span>
-            )}
-            {b.notes && <span className="line-clamp-3 text-meta text-muted-foreground">{b.notes}</span>}
-            {showRequester && (
-              <span className="text-meta text-muted-foreground">
-                {t("requestedBy", { name: b.requestedByName })}
-              </span>
-            )}
-          </span>
-        )}
-      </ItemRow>
+        note={
+          hasDetails ? (
+            <>
+              {b.declineReason && (
+                <span className="text-foreground">{t("declineReason", { reason: b.declineReason })}</span>
+              )}
+              {b.notes && <span className="line-clamp-3">{b.notes}</span>}
+              {showRequester && <span>{t("requestedBy", { name: b.requestedByName })}</span>}
+            </>
+          ) : undefined
+        }
+      />
     </li>
   );
 }

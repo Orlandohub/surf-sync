@@ -151,6 +151,15 @@ type ConfirmResult = void | boolean
  *   `trigger` too (it's called on every open/close).
  * - Extra content (e.g. an optional reason field) goes in `children`.
  * - Controlled use: pass `open` + `onOpenChange` instead of `trigger`.
+ * - On close, focus returns to whatever opened the dialog. When the
+ *   confirmed action removed that element (the row it acted on left the
+ *   list), it would fall to <body>: `finalFocus` says where it goes
+ *   instead — a ref or a function returning an element (give a
+ *   non-control `tabIndex={-1}`). Resolved after the exit animation, so
+ *   it sees the updated page. While the opener is still there, focus
+ *   goes back to it as usual.
+ *
+ *     <ConfirmDialog open={open} onOpenChange={setOpen} finalFocus={listRef} … />
  */
 function ConfirmDialog({
   trigger,
@@ -165,6 +174,7 @@ function ConfirmDialog({
   tone = "default",
   onConfirm,
   error,
+  finalFocus,
 }: {
   /** The element that opens the dialog, usually a Button. */
   trigger?: React.ReactElement
@@ -179,13 +189,32 @@ function ConfirmDialog({
   tone?: "default" | "destructive"
   onConfirm: () => ConfirmResult | Promise<ConfirmResult>
   error?: React.ReactNode
+  /** Where focus goes on close if the element that opened the dialog is gone. */
+  finalFocus?: React.RefObject<HTMLElement | null> | (() => HTMLElement | null | undefined)
 }) {
   const t = useTranslations("UI")
   const [internalOpen, setInternalOpen] = React.useState(false)
   const [pending, setPending] = React.useState(false)
   const [failed, setFailed] = React.useState(false)
   const cancelRef = React.useRef<HTMLButtonElement>(null)
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
+  const openerRef = React.useRef<Element | null>(null)
   const isOpen = open ?? internalOpen
+
+  // Remember what opened the dialog: the trigger, or (controlled use) the
+  // element focused at that moment. Layout effect: it runs before the
+  // dialog moves focus inside.
+  React.useLayoutEffect(() => {
+    if (isOpen) openerRef.current = triggerRef.current ?? document.activeElement
+  }, [isOpen])
+
+  function resolveFinalFocus(): HTMLElement | boolean {
+    const opener = openerRef.current
+    const openerKnown = opener instanceof HTMLElement && opener !== document.body
+    if (!finalFocus || (openerKnown && opener.isConnected)) return true
+    const target = typeof finalFocus === "function" ? finalFocus() : finalFocus.current
+    return target ?? true
+  }
 
   function setOpen(next: boolean) {
     if (open === undefined) setInternalOpen(next)
@@ -218,8 +247,8 @@ function ConfirmDialog({
         if (!pending) setOpen(next)
       }}
     >
-      {trigger && <AlertDialogPrimitive.Trigger render={trigger} />}
-      <DialogContent initialFocus={cancelRef}>
+      {trigger && <AlertDialogPrimitive.Trigger ref={triggerRef} render={trigger} />}
+      <DialogContent initialFocus={cancelRef} {...(finalFocus ? { finalFocus: resolveFinalFocus } : {})}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
