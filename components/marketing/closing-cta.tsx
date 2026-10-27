@@ -37,10 +37,7 @@ export async function ClosingCta() {
           </Link>
           <p className="mt-6 text-body text-muted-foreground">
             {t("closing.haveAccount")}{" "}
-            <Link
-              href="/sign-in"
-              className="tap rounded-chip font-semibold text-primary underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
+            <Link href="/sign-in" className={cn(buttonVariants({ variant: "link" }), "tap ml-1 px-1")}>
               {t("cta.signIn")}
             </Link>
           </p>

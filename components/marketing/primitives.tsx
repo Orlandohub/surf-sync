@@ -32,22 +32,18 @@ export function PanelFrame({
   );
 }
 
-/** Rounded marketing panel. `tone="ink"` is the Azul Atlântico panel. */
-export function Panel({
-  tone,
-  className,
-  children,
-}: {
-  tone: "ink" | "card";
-  className?: string;
-  children: React.ReactNode;
-}) {
+/**
+ * Rounded marketing panel. `tone="ink"` is the Azul Atlântico panel.
+ * It does not clip its content, so text that grows (browser text size at
+ * 150–200 %) wraps instead of being cut off; only the MarkBackdrop layer
+ * is clipped to the panel's corners.
+ */
+export function Panel({ tone, children }: { tone: "ink" | "card"; children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "relative isolate mx-auto w-full max-w-7xl overflow-hidden rounded-panel",
+        "relative isolate mx-auto w-full max-w-7xl rounded-panel",
         tone === "ink" ? "bg-inverse text-inverse-foreground" : "border bg-card text-card-foreground shadow-card",
-        className,
       )}
     >
       {children}
@@ -55,23 +51,24 @@ export function Panel({
   );
 }
 
+/** Wrapping for BD Sans display lines: hyphenate (html lang is pt-PT), else break the word. */
+export const displayWrap = "hyphens-auto wrap-break-word";
+
 /**
  * Section title in BD Sans: lowercase, weight 400, 32 px on phones and
  * 48 px from md (never below 24 px, DESIGN.md T2). Petrol teal on light
- * surfaces, brand teal on ink (5.7:1).
+ * surfaces, brand teal on ink (5.7:1). Long words hyphenate (or break)
+ * rather than overflow when the browser's text size is raised.
  */
 export function DisplayHeading({
-  as: Tag = "h2",
   tone = "light",
   className,
   ...props
-}: React.ComponentProps<"h2"> & {
-  as?: "h1" | "h2";
-  tone?: "light" | "ink";
-}) {
+}: React.ComponentProps<"h2"> & { tone?: "light" | "ink" }) {
   return (
-    <Tag
+    <h2
       className={cn(
+        displayWrap,
         "font-display text-display-sm text-balance lowercase md:text-display",
         tone === "light" ? "text-primary" : "text-brand",
         className,
@@ -83,19 +80,24 @@ export function DisplayHeading({
 
 /**
  * The oversized, cropped wave mark at very low contrast — the deck's
- * background device for brand surfaces (DESIGN.md §10). Place it inside a
- * `relative isolate overflow-hidden` parent and position it with
+ * background device for brand surfaces (DESIGN.md §10). Use it as the
+ * first child of a <Panel>: it fills the panel in its own layer, clipped
+ * to the panel's corners, behind the content. Position the mark with
  * `className` (size + offsets + colour).
  */
 export function MarkBackdrop({ className }: { className?: string }) {
   return (
-    <LogoMark
-      className={cn("pointer-events-none absolute -z-10 select-none", className)}
-    />
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-panel">
+      <LogoMark className={cn("absolute select-none", className)} />
+    </div>
   );
 }
 
-/** One feature line: tint icon circle, title, one or two sentences. */
+/**
+ * One feature line: tint icon circle, title, one or two sentences. When
+ * the text column would drop below 10rem (large browser text on a phone)
+ * the text wraps under the icon instead of squeezing or overflowing.
+ */
 export function FeatureItem({
   icon,
   title,
@@ -108,9 +110,9 @@ export function FeatureItem({
   tone?: "light" | "ink";
 }) {
   return (
-    <li className="flex gap-4">
+    <li className="flex min-w-0 flex-wrap gap-4">
       {icon}
-      <div className="flex min-w-0 flex-col gap-1 pt-0.5">
+      <div className="flex min-w-0 grow basis-40 flex-col gap-1 pt-0.5">
         <h3 className="text-label">{title}</h3>
         <p
           className={cn(

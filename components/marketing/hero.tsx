@@ -6,14 +6,15 @@ import { LogoLockup } from "@/components/brand/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import whitewater from "@/public/brand/whitewater-aerial.jpg";
-import { MarkBackdrop, Panel, PanelFrame, marketingColumn } from "@/components/marketing/primitives";
+import { MarkBackdrop, Panel, PanelFrame, displayWrap, marketingColumn } from "@/components/marketing/primitives";
 
 /**
  * Landing hero: an Azul Atlântico panel with a short BD Sans display line,
- * what surfsync does in one plain sentence, and the two ways in. The
- * whitewater aerial (portrait, 1043×1304) sits in its own rounded frame —
- * a tall strip beside the text from lg, a 3:2 (phones) or 2:1 (tablets)
- * crop below it — never stretched full-bleed.
+ * what surfsync does in two plain sentences, and the two ways in. The
+ * whitewater aerial (portrait, 1043×1304) sits in its own rounded frame:
+ * a tall portrait strip beside the text from md (tablets included, so the
+ * ~1000 px source is never blown up across a wide crop), a 3:2 crop below
+ * the text on phones. Never stretched full-bleed.
  *
  * The app bar shows only the mark below 640 px, so the hero carries the
  * full lockup there; from 640 px the bar's lockup is enough.
@@ -24,14 +25,19 @@ export async function Hero() {
   return (
     <PanelFrame aria-labelledby="hero-title" className="pt-2 sm:pt-4">
       <Panel tone="ink">
-        <MarkBackdrop className="-bottom-40 -left-32 size-120 text-inverse-foreground/5 lg:-bottom-64 lg:-left-48 lg:size-200" />
+        {/* Phones: top right, behind the headline (the photo covers the bottom).
+            From md: bottom left, behind the text column. */}
+        <MarkBackdrop className="-top-24 -right-40 size-120 text-inverse-foreground/5 md:top-auto md:right-auto md:-bottom-64 md:-left-48 md:size-200" />
 
         <div className={marketingColumn}>
-          <div className="flex flex-col pt-8 pb-10 sm:pt-14 sm:pb-12 lg:w-7/12 lg:py-24 lg:pr-10 xl:w-2/3 xl:py-32">
+          <div className="flex min-w-0 flex-col pt-8 pb-10 sm:pt-14 sm:pb-12 md:w-7/12 md:py-20 md:pr-10 lg:py-24 xl:w-2/3 xl:py-32">
             <LogoLockup height={32} className="mb-12 self-start text-inverse-foreground sm:hidden" />
             <h1
               id="hero-title"
-              className="font-display text-display-sm text-balance lowercase sm:text-display xl:text-display-lg"
+              className={cn(
+                displayWrap,
+                "font-display text-display-sm text-balance lowercase sm:text-display xl:text-display-lg",
+              )}
             >
               {t("hero.title")}
             </h1>
@@ -64,15 +70,15 @@ export async function Hero() {
         </div>
 
         {/* 8 px inset, radius 24 inside the panel's 32: concentric corners. */}
-        <div className="px-2 pb-2 lg:absolute lg:inset-y-0 lg:right-0 lg:w-5/12 lg:py-2 lg:pl-0 xl:w-1/3">
-          <div className="relative aspect-3/2 overflow-hidden rounded-sheet sm:aspect-2/1 lg:aspect-auto lg:h-full">
+        <div className="px-2 pb-2 md:absolute md:inset-y-0 md:right-0 md:w-5/12 md:py-2 md:pl-0 xl:w-1/3">
+          <div className="relative aspect-3/2 overflow-hidden rounded-sheet md:aspect-auto md:h-full">
             <Image
               src={whitewater}
               alt={t("hero.photoAlt")}
               fill
               preload
               placeholder="blur"
-              sizes="(min-width: 1280px) 427px, (min-width: 1024px) 42vw, 100vw"
+              sizes="(min-width: 1280px) 427px, (min-width: 768px) 42vw, 100vw"
               className="object-cover"
             />
           </div>

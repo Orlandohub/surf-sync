@@ -4,44 +4,57 @@ import { DisplayHeading, marketingColumn, marketingSection } from "@/components/
 
 export type Zone = { id: string; name: string; region: string };
 
-// Presentation order only: the coast read from north to south. The
-// zones themselves come from the database, so a new one still shows up
-// (after the known ones of its region, or in a new region at the end).
-const REGION_ORDER = ["Leiria", "Lisboa", "Setúbal"];
-const COAST_ORDER = [
-  "Nazaré",
-  "Peniche",
-  "Ericeira",
-  "Guincho",
-  "Carcavelos",
-  "Costa da Caparica Norte",
-  "Costa da Caparica",
-  "Sesimbra",
-];
+type RegionKey = "leiria" | "lisboa" | "setubal" | "other";
 
-function rank(order: string[], value: string) {
-  const i = order.indexOf(value);
-  return i === -1 ? order.length : i;
+// Presentation knowledge only: the coast from north to south and the
+// district each zone sits in, keyed by zone name. The zones themselves
+// come from the database. The DB `region` column is never printed: older
+// seeds wrote an English "Lisbon area" for some rows, so headings come
+// from this map and next-intl instead. Cascais is listed because the
+// documented launch seed (scripts/seed.ts) creates it.
+const COAST: readonly (readonly [string, RegionKey])[] = [
+  ["Nazaré", "leiria"],
+  ["Peniche", "leiria"],
+  ["Ericeira", "lisboa"],
+  ["Guincho", "lisboa"],
+  ["Cascais", "lisboa"],
+  ["Carcavelos", "lisboa"],
+  ["Costa da Caparica Norte", "setubal"],
+  ["Costa da Caparica", "setubal"],
+  ["Sesimbra", "setubal"],
+];
+const REGIONS: readonly RegionKey[] = ["leiria", "lisboa", "setubal", "other"];
+
+// A zone not in COAST joins its district when the DB region names one
+// we know (after the known zones), otherwise "Outras zonas" at the end.
+const REGION_BY_DB_NAME: Record<string, RegionKey> = {
+  Leiria: "leiria",
+  Lisboa: "lisboa",
+  Setúbal: "setubal",
+};
+
+function coastRank(name: string) {
+  const i = COAST.findIndex(([known]) => known === name);
+  return i === -1 ? COAST.length : i;
+}
+
+function regionOf(zone: Zone): RegionKey {
+  const known = COAST.find(([name]) => name === zone.name);
+  return known ? known[1] : (REGION_BY_DB_NAME[zone.region] ?? "other");
 }
 
 function byCoast(zones: Zone[]) {
-  const regions = new Map<string, Zone[]>();
-  for (const zone of zones) {
-    regions.set(zone.region, [...(regions.get(zone.region) ?? []), zone]);
-  }
-  return [...regions.entries()]
-    .sort(([a], [b]) => rank(REGION_ORDER, a) - rank(REGION_ORDER, b) || a.localeCompare(b, "pt"))
-    .map(([region, list]) => ({
-      region,
-      zones: list.sort(
-        (a, b) => rank(COAST_ORDER, a.name) - rank(COAST_ORDER, b.name) || a.name.localeCompare(b.name, "pt"),
-      ),
-    }));
+  return REGIONS.map((region) => ({
+    region,
+    zones: zones
+      .filter((zone) => regionOf(zone) === region)
+      .sort((a, b) => coastRank(a.name) - coastRank(b.name) || a.name.localeCompare(b.name, "pt")),
+  })).filter((group) => group.zones.length > 0);
 }
 
 /**
  * The zones instructors can pick and schools search by — read from the
- * `location` table, grouped by region and drawn as a line down the coast.
+ * `location` table, grouped by district and drawn as a line down the coast.
  */
 export async function Zones({ zones }: { zones: Zone[] }) {
   if (zones.length === 0) return null;
@@ -53,18 +66,27 @@ export async function Zones({ zones }: { zones: Zone[] }) {
       <DisplayHeading id="zonas">{t("title")}</DisplayHeading>
       <p className="mt-4 max-w-prose text-body-lg text-muted-foreground">{t("intro")}</p>
 
-      <div className="mt-12 grid gap-8 sm:grid-cols-3 sm:gap-6 md:mt-16">
+      <div
+        className={cn(
+          "mt-12 grid grid-cols-1 gap-8 sm:gap-6 md:mt-16",
+          groups.length > 3 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3",
+        )}
+      >
         {groups.map(({ region, zones: list }) => (
-          <div key={region} className="flex flex-col gap-4">
-            <h3 className="text-meta text-muted-foreground">{region}</h3>
-            <ul className="ml-1 flex flex-col border-l-2 border-brand-water pl-6">
+          <div key={region} className="flex min-w-0 flex-col gap-4">
+            <h3 className="text-meta text-muted-foreground">{t(`regions.${region}`)}</h3>
+            <ul className="flex flex-col">
               {list.map((zone) => (
-                <li key={zone.id} className="relative py-2.5 text-title-sm">
-                  <span
-                    aria-hidden
-                    className="absolute top-5.5 -left-6.25 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary ring-4 ring-background"
-                  />
-                  {zone.name}
+                <li key={zone.id} className="flex gap-4 text-title-sm">
+                  {/* Rail: one continuous line, and a dot centred on the
+                      name's first line (same top padding, one line tall). */}
+                  <span aria-hidden className="relative flex w-2.5 shrink-0 justify-center">
+                    <span className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-brand-water" />
+                    <span className="relative mt-2.5 flex h-lh items-center">
+                      <span className="size-2.5 rounded-full bg-primary ring-4 ring-background" />
+                    </span>
+                  </span>
+                  <span className="min-w-0 py-2.5">{zone.name}</span>
                 </li>
               ))}
             </ul>

@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { BellRing, CircleCheck, UserRoundCheck } from "lucide-react";
-import { CalendarWave, type IconComponent } from "@/components/brand/icons";
+import { BellRing, CalendarX2, CircleCheck } from "lucide-react";
+import type { IconComponent } from "@/components/brand/icons";
 import { cn } from "@/lib/utils";
 import {
   DisplayHeading,
@@ -12,14 +12,14 @@ import {
   marketingSection,
 } from "@/components/marketing/primitives";
 
-// Each line is a rule the services enforce today:
-// active-only search (discovery), slot inside weekly availability and no
-// overlap (booking), requested → accepted only by the instructor, either
-// side may cancel (booking), every event notifies the other side
-// (notifications: in-app row + email).
+// Only guarantees the services enforce today (lib/services/booking,
+// notifications): a request must sit inside the instructor's weekly slot
+// and can't overlap another requested/accepted lesson; requested →
+// accepted only by the instructor, and either side may cancel a requested
+// or accepted booking; every event reaches the other side in the app and
+// by email.
 const RULES = [
-  ["active", UserRoundCheck],
-  ["availability", CalendarWave],
+  ["overlap", CalendarX2],
   ["decision", CircleCheck],
   ["notify", BellRing],
 ] as const satisfies readonly (readonly [string, IconComponent])[];
@@ -37,7 +37,7 @@ export async function Trust() {
             {t("title")}
           </DisplayHeading>
           <p className="mt-4 max-w-prose text-body-lg text-inverse-foreground/80">{t("intro")}</p>
-          <ul className="mt-12 grid gap-x-12 gap-y-8 md:mt-16 md:grid-cols-2">
+          <ul className="mt-12 grid grid-cols-1 gap-x-10 gap-y-8 md:mt-16 lg:grid-cols-3">
             {RULES.map(([key, Icon]) => (
               <FeatureItem
                 key={key}

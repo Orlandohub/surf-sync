@@ -44,9 +44,12 @@
     "backHome": "Voltar ao início"
   },
   "HomePage": {
+    "meta": {
+      "description": "Escolas de surf encontram instrutores por zona, nível e dia da semana e pedem aulas. Os instrutores decidem que aulas aceitam."
+    },
     "hero": {
       "title": "escolas e instrutores, em sincronia.",
-      "tagline": "Escolas de surf encontram instrutores por zona, nível e dia da semana. Instrutores recebem pedidos das escolas nas praias onde dão aulas.",
+      "tagline": "Escolas de surf encontram instrutores por zona, nível e dia da semana e pedem aulas. Os instrutores escolhem quando dão aulas e respondem a cada pedido.",
       "photoAlt": "Espuma de ondas no Atlântico, vista de cima."
     },
     "cta": {
@@ -56,41 +59,41 @@
     "audiences": {
       "schools": {
         "title": "para escolas",
-        "intro": "Encontra quem dá aulas nas tuas praias, nos dias em que precisas.",
+        "intro": "Encontra instrutores para as aulas da tua escola e acompanha cada pedido até à aula.",
         "items": {
-          "search": {
-            "title": "Pesquisa por zona, nível e dia",
-            "description": "Filtra os instrutores ativos pela praia, pelo nível de experiência e pelo dia da semana."
+          "profiles": {
+            "title": "Perfis com o essencial",
+            "description": "Cada instrutor mostra o nível, as zonas onde dá aulas e o horário de cada dia da semana."
           },
-          "availability": {
-            "title": "Disponibilidade à vista",
-            "description": "Cada perfil mostra os dias e os horários em que o instrutor dá aulas, semana a semana."
+          "bookings": {
+            "title": "Reservas num só sítio",
+            "description": "Pedidos, aulas marcadas e histórico, cada um com o seu estado."
           },
-          "request": {
-            "title": "Pedido para dia e hora",
-            "description": "Escolhe a data e o horário dentro da disponibilidade. O instrutor é notificado de imediato."
+          "saved": {
+            "title": "Instrutores guardados",
+            "description": "Guarda os instrutores com quem queres voltar a trabalhar. Ficam guardados para toda a equipa."
           },
           "team": {
-            "title": "A tua equipa na mesma conta",
-            "description": "Convida colegas por email. Todos veem e gerem as reservas da escola."
+            "title": "A tua equipa na mesma escola",
+            "description": "Convida colegas por email. Cada um entra com a sua conta e todos gerem as reservas da escola."
           }
         }
       },
       "instructors": {
         "title": "para instrutores",
-        "intro": "Recebe pedidos das escolas nas praias onde dás aulas, só nos horários que escolhes.",
+        "intro": "Diz onde e quando dás aulas. As escolas encontram-te e enviam-te pedidos.",
         "items": {
           "zones": {
-            "title": "Pedidos nas tuas zonas",
-            "description": "Escolhe as praias onde dás aulas. As escolas encontram-te por zona e por nível."
+            "title": "Visível nas tuas zonas",
+            "description": "Escolhe as praias onde dás aulas e indica o teu nível."
           },
           "availability": {
-            "title": "Disponibilidade semanal",
-            "description": "Define os dias e os horários em que dás aulas. Os pedidos chegam só dentro deles."
+            "title": "O teu horário",
+            "description": "Define um horário para cada dia da semana em que dás aulas. Muda-o sempre que precisares."
           },
-          "respond": {
-            "title": "Aceitas ou recusas",
-            "description": "Cada pedido traz a escola, o dia e o horário. A escola recebe a tua resposta."
+          "lessons": {
+            "title": "Pedidos e aulas num só sítio",
+            "description": "Cada pedido e cada aula com a escola, o dia e o horário."
           },
           "pause": {
             "title": "Pausa quando quiseres",
@@ -106,15 +109,15 @@
         "label": "Escolas",
         "account": {
           "title": "Cria a conta e a escola",
-          "description": "Regista-te, confirma o email e preenche os dados da escola."
+          "description": "Regista-te e preenche os dados da escola."
         },
         "search": {
-          "title": "Pesquisa instrutores",
-          "description": "Filtra por zona, nível e dia, e abre o perfil com a disponibilidade semanal."
+          "title": "Encontra instrutores",
+          "description": "Usa os filtros e abre os perfis que te interessam."
         },
         "request": {
           "title": "Envia o pedido",
-          "description": "Escolhe o dia e o horário. Acompanha a resposta em Reservas."
+          "description": "Escolhe o dia e o horário. A resposta aparece em Reservas."
         }
       },
       "instructors": {
@@ -125,11 +128,11 @@
         },
         "profile": {
           "title": "Completa o perfil",
-          "description": "Indica o nível, as zonas e a disponibilidade semanal. O perfil fica ativo."
+          "description": "Indica o nível, as zonas e o horário. O perfil fica ativo."
         },
         "respond": {
           "title": "Responde aos pedidos",
-          "description": "Aceita ou recusa cada pedido. A escola é notificada."
+          "description": "Aceita ou recusa cada pedido em Aulas."
         }
       }
     },
@@ -137,17 +140,13 @@
       "title": "regras claras, dos dois lados",
       "intro": "Cada pedido segue as mesmas regras, para escolas e instrutores saberem sempre com o que contam.",
       "items": {
-        "active": {
-          "title": "Só perfis ativos",
-          "description": "Na pesquisa só aparecem instrutores com o perfil completo e a disponibilidade definida. Um perfil pausado sai da pesquisa."
-        },
-        "availability": {
-          "title": "Dentro da disponibilidade",
-          "description": "Um pedido só cabe nos dias e horários que o instrutor definiu, e nunca por cima de outra aula já pedida ou aceite."
+        "overlap": {
+          "title": "Sem sobreposições",
+          "description": "Um pedido tem de caber no horário do instrutor e não pode coincidir com outra aula pedida ou marcada."
         },
         "decision": {
-          "title": "O instrutor decide",
-          "description": "Nenhuma aula fica marcada sem o instrutor aceitar. Depois, qualquer das partes pode cancelar."
+          "title": "O instrutor confirma",
+          "description": "Nenhuma aula fica marcada sem o instrutor aceitar. Qualquer das partes pode cancelar um pedido ou uma aula marcada."
         },
         "notify": {
           "title": "Tudo notificado",
@@ -156,12 +155,18 @@
       }
     },
     "zones": {
-      "title": "escolhe a tua zona",
-      "intro": "Os instrutores indicam as zonas onde dão aulas e as escolas pesquisam por zona. Estas são as zonas no surfsync, ordenadas de norte a sul."
+      "title": "as zonas no surfsync",
+      "intro": "Os instrutores escolhem, entre estas, as zonas onde dão aulas.",
+      "regions": {
+        "leiria": "Leiria",
+        "lisboa": "Lisboa",
+        "setubal": "Setúbal",
+        "other": "Outras zonas"
+      }
     },
     "closing": {
       "title": "a próxima aula começa aqui.",
-      "description": "Cria a conta como escola ou como instrutor. Os passos seguintes aparecem no teu painel.",
+      "description": "Cria a conta como escola ou como instrutor. Os primeiros passos aparecem logo no Início.",
       "haveAccount": "Já tens conta?"
     },
     "footer": {

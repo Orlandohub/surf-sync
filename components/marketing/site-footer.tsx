@@ -14,7 +14,7 @@ export async function SiteFooter() {
   const year = lisbonToday().slice(0, 4);
 
   return (
-    <footer className="mt-16 border-t md:mt-24">
+    <footer className="mt-16 border-t wrap-break-word md:mt-24">
       <div className={cn(marketingColumn, "flex flex-col gap-8 py-10 md:flex-row md:items-end md:justify-between md:py-12")}>
         <div className="flex flex-col gap-3">
           <LogoLockup height={24} className="text-foreground" />
