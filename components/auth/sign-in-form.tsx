@@ -10,7 +10,7 @@ import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
 import { PasswordInput } from "@/components/auth/password-input";
-import { AuthAltLink, AuthNotice, authTextLinkClass } from "@/components/auth/auth-parts";
+import { AuthAltLink, AuthNotice, authStandaloneLinkClass } from "@/components/auth/auth-parts";
 import { emailProblem, homeFor, signInErrorKey } from "@/components/auth/auth-helpers";
 
 type Errors = { email?: string; password?: string; form?: string };
@@ -54,7 +54,8 @@ export function SignInForm({ resetSuccess = false }: { resetSuccess?: boolean })
       // navigation so the server-rendered shell picks up the session.
       const { data: session } = await authClient.getSession();
       window.location.href = homeFor(session?.user?.type);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setErrors({ form: t("errors.generic") });
       setPending(false);
     }
@@ -84,7 +85,8 @@ export function SignInForm({ resetSuccess = false }: { resetSuccess?: boolean })
           />
         </Field>
 
-        <div className="flex flex-col gap-2">
+        {/* 14px: clears the link's 44px touch area (13px above its line). */}
+        <div className="flex flex-col gap-3.5">
           <Field id="password" label={t("password.label")} error={errors.password}>
             <PasswordInput
               ref={passwordRef}
@@ -96,7 +98,7 @@ export function SignInForm({ resetSuccess = false }: { resetSuccess?: boolean })
               }}
             />
           </Field>
-          <Link href="/forgot-password" className={`${authTextLinkClass} self-start text-meta`}>
+          <Link href="/forgot-password" className={`${authStandaloneLinkClass} self-start text-meta`}>
             {t("forgotPassword")}
           </Link>
         </div>

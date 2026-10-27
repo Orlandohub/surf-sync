@@ -1,3 +1,5 @@
+import { TIME_ZONE } from "@/lib/format";
+
 /**
  * Pure helpers for the auth screens: client-side validation and mapping
  * Better Auth client errors onto PT-PT message keys. No React, no Next —
@@ -15,8 +17,9 @@ export type AuthClientError =
   | null
   | undefined;
 
-/** Matches the server's default minimum (Better Auth minPasswordLength). */
+/** Match the server's defaults (Better Auth min/maxPasswordLength). */
 export const MIN_PASSWORD_LENGTH = 8;
+export const MAX_PASSWORD_LENGTH = 128;
 
 /** The account types a person can choose at sign-up (immutable after). */
 export const ACCOUNT_TYPES = ["school_staff", "instructor"] as const;
@@ -42,10 +45,19 @@ export function emailProblem(email: string): EmailProblem | null {
   return EMAIL_SHAPE.test(value) ? null : "emailInvalid";
 }
 
-export type NewPasswordProblem = "passwordRequired" | "passwordTooShort";
+export type NewPasswordProblem = "passwordRequired" | "passwordTooShort" | "passwordTooLong";
 export function newPasswordProblem(password: string): NewPasswordProblem | null {
   if (!password) return "passwordRequired";
-  return password.length < MIN_PASSWORD_LENGTH ? "passwordTooShort" : null;
+  if (password.length < MIN_PASSWORD_LENGTH) return "passwordTooShort";
+  return password.length > MAX_PASSWORD_LENGTH ? "passwordTooLong" : null;
+}
+
+/** Better Auth's length codes (sign-up, reset, change password). */
+type PasswordLengthKey = "passwordTooShort" | "passwordTooLong";
+function passwordLengthKey(error: AuthClientError): PasswordLengthKey | null {
+  if (error?.code === "PASSWORD_TOO_SHORT") return "passwordTooShort";
+  if (error?.code === "PASSWORD_TOO_LONG") return "passwordTooLong";
+  return null;
 }
 
 const isRateLimited = (error: AuthClientError) => error?.status === 429;
@@ -68,7 +80,7 @@ export function signInErrorKey(error: AuthClientError): SignInErrorKey {
 export type SignUpErrorKey =
   | "emailTaken"
   | "emailInvalid"
-  | "passwordTooShort"
+  | PasswordLengthKey
   | "rateLimited"
   | "generic";
 export function signUpErrorKey(error: AuthClientError): SignUpErrorKey {
@@ -77,8 +89,7 @@ export function signUpErrorKey(error: AuthClientError): SignUpErrorKey {
   // USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL.
   if (error?.code?.startsWith("USER_ALREADY_EXISTS") || error?.status === 422) return "emailTaken";
   if (error?.code === "INVALID_EMAIL") return "emailInvalid";
-  if (error?.code === "PASSWORD_TOO_SHORT") return "passwordTooShort";
-  return "generic";
+  return passwordLengthKey(error) ?? "generic";
 }
 
 export type ResendErrorKey = "wait" | "daily" | "alreadyVerified" | "generic";
@@ -90,28 +101,51 @@ export function resendErrorKey(error: AuthClientError): ResendErrorKey {
   return "generic";
 }
 
-export type ResetPasswordErrorKey = "invalidToken" | "passwordTooShort" | "rateLimited" | "generic";
+export type ResetPasswordErrorKey = "invalidToken" | PasswordLengthKey | "rateLimited" | "generic";
 export function resetPasswordErrorKey(error: AuthClientError): ResetPasswordErrorKey {
   if (isRateLimited(error)) return "rateLimited";
-  if (error?.code === "PASSWORD_TOO_SHORT") return "passwordTooShort";
+  const length = passwordLengthKey(error);
+  if (length) return length;
   // INVALID_TOKEN (400): expired or already used — the token is
-  // single-use and deleted on a successful reset.
-  if (error?.code === "INVALID_TOKEN" || error?.status === 400) return "invalidToken";
+  // single-use and deleted on a successful reset. A 400 without a code is
+  // treated the same; a 400 with another code (e.g. a length rule) is not.
+  if (error?.code === "INVALID_TOKEN" || (error?.status === 400 && !error.code)) return "invalidToken";
   return "generic";
 }
 
 export type ChangePasswordErrorKey =
   | "wrongPassword"
-  | "passwordTooShort"
+  | PasswordLengthKey
   | "rateLimited"
   | "generic";
 export function changePasswordErrorKey(error: AuthClientError): ChangePasswordErrorKey {
   if (isRateLimited(error)) return "rateLimited";
-  if (error?.code === "PASSWORD_TOO_SHORT") return "passwordTooShort";
+  const length = passwordLengthKey(error);
+  if (length) return length;
   if (error?.code === "INVALID_PASSWORD" || error?.code === "CREDENTIAL_ACCOUNT_NOT_FOUND") {
     return "wrongPassword";
   }
   return "generic";
+}
+
+const lisbonClock = new Intl.DateTimeFormat("en-GB", {
+  timeZone: TIME_ZONE,
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/**
+ * The Lisbon wall-clock time of an instant as "HH:MM", ready for
+ * lib/format's formatTime ("09:05" → "9:05"). Pairs with lisbonDate().
+ */
+export function lisbonTimeOf(at: Date | string | number): string {
+  const parts = lisbonClock.formatToParts(new Date(at));
+  const get = (type: "hour" | "minute") => Number(parts.find((p) => p.type === type)?.value ?? NaN);
+  const hour = get("hour") % 24; // some engines report midnight as 24
+  const minute = get("minute");
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) throw new RangeError("Invalid instant");
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 }
 
 export type DeviceKind = "phone" | "tablet" | "desktop" | "unknown";

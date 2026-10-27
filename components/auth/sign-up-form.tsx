@@ -15,9 +15,11 @@ import { PageHeader } from "@/components/ui/page-header";
 import { PasswordInput } from "@/components/auth/password-input";
 import { ResendVerification } from "@/components/auth/resend-verification";
 import { AuthAltLink, AuthStateIcon, authTextLinkClass } from "@/components/auth/auth-parts";
+import { AuthStateScreen } from "@/components/auth/auth-state";
 import {
   ACCOUNT_TYPES,
   emailProblem,
+  homeFor,
   newPasswordProblem,
   signUpErrorKey,
   type AccountType,
@@ -52,7 +54,7 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
   const [password, setPassword] = React.useState("");
   const [errors, setErrors] = React.useState<Errors>({});
   const [pending, setPending] = React.useState(false);
-  const [sent, setSent] = React.useState<{ email: string; at: number } | null>(null);
+  const [sent, setSent] = React.useState<{ email: string; at: number; type: AccountType } | null>(null);
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
@@ -106,8 +108,8 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
         } else if (key === "emailInvalid") {
           setErrors({ email: tv("emailInvalid") });
           emailRef.current?.focus();
-        } else if (key === "passwordTooShort") {
-          setErrors({ password: tv("passwordTooShort") });
+        } else if (key === "passwordTooShort" || key === "passwordTooLong") {
+          setErrors({ password: tv(key) });
           passwordRef.current?.focus();
         } else {
           setErrors({ form: key === "rateLimited" ? ta("rateLimited") : t("errors.generic") });
@@ -115,11 +117,13 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
         return;
       }
 
-      // Better Auth sends the confirmation email on sign-up (sendOnSignUp).
-      setSent({ email: email.trim(), at: Date.now() });
-    } catch {
+      // Better Auth sends the confirmation email on sign-up (sendOnSignUp)
+      // and signs the person in (autoSignIn; no sign-in wall).
+      setSent({ email: email.trim(), at: Date.now(), type: accountType });
+    } catch (err) {
       // Network-level failure: better-fetch only converts HTTP errors into
       // { error }; transport errors reject the promise.
+      console.error(err);
       setErrors({ form: t("errors.generic") });
     } finally {
       setPending(false);
@@ -127,8 +131,11 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
   }
 
   if (sent) {
+    // The person is signed in already; "Continuar" reloads into the app so
+    // the server-rendered app bar shows the session (a client transition
+    // would keep the signed-out bar, and refreshing /sign-up redirects).
     return (
-      <div className="flex flex-col gap-8">
+      <AuthStateScreen focusOnMount>
         <div className="flex flex-col gap-5">
           <AuthStateIcon icon={MailCheck} />
           <PageHeader
@@ -141,9 +148,12 @@ export function SignUpForm({ defaultType = null }: { defaultType?: AccountType |
         </div>
         <div className="flex flex-col gap-4">
           <p className="text-meta text-muted-foreground">{t("done.spam")}</p>
-          <ResendVerification email={sent.email} sentAt={sent.at} sentCount={1} />
+          <ResendVerification email={sent.email} start={{ sentAt: sent.at, sentCount: 1 }} />
         </div>
-      </div>
+        <AuthAltLink lead={t("done.later")} href={homeFor(sent.type)} reload>
+          {t("done.continue")}
+        </AuthAltLink>
+      </AuthStateScreen>
     );
   }
 

@@ -5,6 +5,7 @@ import {
   emailProblem,
   homeFor,
   isAccountType,
+  lisbonTimeOf,
   newPasswordProblem,
   resendErrorKey,
   resetPasswordErrorKey,
@@ -24,10 +25,12 @@ describe("auth validation", () => {
     expect(emailProblem(" ana@example.pt ")).toBeNull();
   });
 
-  it("requires 8+ characters for a new password", () => {
+  it("requires 8 to 128 characters for a new password", () => {
     expect(newPasswordProblem("")).toBe("passwordRequired");
     expect(newPasswordProblem("1234567")).toBe("passwordTooShort");
     expect(newPasswordProblem("12345678")).toBeNull();
+    expect(newPasswordProblem("a".repeat(128))).toBeNull();
+    expect(newPasswordProblem("a".repeat(129))).toBe("passwordTooLong");
   });
 
   it("knows the two account types and their homes", () => {
@@ -54,6 +57,7 @@ describe("Better Auth error mapping", () => {
     expect(signUpErrorKey(err(422))).toBe("emailTaken");
     expect(signUpErrorKey(err(400, "INVALID_EMAIL"))).toBe("emailInvalid");
     expect(signUpErrorKey(err(400, "PASSWORD_TOO_SHORT"))).toBe("passwordTooShort");
+    expect(signUpErrorKey(err(400, "PASSWORD_TOO_LONG"))).toBe("passwordTooLong");
     expect(signUpErrorKey(err(429))).toBe("rateLimited");
     expect(signUpErrorKey(err(500))).toBe("generic");
   });
@@ -66,9 +70,12 @@ describe("Better Auth error mapping", () => {
     expect(resendErrorKey(err(500))).toBe("generic");
   });
 
-  it("reset treats any 400 as a spent or expired link", () => {
+  it("reset treats INVALID_TOKEN or a bare 400 as a spent or expired link", () => {
     expect(resetPasswordErrorKey(err(400, "INVALID_TOKEN"))).toBe("invalidToken");
+    expect(resetPasswordErrorKey(err(400))).toBe("invalidToken");
     expect(resetPasswordErrorKey(err(400, "PASSWORD_TOO_SHORT"))).toBe("passwordTooShort");
+    expect(resetPasswordErrorKey(err(400, "PASSWORD_TOO_LONG"))).toBe("passwordTooLong");
+    expect(resetPasswordErrorKey(err(400, "SOMETHING_ELSE"))).toBe("generic");
     expect(resetPasswordErrorKey(err(429))).toBe("rateLimited");
     expect(resetPasswordErrorKey(err(500))).toBe("generic");
   });
@@ -76,8 +83,21 @@ describe("Better Auth error mapping", () => {
   it("change password points at the current password when it is wrong", () => {
     expect(changePasswordErrorKey(err(400, "INVALID_PASSWORD"))).toBe("wrongPassword");
     expect(changePasswordErrorKey(err(400, "PASSWORD_TOO_SHORT"))).toBe("passwordTooShort");
+    expect(changePasswordErrorKey(err(400, "PASSWORD_TOO_LONG"))).toBe("passwordTooLong");
     expect(changePasswordErrorKey(err(429))).toBe("rateLimited");
     expect(changePasswordErrorKey(null)).toBe("generic");
+  });
+});
+
+describe("lisbonTimeOf", () => {
+  it("gives the Lisbon wall-clock time of an instant", () => {
+    expect(lisbonTimeOf("2026-10-27T09:05:00Z")).toBe("09:05"); // WET, UTC+0
+    expect(lisbonTimeOf("2026-07-15T23:30:00Z")).toBe("00:30"); // WEST, UTC+1
+    expect(lisbonTimeOf(new Date("2026-03-29T01:00:00Z"))).toBe("02:00"); // DST starts
+  });
+
+  it("rejects an invalid instant", () => {
+    expect(() => lisbonTimeOf("not a date")).toThrow(RangeError);
   });
 });
 

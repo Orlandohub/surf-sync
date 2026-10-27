@@ -5,19 +5,21 @@ import { useTranslations } from "next-intl";
 import {
   IdCard,
   KeyRound,
+  LoaderCircle,
   LogOut,
   Mail,
   MailCheck,
   Monitor,
+  MonitorOff,
   MonitorSmartphone,
   MonitorX,
   Smartphone,
   Tablet,
   UserRound,
-  UsersRound,
 } from "lucide-react";
 import { authClient } from "@/lib/auth/client";
-import { formatDate, lisbonDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { daysFromToday, formatDate, formatTime, lisbonDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,10 +40,15 @@ import { toast } from "@/components/ui/toast";
 import type { IconComponent } from "@/components/brand/icons";
 import { PasswordInput } from "@/components/auth/password-input";
 import {
+  ResendStatus,
+  useResendVerification,
+  type ResendStart,
+} from "@/components/auth/resend-verification";
+import {
   changePasswordErrorKey,
   describeDevice,
+  lisbonTimeOf,
   newPasswordProblem,
-  resendErrorKey,
   type AccountType,
   type DeviceKind,
 } from "@/components/auth/auth-helpers";
@@ -62,8 +69,13 @@ const DEVICE_ICON: Record<DeviceKind, IconComponent> = {
   unknown: MonitorSmartphone,
 };
 
-/** Matches the server's 1-per-minute email limiter. */
-const RESEND_COOLDOWN_MS = 60_000;
+/**
+ * A row's leading icon while its action runs (MenuRow has no pending
+ * state, and its `value` slot only takes text).
+ */
+const PendingIcon: IconComponent = ({ className, ...props }) => (
+  <LoaderCircle {...props} className={cn(className, "animate-spin")} />
+);
 
 /** "27 de outubro" from a timestamp (Lisbon calendar day). */
 function dayOf(at: Date | string): string {
@@ -84,15 +96,19 @@ export function AccountSettings({
   userEmail,
   userType,
   emailVerified,
+  resendStart,
 }: {
   userName: string;
   userEmail: string;
   userType: AccountType;
   emailVerified: boolean;
+  /** Server-read email budget (unconfirmed email only), see ResendStart. */
+  resendStart?: ResendStart;
 }) {
   const t = useTranslations("AccountSettingsPage");
   const [sessions, setSessions] = React.useState<SessionRow[] | null>(null);
   const [currentId, setCurrentId] = React.useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = React.useState(false);
   const [busy, setBusy] = React.useState<string | null>(null);
   const [sessionsError, setSessionsError] = React.useState<string | null>(null);
   // Kind outlives `open` so the dialog's text doesn't flip while it closes.
@@ -101,9 +117,8 @@ export function AccountSettings({
   const [confirmError, setConfirmError] = React.useState<string | null>(null);
   const [passwordOpen, setPasswordOpen] = React.useState(false);
   const [signingOut, setSigningOut] = React.useState(false);
-  // "sent": paused after a send (shows "Enviado"); "wait": paused after a 429.
-  const [resendPause, setResendPause] = React.useState<"sent" | "wait" | null>(null);
-  const [resending, setResending] = React.useState(false);
+  const [signOutError, setSignOutError] = React.useState<string | null>(null);
+  const resend = useResendVerification(userEmail, resendStart);
   const sessionsListRef = React.useRef<HTMLUListElement>(null);
 
   /**
@@ -121,26 +136,48 @@ export function AccountSettings({
 
   const load = React.useCallback(async () => {
     const [list, current] = await Promise.all([authClient.listSessions(), authClient.getSession()]);
+    if (list.error) throw list.error;
     return { list: list.data ?? [], currentId: current.data?.session?.id ?? null };
   }, []);
 
-  const reload = React.useCallback(async () => {
-    const next = await load();
-    setSessions(next.list);
-    setCurrentId(next.currentId);
-  }, [load]);
+  /** First load, and "Tentar novamente" after it failed. */
+  const fetchSessions = React.useCallback(
+    (isCancelled: () => boolean = () => false) =>
+      load().then(
+        (next) => {
+          if (isCancelled()) return;
+          setSessions(next.list);
+          setCurrentId(next.currentId);
+          setLoadFailed(false);
+        },
+        (err: unknown) => {
+          if (isCancelled()) return;
+          console.error(err);
+          setLoadFailed(true);
+        },
+      ),
+    [load],
+  );
+
+  /** Re-read after an action; a failure keeps the list and says so. */
+  async function reload() {
+    try {
+      const next = await load();
+      setSessions(next.list);
+      setCurrentId(next.currentId);
+    } catch (err) {
+      console.error(err);
+      setSessionsError(t("sessions.loadFailed"));
+    }
+  }
 
   React.useEffect(() => {
     let cancelled = false;
-    void load().then((next) => {
-      if (cancelled) return;
-      setSessions(next.list);
-      setCurrentId(next.currentId);
-    });
+    void fetchSessions(() => cancelled);
     return () => {
       cancelled = true;
     };
-  }, [load]);
+  }, [fetchSessions]);
 
   const ordered = React.useMemo(() => {
     if (!sessions) return null;
@@ -159,6 +196,19 @@ export function AccountSettings({
     return [d.os, d.browser ?? t("sessions.unknownBrowser")].filter(Boolean).join(" · ");
   }
 
+  /** "hoje às 14:30", "ontem à 1:05", "a 25 de outubro às 9:10" (Lisbon). */
+  function startedWhen(at: Date | string): string {
+    const date = lisbonDate(at);
+    const time = lisbonTimeOf(at);
+    const diff = daysFromToday(date);
+    return t("sessions.startedAt", {
+      day: diff === 0 ? "today" : diff === -1 ? "yesterday" : "other",
+      date: formatDate(date),
+      time: formatTime(time),
+      hour: Number(time.slice(0, 2)),
+    });
+  }
+
   async function revokeOne(session: SessionRow) {
     setBusy(session.id);
     setSessionsError(null);
@@ -167,7 +217,8 @@ export function AccountSettings({
       if (error) setSessionsError(t("errors.revokeFailed"));
       else toast(t("sessions.revoked"));
       await reload();
-    } catch {
+    } catch (err) {
+      console.error(err);
       setSessionsError(t("errors.revokeFailed"));
     } finally {
       setBusy(null);
@@ -209,42 +260,18 @@ export function AccountSettings({
   }
 
   async function signOut() {
+    if (signingOut) return;
     setSigningOut(true);
-    const { error } = await authClient.signOut();
-    if (error) {
-      toast.error(t("errors.signOutFailed"));
-      setSigningOut(false);
-      return;
-    }
-    // Full navigation so the server-rendered shell drops the session.
-    window.location.assign("/");
-  }
-
-  /** One email per minute (the server's limit): pause the row meanwhile. */
-  function coolDownResend(reason: "sent" | "wait") {
-    setResendPause(reason);
-    window.setTimeout(() => setResendPause(null), RESEND_COOLDOWN_MS);
-  }
-
-  async function resendConfirmation() {
-    setResending(true);
+    setSignOutError(null);
     try {
-      const { error } = await authClient.sendVerificationEmail({
-        email: userEmail,
-        callbackURL: "/verify-email",
-      });
-      if (error) {
-        const key = resendErrorKey(error);
-        toast.error(t(`account.resendErrors.${key}`));
-        if (key === "wait") coolDownResend("wait");
-        return;
-      }
-      toast(t("account.resent"));
-      coolDownResend("sent");
-    } catch {
-      toast.error(t("account.resendErrors.generic"));
-    } finally {
-      setResending(false);
+      const { error } = await authClient.signOut();
+      if (error) throw error;
+      // Full navigation so the server-rendered shell drops the session.
+      window.location.assign("/");
+    } catch (err) {
+      console.error(err);
+      setSignOutError(t("errors.signOutFailed"));
+      setSigningOut(false);
     }
   }
 
@@ -268,16 +295,25 @@ export function AccountSettings({
             icon={IdCard}
             label={<Stacked label={t("account.type")} value={t(`account.types.${userType}`)} />}
           />
-          {!emailVerified && (
-            <MenuRow
-              icon={MailCheck}
-              label={t("account.resend")}
-              value={resendPause === "sent" ? t("account.resentValue") : undefined}
-              onClick={resendConfirmation}
-              disabled={resending || resendPause !== null}
-            />
-          )}
         </MenuGroup>
+        {!emailVerified && (
+          <>
+            {/* An action, so its own group rather than a fourth data row.
+                It stays focusable while it waits (aria-disabled): a native
+                disabled button would drop keyboard focus to the page. */}
+            <MenuGroup>
+              <MenuRow
+                icon={resend.pending ? PendingIcon : MailCheck}
+                label={t("account.resend")}
+                onClick={() => void resend.send()}
+                aria-disabled={resend.blocked || undefined}
+                aria-busy={resend.pending || undefined}
+                className="aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:hover:bg-transparent"
+              />
+            </MenuGroup>
+            <ResendStatus state={resend} />
+          </>
+        )}
       </section>
 
       <section aria-labelledby="account-security" className="flex flex-col gap-3">
@@ -303,13 +339,30 @@ export function AccountSettings({
           role="list"
           tabIndex={-1}
           aria-labelledby="account-sessions"
-          aria-busy={ordered === null || undefined}
+          aria-busy={(ordered === null && !loadFailed) || undefined}
           className="overflow-hidden rounded-card border bg-card shadow-card outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          {ordered === null ? (
+          {ordered === null && loadFailed ? (
+            <li className="flex flex-col items-start gap-3 px-card py-4">
+              <p className="text-meta text-muted-foreground">{t("sessions.loadFailed")}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setLoadFailed(false);
+                  // The button goes with the error state: keep focus here.
+                  keepFocusInSessions();
+                  void fetchSessions();
+                }}
+              >
+                {t("sessions.retry")}
+              </Button>
+            </li>
+          ) : ordered === null ? (
             <>
-              <li className="sr-only" role="status">
-                {t("sessions.loading")}
+              {/* A list owns only listitems: the live region sits inside one. */}
+              <li className="sr-only">
+                <span role="status">{t("sessions.loading")}</span>
               </li>
               <SessionSkeleton />
               <SessionSkeleton />
@@ -319,22 +372,20 @@ export function AccountSettings({
               const current = s.id === currentId;
               const device = deviceName(s.userAgent);
               const Icon = DEVICE_ICON[describeDevice(s.userAgent).kind];
+              const when = startedWhen(s.createdAt);
               return (
                 <SessionItem
                   key={s.id}
                   icon={Icon}
                   title={device}
                   badge={current ? <Badge>{t("sessions.current")}</Badge> : null}
-                  meta={[
-                    t("sessions.started", { date: dayOf(s.createdAt) }),
-                    t("sessions.expires", { date: dayOf(s.expiresAt) }),
-                  ]}
+                  meta={[t("sessions.started", { when }), t("sessions.expires", { date: dayOf(s.expiresAt) })]}
                   action={
                     current ? null : (
                       <Button
                         variant="outline"
                         size="sm"
-                        aria-label={t("sessions.revokeLabel", { device })}
+                        aria-label={t("sessions.revokeLabel", { device, when })}
                         disabled={busy !== null && busy !== s.id}
                         // Spinner only: a gerund label would widen the
                         // button and squeeze the meta line on phones.
@@ -351,8 +402,10 @@ export function AccountSettings({
           )}
         </ul>
         {sessionsError && <FieldError>{sessionsError}</FieldError>}
-        <MenuGroup label={t("sessions.actionsLabel")}>
-          {hasOthers && (
+        {/* Only with other sessions: otherwise "todas" is just "Terminar
+            sessão" again. The dialogs carry the destructive tone. */}
+        {hasOthers && (
+          <MenuGroup label={t("sessions.actionsLabel")}>
             <MenuRow
               icon={MonitorX}
               label={t("sessions.revokeOthers")}
@@ -360,26 +413,29 @@ export function AccountSettings({
               disabled={busy !== null}
               aria-haspopup="dialog"
             />
-          )}
-          <MenuRow
-            icon={UsersRound}
-            label={t("sessions.signOutEverywhere")}
-            onClick={() => openConfirm("all")}
-            disabled={busy !== null}
-            aria-haspopup="dialog"
-          />
-        </MenuGroup>
+            <MenuRow
+              icon={MonitorOff}
+              label={t("sessions.signOutEverywhere")}
+              onClick={() => openConfirm("all")}
+              disabled={busy !== null}
+              aria-haspopup="dialog"
+            />
+          </MenuGroup>
+        )}
       </section>
 
-      <MenuGroup>
-        <MenuRow
-          icon={LogOut}
-          label={t("signOut")}
-          destructive
-          onClick={signOut}
-          disabled={signingOut}
-        />
-      </MenuGroup>
+      <div className="flex flex-col gap-3">
+        <MenuGroup>
+          <MenuRow
+            icon={signingOut ? PendingIcon : LogOut}
+            label={t("signOut")}
+            destructive
+            onClick={() => void signOut()}
+            aria-busy={signingOut || undefined}
+          />
+        </MenuGroup>
+        {signOutError && <FieldError>{signOutError}</FieldError>}
+      </div>
 
       <ConfirmDialog
         open={confirmOpen}
@@ -536,8 +592,8 @@ function ChangePasswordDialog({
         if (key === "wrongPassword") {
           setErrors({ current: t("errors.invalidPassword") });
           currentRef.current?.focus();
-        } else if (key === "passwordTooShort") {
-          setErrors({ next: tv("passwordTooShort") });
+        } else if (key === "passwordTooShort" || key === "passwordTooLong") {
+          setErrors({ next: tv(key) });
           nextRef.current?.focus();
         } else {
           setErrors({ form: key === "rateLimited" ? ta("rateLimited") : t("errors.generic") });
@@ -547,7 +603,8 @@ function ChangePasswordDialog({
       onOpenChange(false);
       reset();
       await onChanged();
-    } catch {
+    } catch (err) {
+      console.error(err);
       setErrors({ form: t("errors.generic") });
     } finally {
       setPending(false);

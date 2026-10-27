@@ -47,21 +47,24 @@ export function ResetPasswordForm({ token }: { token: string }) {
         // The token is single-use and server-stored: once rejected, the
         // form is useless — show the "request a new link" state.
         if (key === "invalidToken") setExpired(true);
-        else if (key === "passwordTooShort") setErrors({ password: tv("passwordTooShort") });
-        else setErrors({ form: key === "rateLimited" ? ta("rateLimited") : t("errors.generic") });
+        else if (key === "passwordTooShort" || key === "passwordTooLong") {
+          setErrors({ password: tv(key) });
+          passwordRef.current?.focus();
+        } else setErrors({ form: key === "rateLimited" ? ta("rateLimited") : t("errors.generic") });
         setPending(false);
         return;
       }
       // Success → every session is revoked server-side
       // (revokeSessionsOnPasswordReset); sign in with the new password.
       window.location.href = "/sign-in?reset=success";
-    } catch {
+    } catch (err) {
+      console.error(err);
       setErrors({ form: t("errors.generic") });
       setPending(false);
     }
   }
 
-  if (expired) return <ResetLinkInvalid />;
+  if (expired) return <ResetLinkInvalid focusOnMount />;
 
   return (
     <div className="flex flex-col gap-8">

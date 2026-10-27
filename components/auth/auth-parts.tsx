@@ -9,32 +9,55 @@ import { cn } from "@/lib/utils";
  * directive: usable from Server and Client Components alike.
  */
 
-/** Teal inline text link (forgot password, "Criar conta" in a sentence). */
+/**
+ * Teal text link (forgot password, "Criar conta" after a lead). For links
+ * set inside running text (e.g. inside a field error) — it has no touch
+ * extension, which would cover the control above.
+ */
 export const authTextLinkClass =
   "rounded-chip font-medium text-primary underline-offset-4 outline-none hover:underline " +
   "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 /**
+ * A standalone text link: the `tap` utility extends its 18px line to a
+ * 44px touch target (DESIGN.md §7 "Touch"). Keep ≥ 13px clear above and
+ * below it.
+ */
+export const authStandaloneLinkClass = `tap ${authTextLinkClass}`;
+
+/**
  * The quiet way out at the end of an auth form:
  * "Ainda não tens conta? Criar conta".
+ *
+ * `reload`: a plain <a> (full navigation) instead of a client transition —
+ * for leaving an auth screen right after the session changed, so the
+ * server-rendered app bar picks up the new session.
  */
 export function AuthAltLink({
   lead,
   href,
+  reload = false,
   children,
   className,
 }: {
   lead?: React.ReactNode;
   href: string;
+  reload?: boolean;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
     <p className={cn("text-meta text-muted-foreground", className)}>
       {lead && <>{lead} </>}
-      <Link href={href} className={authTextLinkClass}>
-        {children}
-      </Link>
+      {reload ? (
+        <a href={href} className={authStandaloneLinkClass}>
+          {children}
+        </a>
+      ) : (
+        <Link href={href} className={authStandaloneLinkClass}>
+          {children}
+        </Link>
+      )}
     </p>
   );
 }

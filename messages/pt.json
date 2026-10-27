@@ -75,13 +75,14 @@
       "emailRequired": "Indica o teu email.",
       "emailInvalid": "Indica um email válido, como nome@exemplo.pt.",
       "passwordRequired": "Indica a palavra-passe.",
-      "passwordTooShort": "A palavra-passe precisa de pelo menos 8 caracteres."
+      "passwordTooShort": "A palavra-passe precisa de pelo menos 8 caracteres.",
+      "passwordTooLong": "A palavra-passe pode ter no máximo 128 caracteres."
     },
     "rateLimited": "Demasiadas tentativas. Espera um minuto e tenta novamente.",
     "resend": {
       "submit": "Reenviar email",
       "pending": "A reenviar…",
-      "sent": "Email reenviado. Se não o encontrares, vê na pasta de spam.",
+      "sent": "Email reenviado.",
       "cooldown": "Podes pedir outro email daqui a {seconds} s.",
       "errors": {
         "wait": "Espera um minuto antes de pedires outro email.",
@@ -123,8 +124,10 @@
     "signIn": "Entrar",
     "done": {
       "title": "Confirma o teu email",
-      "description": "Enviámos um link de confirmação para <strong>{email}</strong>. Abre-o para ativares a tua conta.",
-      "spam": "Não encontras o email? Vê na pasta de spam ou pede outro."
+      "description": "Enviámos um link para <strong>{email}</strong>. Abre-o para confirmares o teu email.",
+      "spam": "Não encontras o email? Vê na pasta de spam ou pede outro.",
+      "later": "Podes confirmar mais tarde.",
+      "continue": "Continuar"
     },
     "errors": {
       "emailTaken": "Este email já tem uma conta. <link>Entrar</link>",
@@ -139,14 +142,18 @@
       "signedOut": "A tua conta está pronta. Entra para continuares."
     },
     "continue": "Continuar",
+    "back": "Voltar ao início",
+    "pending": {
+      "title": "Confirma o teu email",
+      "description": "Abre o link que enviámos para <strong>{email}</strong>. Se não o encontras ou já passaram 24 horas, pede outro."
+    },
     "failedTitle": "Este link já não é válido",
     "failedDescription": "Os links de confirmação são válidos durante 24 horas e só podem ser usados uma vez.",
     "failed": {
       "signInHint": "Entra na tua conta para pedires um novo email de confirmação.",
       "signIn": "Entrar",
       "alreadyVerified": "O teu email já está confirmado. Podes continuar.",
-      "resendHint": "Pede um novo email de confirmação para <strong>{email}</strong>.",
-      "back": "Voltar ao início"
+      "resendHint": "Pede um novo email de confirmação para <strong>{email}</strong>."
     }
   },
   "SignInPage": {
@@ -185,8 +192,7 @@
       "title": "Verifica o teu email",
       "description": "Se existir uma conta com <strong>{email}</strong>, enviámos um link para redefinires a palavra-passe. O link é válido durante 1 hora.",
       "spam": "Não encontras o email? Vê na pasta de spam.",
-      "useAnotherEmail": "Usar outro email",
-      "backToSignIn": "Voltar a entrar"
+      "useAnotherEmail": "Usar outro email"
     },
     "errors": {
       "generic": "Não foi possível enviar o email. Verifica a ligação e tenta novamente."
@@ -207,7 +213,8 @@
       "title": "Este link já não é válido",
       "description": "Os links para redefinir a palavra-passe são válidos durante 1 hora e só podem ser usados uma vez.",
       "requestNew": "Pedir novo link",
-      "backToSignIn": "Voltar a entrar"
+      "remembered": "Já te lembraste da palavra-passe?",
+      "signIn": "Entrar"
     },
     "errors": {
       "passwordMismatch": "As palavras-passe não coincidem.",
@@ -226,15 +233,7 @@
         "school_staff": "Escola de surf"
       },
       "resend": "Reenviar email de confirmação",
-      "unverified": "Por confirmar",
-      "resentValue": "Enviado",
-      "resent": "Email de confirmação reenviado.",
-      "resendErrors": {
-        "wait": "Espera um minuto antes de pedires outro email.",
-        "daily": "Atingiste o limite de emails por hoje. Tenta novamente amanhã.",
-        "alreadyVerified": "O teu email já está confirmado.",
-        "generic": "Não foi possível enviar o email. Verifica a ligação e tenta novamente."
-      }
+      "unverified": "Por confirmar"
     },
     "security": {
       "heading": "Segurança",
@@ -254,13 +253,16 @@
       "heading": "Sessões ativas",
       "description": "Dispositivos com sessão iniciada na tua conta.",
       "loading": "A carregar sessões…",
+      "loadFailed": "Não foi possível carregar as sessões. Verifica a ligação e tenta novamente.",
+      "retry": "Tentar novamente",
       "current": "Este dispositivo",
-      "started": "Iniciada a {date}",
+      "started": "Iniciada {when}",
+      "startedAt": "{day, select, today {hoje} yesterday {ontem} other {a {date}}} {hour, plural, =1 {à} other {às}} {time}",
       "expires": "expira a {date}",
       "unknownDevice": "Dispositivo desconhecido",
       "unknownBrowser": "Navegador",
       "revoke": "Terminar",
-      "revokeLabel": "Terminar sessão em {device}",
+      "revokeLabel": "Terminar a sessão em {device}, iniciada {when}",
       "revoking": "A terminar…",
       "revoked": "Sessão terminada.",
       "actionsLabel": "Terminar sessões",

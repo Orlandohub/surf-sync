@@ -9,6 +9,7 @@ import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
 import { AuthAltLink, AuthStateIcon } from "@/components/auth/auth-parts";
+import { AuthStateScreen } from "@/components/auth/auth-state";
 import { emailProblem } from "@/components/auth/auth-helpers";
 
 export function ForgotPasswordForm() {
@@ -47,7 +48,8 @@ export function ForgotPasswordForm() {
         return;
       }
       setSentTo(email.trim());
-    } catch {
+    } catch (err) {
+      console.error(err);
       setFormError(t("errors.generic"));
     } finally {
       setPending(false);
@@ -56,7 +58,7 @@ export function ForgotPasswordForm() {
 
   if (sentTo) {
     return (
-      <div className="flex flex-col gap-8">
+      <AuthStateScreen focusOnMount>
         <div className="flex flex-col gap-5">
           <AuthStateIcon icon={MailCheck} />
           <PageHeader
@@ -82,8 +84,10 @@ export function ForgotPasswordForm() {
             {t("done.useAnotherEmail")}
           </Button>
         </div>
-        <AuthAltLink href="/sign-in">{t("done.backToSignIn")}</AuthAltLink>
-      </div>
+        <AuthAltLink lead={t("remembered")} href="/sign-in">
+          {t("signIn")}
+        </AuthAltLink>
+      </AuthStateScreen>
     );
   }
 
