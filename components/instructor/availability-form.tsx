@@ -7,16 +7,12 @@ import { Info } from "lucide-react";
 import { saveAvailabilityAction, setPausedAction } from "@/lib/actions/instructor";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
-import { cn } from "@/lib/utils";
+import { PinnedCta } from "@/components/ui/pinned-cta";
+import { toast } from "@/components/ui/toast";
 import { SwitchRow } from "@/components/ui/switch";
 import { DayChips } from "@/components/ui/chip-toggle-group";
 import { TimeSelect } from "@/components/ui/time-select";
 import { SectionHeading } from "@/components/ui/section-heading";
-import {
-  CLEARS_SAVE_BAR,
-  PinnedSaveBar,
-  toastAboveSaveBar,
-} from "@/components/instructor/pinned-save-bar";
 import { DAY_KEYS, formatSlot, weekdayName, type DayKey } from "@/lib/format";
 import type { InstructorOnboarding } from "@/lib/services/instructor";
 
@@ -129,7 +125,7 @@ export function AvailabilityForm({
       }
     }
     setSaving(false);
-    toastAboveSaveBar(activates ? t("activated") : t("saved"));
+    toast(activates ? t("activated") : t("saved"));
     startTransition(() => router.refresh());
   }
 
@@ -140,7 +136,7 @@ export function AvailabilityForm({
       noValidate
       className="flex flex-col gap-section"
     >
-      <div className={cn("grid items-start gap-section lg:grid-cols-2", CLEARS_SAVE_BAR)}>
+      <div className="grid items-start gap-section lg:grid-cols-2">
         <div className="flex flex-col gap-section">
           <section aria-labelledby="visibilidade" className="flex flex-col gap-3">
             <SectionHeading id="visibilidade" title={t("active.title")} />
@@ -219,18 +215,18 @@ export function AvailabilityForm({
         </section>
       </div>
 
-      {/* The screen's one primary, pinned above the tab bar on phones. */}
-      <PinnedSaveBar error={formError}>
+      {/* The screen's one primary, pinned above the tab bar on phones and tablets. */}
+      <PinnedCta until="lg" error={formError}>
         <Button
           type="submit"
           size="lg"
           pending={saving || refreshing}
           pendingLabel={t("saving")}
-          className="md:h-11 md:w-auto"
+          className="md:w-auto lg:h-11"
         >
           {activates ? t("saveActivate") : t("save")}
         </Button>
-      </PinnedSaveBar>
+      </PinnedCta>
     </form>
   );
 }

@@ -7,6 +7,7 @@ import { getSession, toShellUser } from "@/lib/auth/session";
 import { unreadCount } from "@/lib/services/notifications";
 import { SiteHeader } from "@/components/shell/site-header";
 import { BottomTabBar } from "@/components/shell/bottom-tab-bar";
+import { FocusReveal } from "@/components/shell/focus-reveal";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
@@ -60,7 +61,7 @@ export default async function RootLayout({
       lang={locale}
       className={`${inter.variable} ${bdSans.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col pb-(--bottom-chrome)">
+      <body className="flex min-h-full flex-col pb-(--bottom-clearance)">
         <NextIntlClientProvider messages={messages}>
           {/* Off-screen until focused (not sr-only: its focus:not-sr-only
               resets the padding to 0). */}
@@ -76,6 +77,7 @@ export default async function RootLayout({
           </div>
           {user && <BottomTabBar type={user.type} unread={unread} />}
           <Toaster />
+          <FocusReveal />
         </NextIntlClientProvider>
       </body>
     </html>

@@ -174,6 +174,7 @@
   --spacing-section: 1.75rem;        /* 28 — gap between screen sections */
   --spacing-tap: 2.75rem;            /* 44 — minimum touch target (size-tap) */
   --spacing-tabbar: 3.5rem;          /* 56 — bottom tab bar, excl. safe area (h-tabbar) */
+  --spacing-cta: 5rem;               /* 80 — pinned CTA bar: pt-3 + Button lg (h-13) + pb-4 (min-h-cta) */
 
   /* ---------------- Radius ----------------
      Hierarchy: chip < thumb < control < card < sheet < panel.
@@ -267,6 +268,8 @@
   --inverse: var(--color-atlantic-950);            /* dark panels in light UI */
   --inverse-foreground: var(--color-atlantic-50);
   --inverse-primary: var(--color-ocean-300);       /* action on inverse (toast link) */
+  --brand-panel: var(--color-atlantic-950);        /* Azul Atlântico brand panels (landing, auth): */
+  --brand-panel-foreground: var(--color-atlantic-50); /* ink in both themes, never flipped in .dark */
 
   --success: var(--color-success-700);
   --success-foreground: var(--color-white);
@@ -303,6 +306,8 @@
   --elev-overlay: 0 20px 48px -12px rgb(13 27 42 / 0.20), 0 4px 12px -4px rgb(13 27 42 / 0.08);
   --scrim-color: rgb(13 27 42 / 0.55);
   --overlay: rgb(13 27 42 / 0.40);                 /* dialog/sheet backdrop */
+  /* --overlay laid flat on the canvas, for the scrollbar gutter (see html) */
+  --overlay-flat: color-mix(in srgb, rgb(13 27 42) 40%, var(--background));
 
   /* Glass — subtle, functional (see DESIGN.md §5) */
   --glass-bg: rgb(255 255 255 / 0.72);
@@ -397,6 +402,7 @@
   --elev-overlay: 0 24px 56px -12px rgb(0 0 0 / 0.60);
   --scrim-color: rgb(13 27 42 / 0.70);
   --overlay: rgb(5 12 20 / 0.60);
+  --overlay-flat: color-mix(in srgb, rgb(5 12 20) 60%, var(--background));
 
   --glass-bg: rgb(13 27 42 / 0.68);
   --glass-border: rgb(255 255 255 / 0.08);
@@ -445,6 +451,8 @@
   --color-inverse: var(--inverse);
   --color-inverse-foreground: var(--inverse-foreground);
   --color-inverse-primary: var(--inverse-primary);
+  --color-brand-panel: var(--brand-panel);
+  --color-brand-panel-foreground: var(--brand-panel-foreground);
 
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
@@ -538,7 +546,21 @@
   }
   html {
     -webkit-text-size-adjust: 100%;
+    /* The page never moves sideways: not when a dialog locks scrolling
+       (Base UI then only sets overflow: hidden, the gutter stays), not
+       between short and long pages. Classic scrollbars only; overlay
+       scrollbars (macOS, phones) take no room either way. */
+    scrollbar-gutter: stable;
     text-rendering: optimizeLegibility;
+    /* The gutter shows the canvas, i.e. this background (body's no
+       longer propagates), and no fixed backdrop covers it: while a
+       dialog is open it takes the backdrop's tint, in step with its fade. */
+    background-color: var(--background);
+    transition: background-color var(--duration-base) var(--ease-exit);
+  }
+  html:has([data-slot="dialog-backdrop"]:not([data-ending-style])) {
+    background-color: var(--overlay-flat);
+    transition: background-color var(--duration-slow) var(--ease-enter);
   }
   body {
     @apply bg-background text-foreground font-sans text-body antialiased;
@@ -558,17 +580,29 @@
 
   /* App shell chrome (components/shell). Read these, never hard-code the
      bar heights:
-       --top-chrome     height of the sticky top bar (hairline included) →
-                        sticky sub-headers use top-(--top-chrome).
-       --bottom-chrome  space the fixed bottom chrome takes: the mobile tab
-                        bar (+ home-indicator inset) when it is rendered,
-                        else just the inset. The layout pads <body> with it;
-                        bottom-pinned CTAs and toasts sit at
-                        bottom-(--bottom-chrome). */
+       --top-chrome         height of the sticky top bar (hairline included)
+                            → sticky sub-headers use top-(--top-chrome).
+       --bottom-chrome      space the fixed bottom chrome takes: the mobile
+                            tab bar (+ home-indicator inset) when it is
+                            rendered, else just the inset. A pinned CTA
+                            sits at bottom-(--bottom-chrome).
+       --bottom-cta         space a pinned CTA (components/ui/pinned-cta)
+                            takes while it is pinned, else 0. The bar is
+                            --spacing-cta tall; one that grows (a form
+                            error) reports its height as --pinned-cta-height.
+       --bottom-clearance   everything fixed at the bottom: chrome + CTA.
+                            The layout pads <body> with it, toasts float
+                            above it and focused content keeps clear of it.
+       --viewport-below-chrome  the viewport height left between the top
+                            bar and the bottom clearance, for a panel that
+                            fills one screen: h-(--viewport-below-chrome). */
   :root {
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --top-chrome: 3.5rem;
     --bottom-chrome: var(--safe-bottom);
+    --bottom-cta: 0px;
+    --bottom-clearance: calc(var(--bottom-chrome) + var(--bottom-cta));
+    --viewport-below-chrome: calc(100svh - var(--top-chrome) - var(--bottom-clearance));
   }
   @media (width >= 48rem) {
     :root {
@@ -586,14 +620,38 @@
   }
 
   /* Focus never lands under the bars (WCAG 2.4.11): anything in the page
-     content that can be scrolled into view — focusable controls, anchor
-     targets — keeps clear of the sticky top bar and the fixed tab bar.
-     Scoped to #conteudo on purpose: scroll-padding on <html> would also
-     apply to the bars' own links and scroll the page when they get focus.
-     A sticky element of your own in the content: add its height with
-     the scroll-mt / scroll-mb utilities (they win over this). */
-  :where(#conteudo) :where(a[href], button, input, select, textarea, summary, [tabindex], [id]) {
-    scroll-margin-block: calc(var(--top-chrome) + 0.5rem) calc(var(--bottom-chrome) + 0.5rem);
+     content that gets scrolled into view — a focused control, an anchor
+     target, an error brought into view with scrollIntoView() — keeps clear
+     of the sticky top bar and the bottom clearance (tab bar + pinned CTA).
+     scroll-margin does nothing until an element is a scroll target, so it
+     is on every element. Scoped to #conteudo on purpose: scroll-padding on
+     <html> would also apply to the bars' own links and scroll the page
+     when they get focus. Chrome ignores it for a text field that gets
+     focus (it only reveals the caret); components/shell/focus-reveal.tsx
+     covers that case. A sticky element of your own in the content: add
+     its height with the scroll-mt / scroll-mb utilities (they win). */
+  :where(#conteudo) * {
+    scroll-margin-block: calc(var(--top-chrome) + 0.5rem) calc(var(--bottom-clearance) + 0.5rem);
+  }
+
+  /* A pinned CTA (data-pinned-cta = the breakpoint where it goes inline,
+     md or lg) adds its height to the bottom clearance while it is pinned.
+     It is bottom chrome itself then, so its own controls need no margin. */
+  @media (width < 48rem) {
+    :root:has([data-pinned-cta]) {
+      --bottom-cta: var(--pinned-cta-height, var(--spacing-cta));
+    }
+    :where([data-pinned-cta]) * {
+      scroll-margin-block: 0px;
+    }
+  }
+  @media (width < 64rem) {
+    :root:has([data-pinned-cta="lg"]) {
+      --bottom-cta: var(--pinned-cta-height, var(--spacing-cta));
+    }
+    :where([data-pinned-cta="lg"]) * {
+      scroll-margin-block: 0px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

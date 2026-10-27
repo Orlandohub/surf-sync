@@ -33,7 +33,8 @@ export function PanelFrame({
 }
 
 /**
- * Rounded marketing panel. `tone="ink"` is the Azul Atlântico panel.
+ * Rounded marketing panel. `tone="ink"` is the Azul Atlântico panel
+ * (bg-brand-panel: stays ink in dark mode too).
  * It does not clip its content, so text that grows (browser text size at
  * 150–200 %) wraps instead of being cut off; only the MarkBackdrop layer
  * is clipped to the panel's corners.
@@ -43,7 +44,7 @@ export function Panel({ tone, children }: { tone: "ink" | "card"; children: Reac
     <div
       className={cn(
         "relative isolate mx-auto w-full max-w-7xl rounded-panel",
-        tone === "ink" ? "bg-inverse text-inverse-foreground" : "border bg-card text-card-foreground shadow-card",
+        tone === "ink" ? "bg-brand-panel text-brand-panel-foreground" : "border bg-card text-card-foreground shadow-card",
       )}
     >
       {children}
@@ -117,7 +118,7 @@ export function FeatureItem({
         <p
           className={cn(
             "max-w-prose text-body",
-            tone === "light" ? "text-muted-foreground" : "text-inverse-foreground/70",
+            tone === "light" ? "text-muted-foreground" : "text-brand-panel-foreground/70",
           )}
         >
           {description}

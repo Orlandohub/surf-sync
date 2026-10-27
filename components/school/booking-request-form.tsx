@@ -8,12 +8,12 @@ import { requestBookingAction } from "@/lib/actions/booking";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Field, FieldError, FieldHelper } from "@/components/ui/field";
+import { PinnedCta } from "@/components/ui/pinned-cta";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TimeSelect } from "@/components/ui/time-select";
 import { toast } from "@/components/ui/toast";
-import { revealFocusedField } from "@/components/school/focus";
 import { formatDayDate, formatTime } from "@/lib/format";
 import {
   STEP,
@@ -39,14 +39,13 @@ const DEFAULT_MINUTES = 120;
  * still checks everything (requestBooking: inside the weekly availability,
  * no overlap, not in the past) and its message shows inline.
  *
- * Layout: a card in the right column from lg. Below lg the form box is
- * `display: contents`, so the CTA can stay pinned above the tab bar for
- * the whole page (DESIGN.md "One job per screen"). Until a day is chosen
- * it reads "Pedir aula" and takes you to the Dia field instead of
- * failing validation; then it becomes "Enviar pedido". While it is
- * pinned, every control keeps a bottom scroll margin of tab bar + CTA,
- * so focus never lands under it (WCAG 2.4.11), and an error from the
- * server is shown under the times and scrolled into view.
+ * Layout: a card in the right column from lg. Below lg the fields are a
+ * card at the end of the page and the CTA (PinnedCta) stays pinned above
+ * the tab bar for the whole page (DESIGN.md "One job per screen"). Until
+ * a day is chosen it reads "Pedir aula" and takes you to the Dia field
+ * instead of failing validation; then it becomes "Enviar pedido". An
+ * error from the server is shown under the times and scrolled into view
+ * (the shell's scroll margins keep it clear of the pinned CTA).
  */
 export function BookingRequestForm({
   instructorId,
@@ -157,11 +156,8 @@ export function BookingRequestForm({
     <form
       noValidate
       onSubmit={handleSubmit}
-      onFocus={revealFocusedField}
       aria-labelledby="pedir-aula"
-      // Tab bar + pinned CTA (5rem) + 0.5rem, rounded up to the scale;
-      // see token_requests (a --bottom-cta token would make this exact).
-      className="max-lg:contents max-lg:**:scroll-mb-48 lg:col-span-2 lg:flex lg:flex-col lg:gap-5 lg:rounded-card lg:border lg:bg-card lg:p-card lg:shadow-card"
+      className="lg:col-span-2 lg:flex lg:flex-col lg:gap-5 lg:rounded-card lg:border lg:bg-card lg:p-card lg:shadow-card"
     >
       <div className="flex flex-col gap-3 lg:gap-4">
         <SectionHeading id="pedir-aula" title={t("title")} description={t("description")} />
@@ -233,7 +229,7 @@ export function BookingRequestForm({
           </Field>
         </div>
       </div>
-      <div className="sticky bottom-(--bottom-chrome) z-20 -mx-gutter -mt-3 bg-background px-gutter pt-3 pb-4 lg:static lg:m-0 lg:bg-transparent lg:p-0">
+      <PinnedCta until="lg">
         <Button
           type={date ? "submit" : "button"}
           size="lg"
@@ -244,7 +240,7 @@ export function BookingRequestForm({
         >
           {date ? t("submit") : t("cta")}
         </Button>
-      </div>
+      </PinnedCta>
     </form>
   );
 }

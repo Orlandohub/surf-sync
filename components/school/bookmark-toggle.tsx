@@ -6,7 +6,7 @@ import { Bookmark, BookmarkCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toggleBookmarkAction } from "@/lib/actions/discovery";
 import { toast } from "@/components/ui/toast";
-import { byId, refocusWhenRemoved } from "@/components/school/focus";
+import { byId, refocusWhenRemoved } from "@/components/shell/focus";
 import { cn } from "@/lib/utils";
 
 /**

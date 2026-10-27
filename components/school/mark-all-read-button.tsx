@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { markAllNotificationsReadAction } from "@/lib/actions/booking";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
-import { byId, refocusWhenRemoved } from "@/components/school/focus";
+import { byId, refocusWhenRemoved } from "@/components/shell/focus";
 
 /**
  * "Marcar tudo como lido" — then router.refresh() so the unread dots and

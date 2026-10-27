@@ -8,8 +8,8 @@ import { Toaster as Sonner, toast as sonnerToast } from "sonner"
 /**
  * surfsync DS (COMPONENTS.md "Toast") — sonner, restyled.
  * `bg-inverse text-inverse-foreground rounded-control shadow-float`,
- * bottom-centre above the tab bar, 4 s. One <Toaster /> is mounted in the
- * root layout; call `toast()` from any Client Component:
+ * bottom-centre above the tab bar and any pinned CTA, 4 s. One <Toaster />
+ * is mounted in the root layout; call `toast()` from any Client Component:
  *
  *   toast("Alterações guardadas.")                    // reuse the CTA verb
  *   toast("Pedido enviado à escola.", { action: { label: "Ver pedido", onClick: () => router.push(href) } })
@@ -50,10 +50,12 @@ export const toast = Object.assign(show, {
   dismiss: (id?: string | number) => sonnerToast.dismiss(id),
 })
 
-// Toasts float above the tab bar (and the home indicator) on mobile.
-const OFFSET = { bottom: "calc(var(--bottom-chrome) + 1rem)" }
+// Toasts float above everything fixed at the bottom: the tab bar, a
+// pinned CTA (components/ui/pinned-cta) and the home indicator
+// (--bottom-clearance, app/globals.css).
+const OFFSET = { bottom: "calc(var(--bottom-clearance) + 1rem)" }
 const MOBILE_OFFSET = {
-  bottom: "calc(var(--bottom-chrome) + 0.75rem)",
+  bottom: "calc(var(--bottom-clearance) + 0.75rem)",
   left: "var(--spacing-gutter)",
   right: "var(--spacing-gutter)",
 }
