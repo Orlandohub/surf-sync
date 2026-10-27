@@ -22,6 +22,19 @@ const MIN_INTERVAL_MS = 60_000;
 const DAILY_WINDOW_MS = 24 * 60 * 60 * 1000;
 const DAILY_MAX = 5;
 
+/**
+ * `code` on the limiter's 429s, so a client can tell the 1-per-minute
+ * cooldown from the daily cap without parsing the message. The cooldown
+ * error also carries `retryAfter` (seconds) in its body and a Retry-After
+ * header.
+ */
+export const VERIFICATION_EMAIL_LIMIT = {
+  cooldown: "VERIFICATION_EMAIL_COOLDOWN",
+  daily: "VERIFICATION_EMAIL_DAILY_LIMIT",
+} as const;
+export type VerificationEmailLimitCode =
+  (typeof VERIFICATION_EMAIL_LIMIT)[keyof typeof VERIFICATION_EMAIL_LIMIT];
+
 export async function enforceVerificationEmailRateLimit(
   email: string,
 ): Promise<void> {
@@ -32,10 +45,18 @@ export async function enforceVerificationEmailRateLimit(
     .orderBy(desc(verificationEmailLog.sentAt))
     .limit(1);
 
-  if (latest && Date.now() - latest.sentAt.getTime() < MIN_INTERVAL_MS) {
-    throw new APIError("TOO_MANY_REQUESTS", {
-      message: "Please wait a minute before requesting another email.",
-    });
+  const now = Date.now();
+  if (latest && withinMinuteWindow(latest.sentAt, new Date(now))) {
+    const retryAfter = Math.max(1, Math.ceil((latest.sentAt.getTime() + MIN_INTERVAL_MS - now) / 1000));
+    throw new APIError(
+      "TOO_MANY_REQUESTS",
+      {
+        message: "Já te enviámos um email há pouco. Espera um minuto e tenta novamente.",
+        code: VERIFICATION_EMAIL_LIMIT.cooldown,
+        retryAfter,
+      },
+      { "Retry-After": String(retryAfter) },
+    );
   }
 
   const [{ count }] = await db
@@ -48,9 +69,10 @@ export async function enforceVerificationEmailRateLimit(
       ),
     );
 
-  if (count >= DAILY_MAX) {
+  if (dailyRemaining(count) === 0) {
     throw new APIError("TOO_MANY_REQUESTS", {
-      message: "Daily verification email limit reached. Try again tomorrow.",
+      message: "Atingiste o limite de emails por hoje. Tenta novamente amanhã.",
+      code: VERIFICATION_EMAIL_LIMIT.daily,
     });
   }
 }

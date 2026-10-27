@@ -1,6 +1,11 @@
 {
   "Metadata": {
-    "description": "A plataforma que liga escolas de surf a instrutores verificados na zona de Lisboa."
+    "description": "A plataforma que liga escolas de surf e instrutores, da Nazaré a Sesimbra."
+  },
+  "Errors": {
+    "generic": "Não foi possível concluir. Tenta novamente daqui a pouco.",
+    "sessionExpired": "A tua sessão terminou. Entra novamente para continuares.",
+    "invalid": "Alguns dados não são válidos. Revê-os e tenta novamente."
   },
   "Nav": {
     "primary": "Navegação principal",
@@ -198,7 +203,7 @@
       "sent": "Email reenviado.",
       "cooldown": "Podes pedir outro email daqui a {seconds} s.",
       "errors": {
-        "wait": "Espera um minuto antes de pedires outro email.",
+        "wait": "Já te enviámos um email há pouco.",
         "daily": "Atingiste o limite de emails por hoje. Tenta novamente amanhã.",
         "alreadyVerified": "O teu email já está confirmado.",
         "generic": "Não foi possível enviar o email. Verifica a ligação e tenta novamente."
@@ -212,7 +217,7 @@
       "label": "Tipo de conta",
       "school_staff": {
         "title": "Escola de surf",
-        "description": "Reserva instrutores verificados."
+        "description": "Encontra instrutores e pede aulas."
       },
       "instructor": {
         "title": "Instrutor",

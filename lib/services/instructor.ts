@@ -10,6 +10,7 @@ import {
 } from "@/lib/db/schema/app";
 import { user } from "@/lib/db/schema/auth";
 import { requireInstructor } from "@/lib/services/authz";
+import { weekdayName } from "@/lib/format";
 
 /**
  * Instructor onboarding & profile service (SUR-20 + Epic 4 core).
@@ -121,7 +122,7 @@ export async function saveInstructorProfile(
     .from(location)
     .where(inArray(location.id, input.locationIds));
   if (validLocations.length !== input.locationIds.length) {
-    throw new APIError("BAD_REQUEST", { message: "Zona selecionada inválida." });
+    throw new APIError("BAD_REQUEST", { message: "Uma das zonas escolhidas não existe. Escolhe as zonas da lista." });
   }
 
   const existing = await db
@@ -185,7 +186,7 @@ export async function saveInstructorAvailability(
   for (const slot of input.slots) {
     if (slot.startTime >= slot.endTime) {
       throw new APIError("BAD_REQUEST", {
-        message: `End time must be after start time (${slot.dayOfWeek}).`,
+        message: `${weekdayName(slot.dayOfWeek)}: a hora de fim tem de ser depois da hora de início.`,
       });
     }
   }
@@ -244,13 +245,13 @@ export async function setInstructorPaused(
 
   if (paused && profile.status !== "active") {
     throw new APIError("BAD_REQUEST", {
-      message: "Apenas um perfil ativo pode ser pausado.",
+      message: "Só podes pausar um perfil ativo.",
     });
   }
   if (!paused) {
     if (profile.status !== "inactive") {
       throw new APIError("BAD_REQUEST", {
-        message: "Apenas um perfil pausado pode ser reativado.",
+        message: "Só podes reativar um perfil pausado.",
       });
     }
     // Reactivation requires availability to still exist.
@@ -261,7 +262,7 @@ export async function setInstructorPaused(
       .limit(1);
     if (rows.length === 0) {
       throw new APIError("BAD_REQUEST", {
-        message: "Defina a sua disponibilidade antes de reativar.",
+        message: "Define a tua disponibilidade antes de reativares o perfil.",
       });
     }
   }

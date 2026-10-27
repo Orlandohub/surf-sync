@@ -144,13 +144,13 @@ export async function getInstructorForSchool(
     )
     .limit(1);
   if (!profile) {
-    throw new APIError("NOT_FOUND", { message: "Instrutor não encontrado." });
+    throw new APIError("NOT_FOUND", { message: "Não encontrámos este instrutor." });
   }
 
   const cards = await searchInstructors(userId, {});
   const card = cards.find((c) => c.userId === instructorId);
   if (!card) {
-    throw new APIError("NOT_FOUND", { message: "Instrutor não encontrado." });
+    throw new APIError("NOT_FOUND", { message: "Não encontrámos este instrutor." });
   }
 
   // Contact email is only exposed on the profile detail view.
@@ -170,7 +170,7 @@ export async function toggleBookmark(
     .where(eq(instructorProfile.userId, instructorId))
     .limit(1);
   if (!target || target.status !== "active") {
-    throw new APIError("NOT_FOUND", { message: "Instrutor não encontrado." });
+    throw new APIError("NOT_FOUND", { message: "Não encontrámos este instrutor." });
   }
 
   const [existing] = await db

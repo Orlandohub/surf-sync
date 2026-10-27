@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/server";
 import { toggleBookmark } from "@/lib/services/discovery";
+import { actionErrorMessage, UNAUTHORIZED } from "@/lib/actions/errors";
 
 export type BookmarkResult =
   | { ok: true; bookmarked: boolean }
@@ -13,14 +14,10 @@ export async function toggleBookmarkAction(
 ): Promise<BookmarkResult> {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
-    if (!session) throw new Error("UNAUTHORIZED");
+    if (!session) throw new Error(UNAUTHORIZED);
     const bookmarked = await toggleBookmark(session.user.id, instructorId);
     return { ok: true, bookmarked };
   } catch (e) {
-    const msg =
-      e && typeof e === "object" && "body" in e
-        ? (e as { body?: { message?: string } }).body?.message
-        : undefined;
-    return { ok: false, error: msg ?? "Ocorreu um erro. Tente novamente." };
+    return { ok: false, error: await actionErrorMessage(e) };
   }
 }

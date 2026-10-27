@@ -6,16 +6,17 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { UserType } from "@/lib/auth/session";
 import { navItemsFor } from "@/components/shell/nav-items";
-import { UnreadBadge } from "@/components/shell/unread-badge";
+import { UnreadCount, UnreadDot } from "@/components/shell/unread-badge";
 
 /**
  * Bottom tab bar (COMPONENTS.md "Bottom tab bar"), signed-in, < md only.
  * Fixed, `glass` (content scrolls under it), 56px + the home-indicator
  * inset. Icon 24px over a `text-caption` label; inactive muted, active
- * `text-primary` + semibold label — no pill, no filled glyph, no dot.
+ * `text-primary` + semibold label — no pill, no filled glyph, no active dot.
  * Labels never hide: a label too wide for its cell (large text, 320px)
  * wraps — hyphenated where the browser can — instead of overlapping.
- * `unread` shows as a count badge on the item flagged `unread`.
+ * `unread` (unread notifications) shows as a "new activity" dot on the
+ * icon of the item flagged `unread`; screen readers hear the count.
  *
  * Rendering it switches `--bottom-chrome` on (app/globals.css), which pads
  * the page and lifts toasts and pinned CTAs above it.
@@ -50,7 +51,7 @@ export function BottomTabBar({ type, unread = 0 }: { type: UserType; unread?: nu
                 <span className="relative flex shrink-0">
                   <Icon aria-hidden className="size-6 shrink-0" strokeWidth={1.75} />
                   {item.unread && unread > 0 && (
-                    <UnreadBadge count={unread} className="absolute -top-1.5 left-4 ring-2 ring-card" />
+                    <UnreadDot className="absolute -top-0.5 -right-0.5 ring-2 ring-card" />
                   )}
                 </span>
                 {/* Equal cells, no side padding; a label may borrow 4px of
@@ -58,6 +59,7 @@ export function BottomTabBar({ type, unread = 0 }: { type: UserType; unread?: nu
                     and wraps when even that is too narrow (large text). */}
                 <span className="-mx-1 text-center leading-tight text-balance wrap-anywhere hyphens-auto">
                   {t(item.label)}
+                  {item.unread && unread > 0 && <UnreadCount count={unread} />}
                 </span>
               </Link>
             </li>
