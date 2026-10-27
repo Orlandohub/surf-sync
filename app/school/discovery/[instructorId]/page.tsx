@@ -1,14 +1,40 @@
-import { redirect } from "next/navigation";
+import { cache } from "react";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { ChevronLeft } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getInstructorForSchool } from "@/lib/services/discovery";
-import { getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { findSchoolIdForUser, listVerifiedInstructorIds } from "@/lib/services/school-overview";
+import { PageContainer } from "@/components/shell/page-container";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Avatar } from "@/components/ui/avatar";
+import { BookmarkToggle } from "@/components/school/bookmark-toggle";
+import { LevelBadge, VerifiedMark } from "@/components/school/instructor-bits";
+import { WeeklyAvailability } from "@/components/school/weekly-availability";
 import { BookingRequestForm } from "@/components/school/booking-request-form";
+import { DAY_KEYS, formatSlot, type DayKey } from "@/lib/format";
 
-export async function generateMetadata() {
-  const t = await getTranslations("DiscoveryPage");
-  return { title: t("profile.title") };
+/** This request's time: the booking form builds its date list from it on
+ *  the server and again on the client, so both lists match. */
+const requestTime = () => Date.now();
+
+/** One lookup per request, shared by generateMetadata and the page. */
+const loadInstructor = cache(async (userId: string, instructorId: string) => {
+  try {
+    return await getInstructorForSchool(userId, instructorId);
+  } catch {
+    return null;
+  }
+});
+
+export async function generateMetadata({ params }: { params: Promise<{ instructorId: string }> }) {
+  const t = await getTranslations("DiscoveryPage.profile");
+  const session = await getSession();
+  const { instructorId } = await params;
+  const instructor =
+    session?.user.type === "school_staff" ? await loadInstructor(session.user.id, instructorId) : null;
+  return { title: instructor?.displayName ?? t("metaTitle") };
 }
 
 export default async function InstructorProfilePage({
@@ -19,65 +45,78 @@ export default async function InstructorProfilePage({
   const session = await getSession();
   if (!session) redirect("/sign-in");
   if (session.user.type !== "school_staff") redirect("/");
+  if (!(await findSchoolIdForUser(session.user.id))) redirect("/school");
 
   const { instructorId } = await params;
+  const instructor = await loadInstructor(session.user.id, instructorId);
+  if (!instructor) notFound();
 
-  let instructor;
-  try {
-    instructor = await getInstructorForSchool(session.user.id, instructorId);
-  } catch {
-    notFound();
-  }
+  const [t, verifiedIds] = await Promise.all([
+    getTranslations("DiscoveryPage"),
+    listVerifiedInstructorIds([instructor.userId]),
+  ]);
+  const verified = verifiedIds.includes(instructor.userId);
 
-  const t = await getTranslations("DiscoveryPage");
+  // Weekday → "HH:MM" range, in week order, for the list and the form.
+  const slots = DAY_KEYS.flatMap((day) => {
+    const s = instructor.availabilitySlots.find((a) => a.day === day);
+    return s ? [{ day, start: formatSlot(s.startTime), end: formatSlot(s.endTime) }] : [];
+  }) satisfies { day: DayKey; start: string; end: string }[];
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-6 px-4 py-10">
-      <div className="flex w-full max-w-2xl flex-col gap-1">
-        <Link href="/school/discovery" className="text-meta text-muted-foreground underline-offset-4 hover:underline">
-          ← {t("backToSearch")}
+    <PageContainer>
+      <header className="flex flex-col gap-5">
+        <Link
+          href="/school/discovery"
+          className="tap -ml-1 inline-flex w-fit items-center gap-0.5 rounded-chip text-meta font-medium text-muted-foreground transition-colors duration-(--duration-fast) hover:text-foreground"
+        >
+          <ChevronLeft aria-hidden className="size-4" strokeWidth={1.75} />
+          {t("profile.back")}
         </Link>
-        <h1 className="text-headline">{instructor.displayName}</h1>
-        <p className="text-meta text-muted-foreground">
-          {t(`experience.${instructor.experienceLevel}`)}
-          {instructor.locations.length > 0 && ` · ${instructor.locations.join(", ")}`}
-        </p>
+        <div className="flex items-start gap-4 md:items-center md:gap-5">
+          <Avatar name={instructor.displayName} size={88} className="max-md:hidden" />
+          <Avatar name={instructor.displayName} size={44} className="mt-0.5 md:hidden" />
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <h1 className="flex items-center gap-2 text-headline text-balance text-foreground">
+              <span className="min-w-0">{instructor.displayName}</span>
+              {verified && <VerifiedMark className="size-5" />}
+            </h1>
+            {instructor.locations.length > 0 && (
+              <p className="text-body text-muted-foreground">{instructor.locations.join(", ")}</p>
+            )}
+            <div className="mt-1 flex">
+              <LevelBadge level={instructor.experienceLevel} />
+            </div>
+          </div>
+          <BookmarkToggle
+            instructorId={instructor.userId}
+            name={instructor.displayName}
+            bookmarked={instructor.bookmarked}
+            className="border border-input max-md:-mt-1"
+          />
+        </div>
+      </header>
+
+      <div className="flex flex-col gap-section lg:grid lg:grid-cols-5 lg:items-start lg:gap-x-8">
+        <div className="flex flex-col gap-section lg:col-span-3">
+          {instructor.bio && (
+            <section aria-labelledby="sobre" className="flex flex-col gap-3">
+              <SectionHeading id="sobre" title={t("profile.about")} />
+              <p className="max-w-prose text-body whitespace-pre-line text-foreground">{instructor.bio}</p>
+            </section>
+          )}
+          <section aria-labelledby="disponibilidade" className="flex flex-col gap-3">
+            <SectionHeading
+              id="disponibilidade"
+              title={t("profile.availability")}
+              description={t("profile.availabilityDescription")}
+            />
+            <WeeklyAvailability slots={slots} />
+          </section>
+        </div>
+
+        <BookingRequestForm instructorId={instructor.userId} slots={slots} now={requestTime()} />
       </div>
-
-      {instructor.bio && (
-        <div className="w-full max-w-2xl rounded-lg border border-border p-6">
-          <h2 className="text-body-lg font-medium">{t("profile.bio")}</h2>
-          <p className="mt-2 whitespace-pre-line text-meta text-muted-foreground">{instructor.bio}</p>
-        </div>
-      )}
-
-      <div className="grid w-full max-w-2xl gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-border p-6">
-          <h2 className="text-body-lg font-medium">{t("profile.locations")}</h2>
-          <ul className="mt-2 flex flex-col gap-1 text-meta text-muted-foreground">
-            {instructor.locations.map((l) => (
-              <li key={l}>{l}</li>
-            ))}
-            {instructor.locations.length === 0 && <li>{t("profile.none")}</li>}
-          </ul>
-        </div>
-        <div className="rounded-[var(--radius)] border border-border p-6">
-          <h2 className="text-body-lg font-medium">{t("profile.availability")}</h2>
-          <ul className="mt-2 flex flex-col gap-1.5 text-meta text-muted-foreground">
-            {instructor.availabilitySlots.map((s) => (
-              <li key={s.day} className="flex items-center justify-between gap-4">
-                <span>{t(`days.${s.day}`)}</span>
-                <span className="text-primary tabular-nums">
-                  {s.startTime.slice(0, 5)}–{s.endTime.slice(0, 5)}
-                </span>
-              </li>
-            ))}
-            {instructor.availabilitySlots.length === 0 && <li>{t("profile.none")}</li>}
-          </ul>
-        </div>
-      </div>
-
-      <BookingRequestForm instructorId={instructor.userId} />
-    </main>
+    </PageContainer>
   );
 }
