@@ -40,7 +40,7 @@ export function TopNav() {
     <header className="sticky top-0 z-40 glass">
       <nav className="mx-auto flex w-full max-w-5xl items-center gap-5 px-gutter py-3">
         <Link href="/" aria-label="surfsync — início">
-          <LogoLockup height={26} className="text-foreground" />
+          <LogoLockup height={24} className="text-foreground" />
         </Link>
         <div className="flex-1" />
         {session?.type === "instructor" && (
