@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { CalendarCheck, Clock3, History } from "lucide-react";
+import { Bell, CalendarCheck, Clock3, History } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { listSchoolBookings } from "@/lib/services/booking";
 import { listNotifications, unreadCount } from "@/lib/services/notifications";
@@ -15,6 +15,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { BookingRow } from "@/components/school/booking-row";
 import { SchoolNotifications } from "@/components/school/school-notifications";
 import { groupBookings, type BookingTab } from "@/components/school/booking-groups";
+import { TABS_SCROLL } from "@/components/school/tabs-scroll";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
@@ -62,16 +63,37 @@ export default async function SchoolBookingsPage({
 
   return (
     <PageContainer>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        // Phones: notifications sit after the bookings, always (a stable
+        // order), so the header carries a bell that jumps to them.
+        action={
+          <a
+            href="#notificacoes"
+            aria-label={t("notifications.jump", { count: unread })}
+            className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "relative lg:hidden")}
+          >
+            <Bell aria-hidden strokeWidth={1.75} />
+            {unread > 0 && (
+              <Badge variant="count" aria-hidden className="absolute -top-0.5 -right-0.5">
+                {unread}
+              </Badge>
+            )}
+          </a>
+        }
+      />
 
       <div className="flex flex-col gap-section lg:grid lg:grid-cols-3 lg:items-start lg:gap-x-8">
         <section aria-labelledby="reservas-lista" className="flex flex-col gap-4 lg:col-span-2">
-          <h2 id="reservas-lista" className="sr-only">
+          {/* tabIndex: where focus goes when a cancelled row leaves the list. */}
+          <h2 id="reservas-lista" tabIndex={-1} className="sr-only">
             {t(`tabs.${tab}`)}
           </h2>
           <LinkTabs
             label={t("tabs.label")}
             value={tab}
+            className={TABS_SCROLL}
             items={[
               { value: "pending", href: TAB_HREF.pending, label: t("tabs.pending"), badge: count(groups.pending.length) },
               { value: "upcoming", href: TAB_HREF.upcoming, label: t("tabs.upcoming") },
@@ -98,7 +120,8 @@ export default async function SchoolBookingsPage({
               description={t(`empty.${tab}.description`)}
               action={
                 tab === "history" ? undefined : (
-                  <Link href="/school/discovery" className={buttonVariants({ variant: "outline" })}>
+                  // The screen's only action, so primary (COMPONENTS.md "Empty state").
+                  <Link href="/school/discovery" className={buttonVariants()}>
                     {t("empty.action")}
                   </Link>
                 )
@@ -110,8 +133,7 @@ export default async function SchoolBookingsPage({
         <SchoolNotifications
           notifications={notifications}
           unread={unread}
-          // On phones, news comes first while there is something unread.
-          className={cn("lg:col-start-3 lg:row-start-1", unread > 0 && "max-lg:order-first")}
+          className="lg:col-start-3 lg:row-start-1"
         />
       </div>
     </PageContainer>

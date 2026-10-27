@@ -6,32 +6,44 @@ import { Bookmark, BookmarkCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toggleBookmarkAction } from "@/lib/actions/discovery";
 import { toast } from "@/components/ui/toast";
+import { byId, refocusWhenRemoved } from "@/components/school/focus";
 import { cn } from "@/lib/utils";
 
 /**
  * Save / unsave an instructor for the school (any staff member). An icon
  * toggle: aria-pressed carries the state, the accessible name stays
  * "Guardar Ana Marques". Optimistic; reverts with a toast if the action
- * fails. Removing offers "Anular" in the toast.
+ * fails or can't be reached. Removing offers "Anular" in the toast, which
+ * does nothing if the instructor was saved again in the meantime.
  *
  * Sits on top of a row's stretched link (relative z-10), never inside it.
+ * In Guardados an unsave removes the row, so pass `focusAfterUnsave` (an
+ * id with tabIndex -1) to keep keyboard focus on the list.
  */
 export function BookmarkToggle({
   instructorId,
   name,
   bookmarked,
+  focusAfterUnsave,
   className,
 }: {
   instructorId: string;
   name: string;
   bookmarked: boolean;
+  focusAfterUnsave?: string;
   className?: string;
 }) {
   const t = useTranslations("DiscoveryPage.bookmark");
   const router = useRouter();
   const [, startTransition] = React.useTransition();
+  const ref = React.useRef<HTMLButtonElement>(null);
   const [on, setOn] = React.useState(bookmarked);
   const [busy, setBusy] = React.useState(false);
+  // The latest state, for the toast's "Anular" (it runs later).
+  const onRef = React.useRef(bookmarked);
+  React.useEffect(() => {
+    onRef.current = on;
+  }, [on]);
 
   // Follow the server value after a refresh (another tab, the undo action).
   const [prev, setPrev] = React.useState(bookmarked);
@@ -43,12 +55,14 @@ export function BookmarkToggle({
   const refresh = React.useCallback(() => startTransition(() => router.refresh()), [router]);
 
   async function undo() {
-    const res = await toggleBookmarkAction(instructorId);
-    if (!res.ok) {
+    if (onRef.current) return; // saved again meanwhile: nothing to undo
+    try {
+      const res = await toggleBookmarkAction(instructorId);
+      if (!res.ok) throw new Error(res.error);
+      toast(res.bookmarked ? t("saved") : t("removed"));
+    } catch {
       toast.error(t("failed"));
-      return;
     }
-    toast(res.bookmarked ? t("saved") : t("removed"));
     refresh();
   }
 
@@ -57,22 +71,29 @@ export function BookmarkToggle({
     const next = !on;
     setOn(next);
     setBusy(true);
-    const res = await toggleBookmarkAction(instructorId);
-    setBusy(false);
-    if (!res.ok) {
+    try {
+      const res = await toggleBookmarkAction(instructorId);
+      if (!res.ok) throw new Error(res.error);
+      setOn(res.bookmarked);
+      if (res.bookmarked) {
+        toast(t("saved"));
+      } else {
+        toast(t("removed"), { action: { label: t("undo"), onClick: () => void undo() } });
+        if (focusAfterUnsave) refocusWhenRemoved(ref.current, byId(focusAfterUnsave));
+      }
+      refresh();
+    } catch {
       setOn(!next);
       toast.error(t("failed"));
-      return;
+    } finally {
+      setBusy(false);
     }
-    setOn(res.bookmarked);
-    if (res.bookmarked) toast(t("saved"));
-    else toast(t("removed"), { action: { label: t("undo"), onClick: () => void undo() } });
-    refresh();
   }
 
   const Icon = on ? BookmarkCheck : Bookmark;
   return (
     <button
+      ref={ref}
       type="button"
       aria-pressed={on}
       aria-label={t("label", { name })}

@@ -52,10 +52,17 @@ export function earliestStart(date: IsoDate, slot: Slot, now: Instant): number {
 }
 
 /**
+ * How far ahead "Pedir aula" offers dates. The old native date input had
+ * no limit (nor has requestBooking); 12 weeks covers a season's planning
+ * while keeping the native list short enough to scan.
+ */
+export const BOOKING_WEEKS = 12;
+
+/**
  * Upcoming dates on the instructor's weekdays (`weeks` weeks' worth),
  * minus today once no lesson of at least STEP minutes still fits.
  */
-export function bookableDates(slots: readonly Slot[], now: Instant, weeks = 4): IsoDate[] {
+export function bookableDates(slots: readonly Slot[], now: Instant, weeks = BOOKING_WEEKS): IsoDate[] {
   const days = slots.map((s) => s.day);
   return upcomingDates(days.length * weeks, { now, days }).filter((d) => {
     const s = slotFor(slots, d);

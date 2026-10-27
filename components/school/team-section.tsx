@@ -44,7 +44,7 @@ export function TeamSection({
                   {m.userId === currentUserId && <Badge variant="neutral">{t("you")}</Badge>}
                 </span>
                 <span className="truncate text-meta text-muted-foreground">{m.email}</span>
-                <span className="text-caption text-muted-foreground tabular-nums">
+                <span className="text-meta text-muted-foreground tabular-nums">
                   {t("joined", { date: formatDate(lisbonDate(m.joinedAt)) })}
                 </span>
               </div>

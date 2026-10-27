@@ -3,13 +3,12 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Bookmark, SearchX, UsersRound } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
+import { listLocations, searchInstructors, searchSchema } from "@/lib/services/discovery";
 import {
-  getBookmarkedInstructors,
-  listLocations,
-  searchInstructors,
-  searchSchema,
-} from "@/lib/services/discovery";
-import { findSchoolIdForUser, listVerifiedInstructorIds } from "@/lib/services/school-overview";
+  countSavedInstructors,
+  findSchoolIdForUser,
+  listVerifiedInstructorIds,
+} from "@/lib/services/school-overview";
 import { PageContainer } from "@/components/shell/page-container";
 import { PageHeader } from "@/components/ui/page-header";
 import { LinkTabs } from "@/components/ui/link-tabs";
@@ -19,6 +18,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { DiscoveryFilters } from "@/components/school/discovery-filters";
 import { InstructorRow } from "@/components/school/instructor-row";
 import { discoveryHref, hasFilters, type DiscoveryQuery } from "@/components/school/discovery-query";
+import { TABS_SCROLL } from "@/components/school/tabs-scroll";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata() {
@@ -51,16 +51,19 @@ export default async function DiscoveryPage({
     view: params.view === "saved" ? "saved" : undefined,
   };
 
-  const [found, locations, saved, t] = await Promise.all([
+  const [found, locations, savedCount, t] = await Promise.all([
     searchInstructors(session.user.id, filters),
     listLocations(),
-    getBookmarkedInstructors(session.user.id),
+    countSavedInstructors(session.user.id),
     getTranslations("DiscoveryPage"),
   ]);
-  const results = query.view === "saved" ? found.filter((i) => i.bookmarked) : found;
+  const savedView = query.view === "saved";
+  const results = savedView ? found.filter((i) => i.bookmarked) : found;
   const verified = new Set(await listVerifiedInstructorIds(results.map((r) => r.userId)));
   const filtered = hasFilters(query);
   const resetHref = discoveryHref({ view: query.view });
+  // Nothing saved yet: no filters above an empty list, just the way back.
+  const nothingSaved = savedView && savedCount === 0;
 
   return (
     <PageContainer>
@@ -70,6 +73,7 @@ export default async function DiscoveryPage({
         <LinkTabs
           label={t("views.label")}
           value={query.view ?? "all"}
+          className={TABS_SCROLL}
           items={[
             { value: "all", href: discoveryHref({ ...query, view: undefined }), label: t("views.all") },
             {
@@ -77,18 +81,24 @@ export default async function DiscoveryPage({
               href: discoveryHref({ ...query, view: "saved" }),
               label: t("views.saved"),
               badge:
-                saved.length > 0 ? (
+                savedCount > 0 ? (
                   <Badge variant="neutral" className="tabular-nums">
-                    {saved.length}
+                    {savedCount}
                   </Badge>
                 ) : undefined,
             },
           ]}
         />
 
-        <DiscoveryFilters locations={locations} query={query}>
+        <DiscoveryFilters locations={locations} query={query} showFilters={!nothingSaved}>
           <div className={cn("flex min-h-11 items-center justify-between gap-4", results.length === 0 && "sr-only")}>
-            <h2 className="text-meta font-medium text-muted-foreground tabular-nums" aria-live="polite">
+            {/* tabIndex: where focus goes when an unsaved row leaves Guardados. */}
+            <h2
+              id="resultados"
+              tabIndex={-1}
+              className="text-meta font-medium text-muted-foreground tabular-nums outline-none"
+              aria-live="polite"
+            >
               {t("resultsCount", { count: results.length })}
             </h2>
             {filtered && results.length > 0 && (
@@ -109,16 +119,18 @@ export default async function DiscoveryPage({
                   key={instructor.userId}
                   instructor={instructor}
                   verified={verified.has(instructor.userId)}
+                  focusAfterUnsave={savedView ? "resultados" : undefined}
                 />
               ))}
             </ul>
-          ) : query.view === "saved" && !filtered ? (
+          ) : nothingSaved ? (
             <EmptyState
               icon={Bookmark}
               title={t("emptySaved.title")}
               description={t("emptySaved.description")}
               action={
-                <Link href={discoveryHref({})} className={buttonVariants({ variant: "outline" })}>
+                // The screen's only action, so primary (COMPONENTS.md "Empty state").
+                <Link href={discoveryHref({})} className={buttonVariants()}>
                   {t("emptySaved.action")}
                 </Link>
               }
@@ -131,7 +143,7 @@ export default async function DiscoveryPage({
               title={t("empty.title")}
               description={t("empty.description")}
               action={
-                <Link href={resetHref} scroll={false} className={buttonVariants({ variant: "outline" })}>
+                <Link href={resetHref} scroll={false} className={buttonVariants()}>
                   {t("filters.reset")}
                 </Link>
               }

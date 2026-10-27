@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { bookingStats, bookingTab, groupBookings, weekBounds } from "@/components/school/booking-groups";
+import { z } from "zod";
+import { isEmail } from "@/components/school/email";
 import {
+  BOOKING_WEEKS,
   bookableDates,
   earliestStart,
   fromMinutes,
@@ -122,5 +125,29 @@ describe("booking slots", () => {
 
   it("offers nothing without availability", () => {
     expect(bookableDates([], "2026-10-27T10:00:00Z")).toEqual([]);
+  });
+
+  it("offers BOOKING_WEEKS weeks ahead by default", () => {
+    const dates = bookableDates(ana, "2026-10-27T10:10:00Z");
+    expect(dates).toHaveLength(ana.length * BOOKING_WEEKS);
+    expect(dates.at(-1)! > "2027-01-01").toBe(true);
+  });
+});
+
+describe("client email check", () => {
+  it("agrees with the server's z.string().email()", () => {
+    const server = z.string().email();
+    for (const value of [
+      "ana@escola.pt",
+      "x.y+z@a-b.co.uk",
+      "a@b.c",
+      "ana@escola.p",
+      "ana@escola..pt",
+      "ana@-escola.pt",
+      "ana@escola",
+      "ana escola@x.pt",
+    ]) {
+      expect(isEmail(value), value).toBe(server.safeParse(value).success);
+    }
   });
 });

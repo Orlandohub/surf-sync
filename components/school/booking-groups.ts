@@ -12,8 +12,6 @@ import { addDays, dayKeyOf, DAY_KEYS, lisbonToday, type IsoDate } from "@/lib/fo
  */
 export type BookingTab = "pending" | "upcoming" | "history";
 
-export const BOOKING_TABS: readonly BookingTab[] = ["pending", "upcoming", "history"];
-
 export function bookingTab(b: Pick<BookingView, "status" | "bookingDate">, today: IsoDate): BookingTab {
   if (b.bookingDate >= today && b.status === "requested") return "pending";
   if (b.bookingDate >= today && b.status === "accepted") return "upcoming";

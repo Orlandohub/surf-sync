@@ -15,11 +15,14 @@ import type { BookingView } from "@/lib/services/booking";
 export function BookingRow({
   booking: b,
   cancellable = false,
+  focusAfter = "reservas-lista",
   showStatus = true,
   showRequester = true,
 }: {
   booking: BookingView;
   cancellable?: boolean;
+  /** Where focus goes after this row is cancelled (an id, tabIndex -1). */
+  focusAfter?: string;
   showStatus?: boolean;
   showRequester?: boolean;
 }) {
@@ -46,7 +49,10 @@ export function BookingRow({
               bookingId={b.id}
               kind={b.status === "accepted" ? "lesson" : "request"}
               day={formatRelativeDay(b.bookingDate, { lowercase: true })}
+              startTime={b.startTime}
+              endTime={b.endTime}
               instructorName={b.instructorName}
+              focusAfter={focusAfter}
             />
           ) : undefined
         }

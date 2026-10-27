@@ -341,7 +341,7 @@
     "emptySaved": {
       "title": "Ainda não guardaste instrutores",
       "description": "Guarda os instrutores com quem queres voltar a trabalhar para os teres sempre à mão.",
-      "action": "Ver todos"
+      "action": "Ver todos os instrutores"
     },
     "row": {
       "verified": "Identidade verificada",
@@ -367,8 +367,7 @@
       "about": "Sobre",
       "availability": "Disponibilidade semanal",
       "availabilityDescription": "Horário habitual. Os pedidos têm de caber nestes horários.",
-      "unavailable": "Indisponível",
-      "loading": "A carregar o perfil…"
+      "unavailable": "Indisponível"
     },
     "emptyAll": {
       "title": "Ainda não há instrutores ativos",
@@ -384,9 +383,10 @@
     "end": "Fim",
     "timePlaceholder": "––:––",
     "range": "Disponível das {start} às {end}.",
-    "duration": "Duração: {duration}",
+    "duration": "Duração: {hours, number} h",
     "notes": "Notas para o instrutor (opcional)",
     "notesHelper": "Número de alunos, nível e material, por exemplo.",
+    "cta": "Pedir aula",
     "submit": "Enviar pedido",
     "submitting": "A enviar…",
     "sent": "Pedido enviado.",
@@ -421,11 +421,11 @@
     "cancel": {
       "lesson": "Cancelar aula",
       "request": "Cancelar pedido",
-      "lessonAria": "Cancelar aula de {instructor} ({day})",
-      "requestAria": "Cancelar pedido a {instructor} ({day})",
+      "lessonAria": "Cancelar aula de {instructor} ({day}, {time})",
+      "requestAria": "Cancelar pedido a {instructor} ({day}, {time})",
       "lessonTitle": "Cancelar a aula de {day}?",
       "requestTitle": "Cancelar o pedido de {day}?",
-      "description": "Avisamos {instructor} do cancelamento. Esta ação não pode ser anulada.",
+      "description": "Das {start} às {end}, com {instructor}. Enviamos-lhe um aviso do cancelamento. Esta ação não pode ser anulada.",
       "keepLesson": "Manter aula",
       "keepRequest": "Manter pedido",
       "pending": "A cancelar…",
@@ -449,6 +449,7 @@
     },
     "notifications": {
       "title": "Notificações",
+      "jump": "{count, plural, =0 {Ver notificações} one {Ver notificações, # por ler} other {Ver notificações, # por ler}}",
       "unread": "{count, plural, =0 {Tudo lido} one {# por ler} other {# por ler}}",
       "markAll": "Marcar tudo como lido",
       "markingAll": "A marcar…",

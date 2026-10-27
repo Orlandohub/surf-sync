@@ -20,9 +20,12 @@ import type { InstructorCard } from "@/lib/services/discovery";
 export function InstructorRow({
   instructor,
   verified,
+  focusAfterUnsave,
 }: {
   instructor: InstructorCard;
   verified: boolean;
+  /** Guardados: unsaving drops the row, so focus goes to this id. */
+  focusAfterUnsave?: string;
 }) {
   const href = `/school/discovery/${instructor.userId}`;
   return (
@@ -58,6 +61,7 @@ export function InstructorRow({
         instructorId={instructor.userId}
         name={instructor.displayName}
         bookmarked={instructor.bookmarked}
+        focusAfterUnsave={focusAfterUnsave}
       />
       <ChevronRight
         aria-hidden

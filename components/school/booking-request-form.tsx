@@ -13,7 +13,8 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { TimeSelect } from "@/components/ui/time-select";
 import { toast } from "@/components/ui/toast";
-import { formatDayDate } from "@/lib/format";
+import { revealFocusedField } from "@/components/school/focus";
+import { formatDayDate, formatTime } from "@/lib/format";
 import {
   STEP,
   bookableDates,
@@ -24,7 +25,6 @@ import {
   type Slot,
 } from "@/components/school/booking-slots";
 
-const HOURS = new Intl.NumberFormat("pt-PT", { maximumFractionDigits: 2 });
 /** Default lesson length when a day is picked. */
 const DEFAULT_MINUTES = 120;
 
@@ -40,8 +40,13 @@ const DEFAULT_MINUTES = 120;
  * no overlap, not in the past) and its message shows inline.
  *
  * Layout: a card in the right column from lg. Below lg the form box is
- * `display: contents`, so "Enviar pedido" can stay pinned above the tab
- * bar for the whole page (DESIGN.md "One job per screen").
+ * `display: contents`, so the CTA can stay pinned above the tab bar for
+ * the whole page (DESIGN.md "One job per screen"). Until a day is chosen
+ * it reads "Pedir aula" and takes you to the Dia field instead of
+ * failing validation; then it becomes "Enviar pedido". While it is
+ * pinned, every control keeps a bottom scroll margin of tab bar + CTA,
+ * so focus never lands under it (WCAG 2.4.11), and an error from the
+ * server is shown under the times and scrolled into view.
  */
 export function BookingRequestForm({
   instructorId,
@@ -56,6 +61,8 @@ export function BookingRequestForm({
   const t = useTranslations("BookingRequestForm");
   const router = useRouter();
   const dateRef = React.useRef<HTMLSelectElement>(null);
+  const startRef = React.useRef<HTMLSelectElement>(null);
+  const errorRef = React.useRef<HTMLParagraphElement>(null);
   const [date, setDate] = React.useState("");
   const [start, setStart] = React.useState("");
   const [end, setEnd] = React.useState("");
@@ -67,6 +74,14 @@ export function BookingRequestForm({
   const dates = bookableDates(slots, now);
   const slot = date ? slotFor(slots, date) : undefined;
   const firstStart = date && slot ? fromMinutes(earliestStart(date, slot, now)) : undefined;
+
+  // A new error: bring it into view (above the pinned CTA, thanks to the
+  // scroll margins) and put focus on the start time, the usual culprit.
+  React.useEffect(() => {
+    if (!formError) return;
+    startRef.current?.focus({ preventScroll: true });
+    errorRef.current?.scrollIntoView({ block: "nearest" });
+  }, [formError]);
 
   if (slots.length === 0) {
     return (
@@ -142,8 +157,11 @@ export function BookingRequestForm({
     <form
       noValidate
       onSubmit={handleSubmit}
+      onFocus={revealFocusedField}
       aria-labelledby="pedir-aula"
-      className="max-lg:contents lg:col-span-2 lg:flex lg:flex-col lg:gap-5 lg:rounded-card lg:border lg:bg-card lg:p-card lg:shadow-card"
+      // Tab bar + pinned CTA (5rem) + 0.5rem, rounded up to the scale;
+      // see token_requests (a --bottom-cta token would make this exact).
+      className="max-lg:contents max-lg:**:scroll-mb-48 lg:col-span-2 lg:flex lg:flex-col lg:gap-5 lg:rounded-card lg:border lg:bg-card lg:p-card lg:shadow-card"
     >
       <div className="flex flex-col gap-3 lg:gap-4">
         <SectionHeading id="pedir-aula" title={t("title")} description={t("description")} />
@@ -151,7 +169,7 @@ export function BookingRequestForm({
           <Field
             label={t("date")}
             error={dateError}
-            helper={slot ? t("range", { start: slot.start, end: slot.end }) : undefined}
+            helper={slot ? t("range", { start: formatTime(slot.start), end: formatTime(slot.end) }) : undefined}
           >
             <Select
               ref={dateRef}
@@ -174,6 +192,7 @@ export function BookingRequestForm({
             <div className="grid grid-cols-2 gap-3">
               <Field label={t("start")}>
                 <TimeSelect
+                  ref={startRef}
                   name="startTime"
                   disabled={!slot}
                   placeholder={slot ? undefined : t("timePlaceholder")}
@@ -200,11 +219,8 @@ export function BookingRequestForm({
                 />
               </Field>
             </div>
-            {minutes > 0 && (
-              <FieldHelper aria-live="polite">
-                {t("duration", { duration: `${HOURS.format(minutes / 60)} h` })}
-              </FieldHelper>
-            )}
+            {minutes > 0 && <FieldHelper aria-live="polite">{t("duration", { hours: minutes / 60 })}</FieldHelper>}
+            {formError && <FieldError ref={errorRef}>{formError}</FieldError>}
           </div>
           <Field label={t("notes")} helper={t("notesHelper")}>
             <Textarea
@@ -215,12 +231,18 @@ export function BookingRequestForm({
               onChange={(e) => setNotes(e.target.value)}
             />
           </Field>
-          {formError && <FieldError>{formError}</FieldError>}
         </div>
       </div>
       <div className="sticky bottom-(--bottom-chrome) z-20 -mx-gutter -mt-3 bg-background px-gutter pt-3 pb-4 lg:static lg:m-0 lg:bg-transparent lg:p-0">
-        <Button type="submit" size="lg" pending={pending} pendingLabel={t("submitting")}>
-          {t("submit")}
+        <Button
+          type={date ? "submit" : "button"}
+          size="lg"
+          pending={pending}
+          pendingLabel={t("submitting")}
+          // No day yet: take the person to Dia instead of failing validation.
+          onClick={date ? undefined : () => dateRef.current?.focus()}
+        >
+          {date ? t("submit") : t("cta")}
         </Button>
       </div>
     </form>

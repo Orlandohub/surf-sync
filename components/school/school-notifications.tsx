@@ -33,6 +33,7 @@ const str = (v: unknown) => (typeof v === "string" ? v : "");
 /**
  * Notificações on Reservas (deck 10): grouped Hoje · Ontem · Esta semana ·
  * Anteriores, actor in semibold, unread dot, "Marcar tudo como lido".
+ * The section takes focus (tabIndex -1) when that button disappears.
  */
 export async function SchoolNotifications({
   notifications,
@@ -73,12 +74,17 @@ export async function SchoolNotifications({
 
   const items = notifications.slice(0, MAX);
   return (
-    <section aria-labelledby="notificacoes" className={cn("flex flex-col gap-3", className)}>
+    <section
+      id="notificacoes-secao"
+      tabIndex={-1}
+      aria-labelledby="notificacoes"
+      className={cn("flex flex-col gap-3 outline-none", className)}
+    >
       <SectionHeading
         id="notificacoes"
         title={t("title")}
-        description={t("unread", { count: unread })}
-        action={unread > 0 ? <MarkAllReadButton /> : undefined}
+        description={items.length > 0 ? t("unread", { count: unread }) : undefined}
+        action={unread > 0 ? <MarkAllReadButton focusAfter="notificacoes-secao" /> : undefined}
       />
       {items.length === 0 ? (
         <p className="rounded-card border bg-card p-card text-body text-muted-foreground shadow-card">

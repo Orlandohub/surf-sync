@@ -1,6 +1,6 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { instructorProfile, schoolStaff } from "@/lib/db/schema/app";
+import { instructorProfile, schoolInstructorBookmark, schoolStaff } from "@/lib/db/schema/app";
 
 /**
  * Read-only lookups for the school screens (UI overhaul). No business
@@ -41,4 +41,25 @@ export async function listVerifiedInstructorIds(
       ),
     );
   return rows.map((r) => r.userId);
+}
+
+/**
+ * How many instructors the user's school has saved, counting only active
+ * profiles — the same set getBookmarkedInstructors returns, without
+ * running a full search just to count it. 0 while there is no school.
+ */
+export async function countSavedInstructors(userId: string): Promise<number> {
+  const schoolId = await findSchoolIdForUser(userId);
+  if (!schoolId) return 0;
+  const [row] = await db
+    .select({ n: count() })
+    .from(schoolInstructorBookmark)
+    .innerJoin(instructorProfile, eq(instructorProfile.userId, schoolInstructorBookmark.instructorId))
+    .where(
+      and(
+        eq(schoolInstructorBookmark.schoolId, schoolId),
+        eq(instructorProfile.profileStatus, "active"),
+      ),
+    );
+  return row?.n ?? 0;
 }

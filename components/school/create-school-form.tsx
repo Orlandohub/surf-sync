@@ -9,10 +9,11 @@ import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
+import { isEmail } from "@/components/school/email";
+import { refocusWhenRemoved, revealFocusedField } from "@/components/school/focus";
 
 type FieldName = "name" | "contactEmail" | "address" | "city";
 const ORDER: FieldName[] = ["name", "contactEmail", "address", "city"];
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * Mirrors createSchoolSchema (lib/services/school.ts) so mistakes show
@@ -21,7 +22,7 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function validate(v: Record<string, string>): Partial<Record<FieldName, true>> {
   const bad: Partial<Record<FieldName, true>> = {};
   if (v.name.length < 2 || v.name.length > 120) bad.name = true;
-  if (!EMAIL.test(v.contactEmail)) bad.contactEmail = true;
+  if (!isEmail(v.contactEmail)) bad.contactEmail = true;
   if (v.address.length < 4 || v.address.length > 240) bad.address = true;
   if (v.city.length < 2 || v.city.length > 80) bad.city = true;
   return bad;
@@ -30,8 +31,10 @@ function validate(v: Record<string, string>): Partial<Record<FieldName, true>> {
 /**
  * "Cria a tua escola" — the whole Início for a school account with no
  * school yet. Three short groups (Escola · Contacto · Localização) in one
- * card; "Criar escola" pinned above the tab bar on phones. On success the
- * page refreshes into the school's Início.
+ * card; "Criar escola" pinned above the tab bar on phones, so there every
+ * control keeps a bottom scroll margin of tab bar + CTA (WCAG 2.4.11).
+ * On success the page refreshes into the school's Início, which then
+ * opens at the top with focus on the school's name.
  */
 export function CreateSchoolForm() {
   const t = useTranslations("SchoolDashboardPage.create");
@@ -71,13 +74,24 @@ export function CreateSchoolForm() {
       return;
     }
     toast(t("saved"));
+    refocusWhenRemoved(formRef.current, () => {
+      window.scrollTo({ top: 0 });
+      return document.querySelector<HTMLElement>("#conteudo h1");
+    });
     startTransition(() => router.refresh());
   }
 
   const err = (name: FieldName) => (errors[name] ? t(`errors.${name}`) : undefined);
 
   return (
-    <form ref={formRef} noValidate onSubmit={handleSubmit} className="flex flex-col gap-section">
+    <form
+      ref={formRef}
+      noValidate
+      onSubmit={handleSubmit}
+      onFocus={revealFocusedField}
+      // Tab bar + pinned CTA (5rem) + 0.5rem, rounded up to the scale.
+      className="flex flex-col gap-section max-md:**:scroll-mb-48"
+    >
       <div className="flex flex-col divide-y divide-border rounded-card border bg-card shadow-card">
         <section aria-labelledby="criar-escola" className="flex flex-col gap-4 p-card md:p-6">
           <h2 id="criar-escola" className="text-title-sm text-foreground">

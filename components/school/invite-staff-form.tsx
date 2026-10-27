@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isEmail } from "@/components/school/email";
 
 /**
  * Invite a colleague by email (Equipa). Outline "Convidar" — the screen's
@@ -28,7 +27,7 @@ export function InviteStaffForm() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const value = email.trim();
-    if (!EMAIL.test(value)) {
+    if (!isEmail(value)) {
       setError(t("invalidEmail"));
       inputRef.current?.focus();
       return;

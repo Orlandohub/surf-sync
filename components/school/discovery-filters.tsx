@@ -17,15 +17,18 @@ const LEVELS = ["beginner", "intermediate", "advanced", "expert"] as const;
  * and the results below dim while the server answers.
  *
  * Desktop: one row of three. Phones: Zona full width, Nível and Dia
- * side by side.
+ * side by side. `showFilters={false}` keeps only the results (Guardados
+ * with nothing saved: there is nothing to filter).
  */
 export function DiscoveryFilters({
   locations,
   query,
+  showFilters = true,
   children,
 }: {
   locations: { id: string; name: string }[];
   query: DiscoveryQuery;
+  showFilters?: boolean;
   /** The results — dimmed while a filter change loads. */
   children: React.ReactNode;
 }) {
@@ -55,58 +58,60 @@ export function DiscoveryFilters({
   const selectClassName = "h-11";
   return (
     <>
-      <form
-        role="search"
-        aria-label={t("filters.label")}
-        onSubmit={(e) => e.preventDefault()}
-        className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4"
-      >
-        <Field label={t("filters.location")} className="col-span-2 md:col-span-1">
-          <Select
-            name="location"
-            value={current.location ?? ""}
-            onChange={(e) => change("location", e.target.value)}
-            selectClassName={selectClassName}
-          >
-            <option value="">{t("filters.anyLocation")}</option>
-            {locations.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t("filters.level")}>
-          <Select
-            name="experience"
-            value={current.experience ?? ""}
-            onChange={(e) => change("experience", e.target.value)}
-            selectClassName={selectClassName}
-          >
-            <option value="">{t("filters.anyLevel")}</option>
-            {LEVELS.map((level) => (
-              <option key={level} value={level}>
-                {t(`levels.${level}`)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-        <Field label={t("filters.day")}>
-          <Select
-            name="day"
-            value={current.day ?? ""}
-            onChange={(e) => change("day", e.target.value)}
-            selectClassName={selectClassName}
-          >
-            <option value="">{t("filters.anyDay")}</option>
-            {DAY_KEYS.map((d) => (
-              <option key={d} value={d}>
-                {weekdayName(d)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </form>
+      {showFilters && (
+        <form
+          role="search"
+          aria-label={t("filters.label")}
+          onSubmit={(e) => e.preventDefault()}
+          className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4"
+        >
+          <Field label={t("filters.location")} className="col-span-2 md:col-span-1">
+            <Select
+              name="location"
+              value={current.location ?? ""}
+              onChange={(e) => change("location", e.target.value)}
+              selectClassName={selectClassName}
+            >
+              <option value="">{t("filters.anyLocation")}</option>
+              {locations.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label={t("filters.level")}>
+            <Select
+              name="experience"
+              value={current.experience ?? ""}
+              onChange={(e) => change("experience", e.target.value)}
+              selectClassName={selectClassName}
+            >
+              <option value="">{t("filters.anyLevel")}</option>
+              {LEVELS.map((level) => (
+                <option key={level} value={level}>
+                  {t(`levels.${level}`)}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label={t("filters.day")}>
+            <Select
+              name="day"
+              value={current.day ?? ""}
+              onChange={(e) => change("day", e.target.value)}
+              selectClassName={selectClassName}
+            >
+              <option value="">{t("filters.anyDay")}</option>
+              {DAY_KEYS.map((d) => (
+                <option key={d} value={d}>
+                  {weekdayName(d)}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </form>
+      )}
       <div
         aria-busy={pending || undefined}
         className={cn(
