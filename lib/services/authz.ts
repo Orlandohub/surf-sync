@@ -35,11 +35,11 @@ async function getUser(userId: string) {
 export async function requireSchoolId(userId: string): Promise<string> {
   const u = await getUser(userId);
   if (!u) {
-    throw new APIError("UNAUTHORIZED", { message: "Sessão expirada. Inicie sessão novamente." });
+    throw new APIError("UNAUTHORIZED", { message: "A tua sessão terminou. Entra novamente para continuares." });
   }
   if (u.type !== "school_staff") {
     throw new APIError("FORBIDDEN", {
-      message: "Apenas contas de escola podem aceder a dados de escolas.",
+      message: "Esta área é só para contas de escola.",
     });
   }
   const [staff] = await db
@@ -49,7 +49,7 @@ export async function requireSchoolId(userId: string): Promise<string> {
     .limit(1);
   if (!staff) {
     throw new APIError("FORBIDDEN", {
-      message: "Ainda não existe uma escola associada a esta conta.",
+      message: "A tua conta ainda não está ligada a uma escola.",
     });
   }
   return staff.schoolId;
@@ -63,11 +63,11 @@ export async function requireSchoolId(userId: string): Promise<string> {
 export async function requireInstructor(userId: string): Promise<string> {
   const u = await getUser(userId);
   if (!u) {
-    throw new APIError("UNAUTHORIZED", { message: "Sessão expirada. Inicie sessão novamente." });
+    throw new APIError("UNAUTHORIZED", { message: "A tua sessão terminou. Entra novamente para continuares." });
   }
   if (u.type !== "instructor") {
     throw new APIError("FORBIDDEN", {
-      message: "Apenas contas de instrutor podem aceder a esta área.",
+      message: "Esta área é só para contas de instrutor.",
     });
   }
   return u.id;
@@ -86,7 +86,7 @@ export async function assertSchoolAccess(
   const schoolId = await requireSchoolId(userId);
   if (schoolId !== requestedSchoolId) {
     throw new APIError("FORBIDDEN", {
-      message: "Esta escola não pertence à sua conta.",
+      message: "Esta escola não está ligada à tua conta.",
     });
   }
   return schoolId;
@@ -103,7 +103,7 @@ export async function assertInstructorSelf(
   const id = await requireInstructor(userId);
   if (id !== requestedUserId) {
     throw new APIError("FORBIDDEN", {
-      message: "Os dados do instrutor só são acessíveis ao próprio.",
+      message: "Só o próprio instrutor pode ver estes dados.",
     });
   }
   return id;
@@ -122,7 +122,7 @@ export async function requireInstructorProfile(userId: string) {
     .limit(1);
   if (!profile) {
     throw new APIError("FORBIDDEN", {
-      message: "Perfil de instrutor não encontrado para esta conta.",
+      message: "Completa primeiro o teu perfil de instrutor.",
     });
   }
   return profile;

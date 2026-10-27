@@ -38,7 +38,7 @@ async function readOutboxEmail(to: string, kind: "verify" | "reset"): Promise<{ 
   if (!latest) fail(`outbox ${kind} email`, `no file for ${to}`);
   const raw = JSON.parse(await readFile(join(dir, latest), "utf8"));
   const subject = String(raw.subject ?? "");
-  const wanted = kind === "verify" ? "Verifique" : "Redefina";
+  const wanted = kind === "verify" ? "Confirma o teu email" : "Redefine a tua palavra-passe";
   if (!subject.includes(wanted)) fail(`outbox ${kind} email subject`, subject);
   const m = String(raw.html).match(/https?:\/\/[^"'\s<]+reset-password[^"'\s<]*/);
   if (kind === "reset" && !m) fail("reset link in email", "not found in html");

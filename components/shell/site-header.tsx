@@ -10,10 +10,10 @@ import { StableLabel } from "@/components/ui/tab-styles";
 import { cn } from "@/lib/utils";
 import type { ShellUser } from "@/lib/auth/session";
 import { AccountMenu } from "@/components/shell/account-menu";
-import { UnreadBadge } from "@/components/shell/unread-badge";
+import { UnreadCount, UnreadDot } from "@/components/shell/unread-badge";
 import { homeHrefFor, navItemsFor } from "@/components/shell/nav-items";
 
-// Glass only once content scrolls under the bar (DESIGN.md G1).
+// The hairline appears once content scrolls under the bar.
 function subscribeScroll(onChange: () => void) {
   window.addEventListener("scroll", onChange, { passive: true });
   return () => window.removeEventListener("scroll", onChange);
@@ -36,14 +36,28 @@ const SIGNED_OUT_ONLY = ["/sign-in", "/sign-up"];
  * Anonymous — logo, quiet "Entrar", small primary "Criar conta". Below
  * 640px the lockup shrinks to the mark so all three fit at 360px.
  *
+ * Surface: an opaque canvas bar that gains a hairline once content scrolls
+ * under it. Not glass: over the landing's ink panels and photos the blur
+ * turned into a muddy band with dark smudges past the panels' corners,
+ * and over the light product pages glass looked the same as opaque.
+ *
+ * Large text: the header is a size container, and its breakpoints are in
+ * rem, so they follow the text size (media queries don't). Below 16rem
+ * (a phone at 150% text and up) it keeps the mark and one action: the
+ * account menu, or "Entrar". On desktop below 42rem (tablets at 125%+)
+ * the lockup becomes the mark and the gaps tighten; if the links still
+ * don't fit (200% at 768–1000px), they scroll sideways inside the bar
+ * instead of widening the page.
+ *
  * `user` comes from the server (root layout), so the first paint is
  * already right — no client session fetch, no flash. The root layout isn't
  * re-rendered on client navigation: if a soft redirect lands a "signed-in"
  * header on /sign-in (session revoked elsewhere), it refreshes once.
  *
- * `unread` (unread notifications) shows as a count on the item flagged
- * `unread` in nav-items.ts. It updates with the layout — `router.refresh()`
- * after marking notifications read.
+ * `unread` (unread notifications) shows as a "new activity" dot on the
+ * item flagged `unread` in nav-items.ts; screen readers hear the count.
+ * It updates with the layout — `router.refresh()` after marking
+ * notifications read.
  */
 export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unread?: number }) {
   const t = useTranslations("Nav");
@@ -66,11 +80,11 @@ export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unrea
       className={cn(
         // Exactly --top-chrome tall, bottom hairline included (border-box),
         // so sticky sub-headers at top-(--top-chrome) meet it flush.
-        "sticky top-0 z-40 h-(--top-chrome) border-b transition-[background-color,border-color,box-shadow] duration-(--duration-fast) ease-move",
-        scrolled ? "glass border-x-0! border-t-0!" : "border-transparent bg-background",
+        "@container sticky top-0 z-40 h-(--top-chrome) border-b bg-background transition-colors duration-(--duration-fast) ease-move",
+        scrolled ? "border-border" : "border-transparent",
       )}
     >
-      <div className="mx-auto flex h-full w-full max-w-5xl items-center gap-8 px-gutter">
+      <div className="mx-auto flex h-full w-full max-w-5xl items-center gap-4 px-gutter @2xl:gap-8">
         <Link
           href={user ? homeHrefFor(user.type) : "/"}
           aria-label={t("home")}
@@ -78,7 +92,10 @@ export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unrea
           className="tap -mx-2 flex shrink-0 items-center rounded-control p-2 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {user ? (
-            <LogoLockup height={24} />
+            <>
+              <LogoMark size={28} className="hidden @max-3xs:block md:@max-2xl:block" />
+              <LogoLockup height={24} className="@max-3xs:hidden md:@max-2xl:hidden" />
+            </>
           ) : (
             <>
               <LogoMark size={28} className="sm:hidden" />
@@ -88,8 +105,8 @@ export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unrea
         </Link>
 
         {items.length > 0 && (
-          <nav aria-label={t("primary")} className="hidden h-full md:block">
-            <ul className="flex h-full items-stretch gap-1">
+          <nav aria-label={t("primary")} className="hidden h-full min-w-0 overflow-x-auto overscroll-x-contain md:block">
+            <ul className="flex h-full min-w-max items-stretch gap-1">
               {items.map((item) => {
                 const active = item.match(pathname);
                 return (
@@ -105,8 +122,11 @@ export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unrea
                         active && "font-semibold text-primary after:opacity-100",
                       )}
                     >
-                      <StableLabel>{t(item.label)}</StableLabel>
-                      {item.unread && unread > 0 && <UnreadBadge count={unread} className="ml-1.5" />}
+                      <span className="relative">
+                        <StableLabel>{t(item.label)}</StableLabel>
+                        {item.unread && unread > 0 && <UnreadDot className="absolute -top-0.5 -right-2.5" />}
+                      </span>
+                      {item.unread && unread > 0 && <UnreadCount count={unread} />}
                     </Link>
                   </li>
                 );
@@ -115,7 +135,7 @@ export function SiteHeader({ user, unread = 0 }: { user: ShellUser | null; unrea
           </nav>
         )}
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex shrink-0 items-center gap-1">
           {user ? <AccountMenu user={user} /> : <AnonymousActions pathname={pathname} />}
         </div>
       </div>
@@ -140,12 +160,15 @@ function AnonymousActions({ pathname }: { pathname: string }) {
     );
   }
 
+  // At large text on a phone (header under 16rem) only "Entrar" stays:
+  // the shorter of the two, and the way back for people who have an
+  // account. "Criar conta" is the landing hero's primary action.
   return (
     <>
       <Link href="/sign-in" className={quiet}>
         {t("signIn")}
       </Link>
-      <Link href="/sign-up" className={buttonVariants({ size: "sm" })}>
+      <Link href="/sign-up" className={cn(buttonVariants({ size: "sm" }), "@max-3xs:hidden")}>
         {t("signUp")}
       </Link>
     </>

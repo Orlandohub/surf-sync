@@ -19,7 +19,7 @@ export async function sendVerificationEmail({
   const { html, text } = await renderVerificationEmail(url);
   await sendEmail({
     to,
-    subject: "Verifique o seu email — SurfSync",
+    subject: "Confirma o teu email no surfsync",
     html,
     text,
   });
