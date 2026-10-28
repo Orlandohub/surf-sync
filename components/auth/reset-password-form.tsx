@@ -1,107 +1,106 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useTranslations } from "next-intl";
+import { Field, FieldError } from "@/components/ui/field";
+import { PageHeader } from "@/components/ui/page-header";
+import { PasswordInput } from "@/components/auth/password-input";
+import { ResetLinkInvalid } from "@/components/auth/reset-link-invalid";
+import { newPasswordProblem, resetPasswordErrorKey } from "@/components/auth/auth-helpers";
 
-export function ResetPasswordForm({
-  token,
-}: {
-  token: string;
-}) {
+type Errors = { password?: string; confirm?: string; form?: string };
+
+export function ResetPasswordForm({ token }: { token: string }) {
   const t = useTranslations("ResetPasswordPage");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
+  const tv = useTranslations("Auth.validation");
+  const ta = useTranslations("Auth");
+  const tp = useTranslations("Auth.password");
+  const [password, setPassword] = React.useState("");
+  const [confirm, setConfirm] = React.useState("");
+  const [errors, setErrors] = React.useState<Errors>({});
+  const [pending, setPending] = React.useState(false);
+  const [expired, setExpired] = React.useState(false);
+  const passwordRef = React.useRef<HTMLInputElement>(null);
+  const confirmRef = React.useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
-    if (password.length < 8) {
-      setError(t("errors.passwordTooShort"));
+    const problem = newPasswordProblem(password);
+    const next: Errors = {
+      password: problem ? tv(problem) : undefined,
+      confirm: !problem && password !== confirm ? t("errors.passwordMismatch") : undefined,
+    };
+    if (next.password || next.confirm) {
+      setErrors(next);
+      (next.password ? passwordRef : confirmRef).current?.focus();
       return;
     }
-    if (password !== confirm) {
-      setError(t("errors.passwordMismatch"));
-      return;
-    }
 
+    setErrors({});
     setPending(true);
     try {
-      const { error } = await authClient.resetPassword({
-        newPassword: password,
-        token,
-      });
+      const { error } = await authClient.resetPassword({ newPassword: password, token });
       if (error) {
-        // INVALID_TOKEN (400) covers expired/already-used tokens; the token
-        // is single-use and server-stored, deleted on successful reset.
-        setError(t("errors.invalidToken"));
+        const key = resetPasswordErrorKey(error);
+        // The token is single-use and server-stored: once rejected, the
+        // form is useless — show the "request a new link" state.
+        if (key === "invalidToken") setExpired(true);
+        else if (key === "passwordTooShort" || key === "passwordTooLong") {
+          setErrors({ password: tv(key) });
+          passwordRef.current?.focus();
+        } else setErrors({ form: key === "rateLimited" ? ta("rateLimited") : t("errors.generic") });
+        setPending(false);
         return;
       }
-      // Success → sessions revoked server-side; send them to sign in with
-      // the new password.
+      // Success → every session is revoked server-side
+      // (revokeSessionsOnPasswordReset); sign in with the new password.
       window.location.href = "/sign-in?reset=success";
-    } catch {
-      setError(t("errors.generic"));
-    } finally {
+    } catch (err) {
+      console.error(err);
+      setErrors({ form: t("errors.generic") });
       setPending(false);
     }
   }
 
+  if (expired) return <ResetLinkInvalid focusOnMount />;
+
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="new-password">{t("newPassword.label")}</Label>
-            <Input
-              id="new-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              autoComplete="new-password"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="confirm-password">{t("confirmPassword.label")}</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-              minLength={8}
-              autoComplete="new-password"
-            />
-          </div>
-          {error && (
-            <p className="text-body text-destructive" role="alert">
-              {error}
-            </p>
-          )}
-          <Button type="submit" disabled={pending}>
-            {pending ? t("submitting") : t("submit")}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+    <div className="flex flex-col gap-8">
+      <PageHeader title={t("title")} description={t("subtitle")} />
+
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <Field id="new-password" label={t("newPassword.label")} helper={tp("requirements")} error={errors.password}>
+          <PasswordInput
+            ref={passwordRef}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (errors.password) setErrors((s) => ({ ...s, password: undefined }));
+            }}
+          />
+        </Field>
+
+        <Field id="confirm-password" label={t("confirmPassword.label")} error={errors.confirm}>
+          <PasswordInput
+            ref={confirmRef}
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => {
+              setConfirm(e.target.value);
+              if (errors.confirm) setErrors((s) => ({ ...s, confirm: undefined }));
+            }}
+          />
+        </Field>
+
+        {errors.form && <FieldError>{errors.form}</FieldError>}
+
+        <Button type="submit" size="lg" className="mt-1" pending={pending} pendingLabel={t("submitting")}>
+          {t("submit")}
+        </Button>
+      </form>
+    </div>
   );
 }

@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { dash } from "@better-auth/infra";
 import { nextCookies } from "better-auth/next-js";
-import { APIError } from "better-auth/api";
+import { APIError, createAuthMiddleware, getSessionFromCtx } from "better-auth/api";
 import { db } from "@/lib/db";
 import * as authSchema from "@/lib/db/schema/auth";
 import { sendVerificationEmail } from "@/lib/email/send-verification";
@@ -31,7 +31,8 @@ export const auth = betterAuth({
       try {
         await enforceVerificationEmailRateLimit(user.email);
       } catch (e) {
-        if (e instanceof APIError && e.status === 429) return;
+        // `status` is the name ("TOO_MANY_REQUESTS"); the number is statusCode.
+        if (e instanceof APIError && e.statusCode === 429) return;
         throw e;
       }
       await sendPasswordResetEmail({ to: user.email, url });
@@ -51,17 +52,51 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24, // refresh expiry once per day of activity
   },
   plugins: [dash(), nextCookies()], // nextCookies must be last
+  hooks: {
+    // "Reenviar email" must hear when the limiter refuses. Better Auth 1.6
+    // awaits sendVerificationEmail below inside runInBackgroundOrAwait,
+    // which logs and swallows whatever it throws, so the endpoint answers
+    // 200 either way. Checking the limit here, before the endpoint runs,
+    // turns a refusal into a 429 with the limiter's PT-PT message and
+    // code (cooldown or daily cap).
+    //
+    // Only for a signed-in caller resending to their own, unconfirmed
+    // address (the only resend the app offers). A signed-out request by
+    // address stays silent, like Better Auth's own handling: a 429 there
+    // would reveal that a recent email went to that address, i.e. that
+    // an account exists. Password resets never pass here and stay silent
+    // too (sendResetPassword above). The sign-up's first email is sent
+    // from /sign-up/email, so this hook doesn't touch it.
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/send-verification-email") return;
+      const email: unknown = ctx.body?.email;
+      if (typeof email !== "string") return;
+      const session = await getSessionFromCtx(ctx);
+      if (!session || session.user.emailVerified) return;
+      if (session.user.email.toLowerCase() !== email.toLowerCase()) return;
+      await enforceVerificationEmailRateLimit(session.user.email);
+    }),
+  },
   emailVerification: {
     expiresIn: 60 * 60 * 24, // 24 hours, single-use token
     sendOnSignUp: true, // auto-send after signup (no sign-in wall — onboarding step)
     sendVerificationEmail: async ({ user, url }) => {
       if (user.emailVerified) {
         throw new APIError("BAD_REQUEST", {
-          message: "Email is already verified.",
+          message: "O teu email já está confirmado.",
+          code: "EMAIL_ALREADY_VERIFIED",
         });
       }
 
-      await enforceVerificationEmailRateLimit(user.email);
+      // Still enforced here for the sends the hook above doesn't see
+      // (sign-up, signed-out requests). Those stay silent: Better Auth
+      // answers 200 regardless, so a refusal is expected, not an error.
+      try {
+        await enforceVerificationEmailRateLimit(user.email);
+      } catch (e) {
+        if (e instanceof APIError && e.statusCode === 429) return;
+        throw e;
+      }
       await sendVerificationEmail({ to: user.email, url });
       await recordVerificationEmailSent(user.email);
     },
@@ -94,7 +129,7 @@ export const auth = betterAuth({
           // otherwise carry the field through.
           if ("type" in data && data.type !== undefined) {
             throw new APIError("BAD_REQUEST", {
-              message: "Account type cannot be changed.",
+              message: "O tipo de conta não pode ser alterado.",
             });
           }
           return { data };

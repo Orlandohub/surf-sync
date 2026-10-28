@@ -13,7 +13,12 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
-import type { BookingEventType, NotificationPayload } from "@/lib/services/notifications";
+import type {
+  BookingEventType,
+  NotificationPayload,
+  NotificationRecipient,
+} from "@/lib/services/notifications";
+import { formatDate, formatTimeRange } from "@/lib/format";
 
 // surfsync email brand — Atlantic palette (docs/design/DESIGN.md).
 const ink = "#0D1B2A";
@@ -41,40 +46,44 @@ function BookingNotificationEmail({
   payload: NotificationPayload;
   dashboardUrl: string;
 }) {
-  const { schoolName, instructorName, bookingDate, startTime, endTime } = payload;
-  const when = `${bookingDate} · ${startTime.slice(0, 5)}–${endTime.slice(0, 5)}`;
+  const { schoolName, instructorName, bookingDate, startTime, endTime, byUserName } = payload;
+  // Absolute date, not "Amanhã": emails are read later. "28 de outubro, 9:00–11:00".
+  const date = formatDate(bookingDate);
+  const when = `${date}, ${formatTimeRange(startTime, endTime)}`;
 
+  // booking_requested goes to the instructor; accepted and declined to the
+  // school's requester; cancelled to the other side.
   const copy: Record<BookingEventType, { preview: string; title: string; body: string }> = {
     booking_requested: {
-      preview: `${schoolName} pediu uma aula a ${instructorName}`,
-      title: "Novo pedido de reserva",
-      body: `${schoolName} pediu uma aula com ${instructorName} a ${when}. Responde no painel para aceitares ou recusares.`,
+      preview: `${schoolName} pediu-te uma aula para ${date}.`,
+      title: "Novo pedido de aula",
+      body: `${schoolName} pediu-te uma aula para ${when}. Abre o surfsync para aceitares ou recusares.`,
     },
     booking_accepted: {
-      preview: `${instructorName} aceitou a reserva de ${schoolName}`,
-      title: "Reserva confirmada",
-      body: `${instructorName} confirmou a aula de ${schoolName} a ${when}.`,
+      preview: `${instructorName} confirmou a aula de ${date}.`,
+      title: "Aula confirmada",
+      body: `${instructorName} confirmou a aula de ${schoolName} para ${when}.`,
     },
     booking_declined: {
-      preview: `${instructorName} não pode aceitar o pedido`,
+      preview: `${instructorName} recusou o pedido de ${date}.`,
       title: "Pedido recusado",
-      body: `${instructorName} não pode aceitar a aula de ${schoolName} a ${when}.${
+      body: `${instructorName} recusou o pedido de aula de ${schoolName} para ${when}.${
         payload.declineReason ? ` Motivo: ${payload.declineReason}` : ""
       }`,
     },
     booking_cancelled: {
-      preview: `Reserva de ${bookingDate} cancelada`,
-      title: "Reserva cancelada",
-      body: `A reserva entre ${schoolName} e ${instructorName} a ${when} foi cancelada por ${
-        payload.byUserName ?? "uma das partes"
-      }.`,
+      preview: `A aula de ${date} foi cancelada.`,
+      title: "Aula cancelada",
+      body: byUserName
+        ? `${byUserName} cancelou a aula de ${schoolName} com ${instructorName} para ${when}.`
+        : `Foi cancelada a aula de ${schoolName} com ${instructorName} para ${when}.`,
     },
   };
 
   const c = copy[type];
 
   return (
-    <Html lang="pt">
+    <Html lang="pt-PT">
       <Head />
       <Preview>{c.preview}</Preview>
       <Body style={{ fontFamily: "system-ui, sans-serif", margin: 0, padding: "24px 0", backgroundColor: canvas }}>
@@ -89,18 +98,18 @@ function BookingNotificationEmail({
               href={dashboardUrl}
               style={{ backgroundColor: teal, borderRadius: 12, color: "#ffffff", fontSize: 15, fontWeight: 600, padding: "12px 20px" }}
             >
-              Ver no SurfSync
+              Abrir surfsync
             </Button>
           </Section>
           <Text style={{ fontSize: 13, lineHeight: "18px", color: muted }}>
-            Se o botão não funcionar, abre este link no browser:
+            Se o botão não funcionar, copia este link para o navegador:
           </Text>
           <Link href={dashboardUrl} style={{ fontSize: 13, color: teal, wordBreak: "break-all" }}>
             {dashboardUrl}
           </Link>
           <Hr style={{ borderColor: hairline, margin: "24px 0" }} />
           <Text style={{ fontSize: 12, lineHeight: "16px", color: faint }}>
-            Recebeste este email porque tens uma conta SurfSync associada a este evento.
+            Recebeste este email porque tens uma conta no surfsync ligada a esta aula.
           </Text>
         </Container>
       </Body>
@@ -108,12 +117,34 @@ function BookingNotificationEmail({
   );
 }
 
+/**
+ * "Abrir surfsync" opens the recipient's own bookings screen, on the tab
+ * where this event put the booking: a new request on the instructor's
+ * Pedidos, a cancellation in either side's Histórico, a confirmation in
+ * the school's Próximas.
+ */
+export function bookingEmailPath(type: BookingEventType, recipient: NotificationRecipient): string {
+  if (recipient === "instructor") {
+    return type === "booking_requested"
+      ? "/instructor/bookings?tab=requests"
+      : type === "booking_accepted"
+        ? "/instructor/bookings?tab=upcoming"
+        : "/instructor/bookings?tab=history";
+  }
+  return type === "booking_requested"
+    ? "/school/bookings"
+    : type === "booking_accepted"
+      ? "/school/bookings?tab=upcoming"
+      : "/school/bookings?tab=history";
+}
+
 export async function renderBookingNotificationEmail(
   type: BookingEventType,
   payload: NotificationPayload,
+  recipient: NotificationRecipient,
 ): Promise<{ html: string; text: string }> {
   const base = process.env.BETTER_AUTH_URL?.replace(/\/api\/auth$/, "") ?? "https://www.surfsync.org";
-  const dashboardUrl = `${base}${type === "booking_requested" ? "/instructor" : "/school"}`;
+  const dashboardUrl = `${base}${bookingEmailPath(type, recipient)}`;
   const html = await render(
     <BookingNotificationEmail type={type} payload={payload} dashboardUrl={dashboardUrl} />,
     { plainText: false },

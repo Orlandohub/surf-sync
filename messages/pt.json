@@ -1,34 +1,238 @@
 {
+  "Metadata": {
+    "description": "A plataforma que liga escolas de surf e instrutores, da Nazaré a Sesimbra."
+  },
+  "Errors": {
+    "generic": "Não foi possível concluir. Tenta novamente daqui a pouco.",
+    "sessionExpired": "A tua sessão terminou. Entra novamente para continuares.",
+    "invalid": "Alguns dados não são válidos. Revê-os e tenta novamente."
+  },
+  "Nav": {
+    "primary": "Navegação principal",
+    "home": "surfsync — início",
+    "skipToContent": "Saltar para o conteúdo",
+    "signIn": "Entrar",
+    "signUp": "Criar conta",
+    "accountMenu": "Menu da conta de {name}",
+    "account": "Conta",
+    "signOut": "Terminar sessão",
+    "signOutError": "Não foi possível terminar sessão. Verifica a ligação e tenta novamente.",
+    "unread": "({count, plural, one {# notificação por ler} other {# notificações por ler}})",
+    "instructor": {
+      "home": "Início",
+      "bookings": "Aulas",
+      "availability": "Disponibilidade",
+      "profile": "Perfil"
+    },
+    "school": {
+      "home": "Início",
+      "discovery": "Instrutores",
+      "bookings": "Reservas",
+      "account": "Conta"
+    }
+  },
+  "UI": {
+    "toastRegion": "Avisos",
+    "actionFailed": "Não foi possível concluir. Verifica a ligação e tenta novamente.",
+    "unread": "Não lida",
+    "verified": "Identidade verificada",
+    "notificationGroups": {
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "week": "Esta semana",
+      "earlier": "Anteriores"
+    },
+    "notifications": {
+      "title": "Notificações",
+      "unread": "{count, plural, =0 {Tudo lido} one {# por ler} other {# por ler}}",
+      "markAll": "Marcar tudo como lido",
+      "marking": "A marcar…",
+      "markedAll": "Tudo marcado como lido.",
+      "jump": "{count, plural, =0 {Ver notificações} one {Ver notificações, # por ler} other {Ver notificações, # por ler}}"
+    }
+  },
+  "NotFoundPage": {
+    "metaTitle": "Página não encontrada",
+    "title": "Esta página não existe",
+    "description": "O endereço pode estar errado ou a página foi removida.",
+    "backHome": "Voltar ao início"
+  },
   "HomePage": {
-    "title": "SurfSync",
-    "tagline": "Staffing de instrutores verificados para escolas de surf na zona de Lisboa.",
+    "meta": {
+      "description": "Escolas de surf encontram instrutores por zona, nível e dia da semana e pedem aulas. Os instrutores decidem que aulas aceitam."
+    },
+    "hero": {
+      "title": "escolas e instrutores, em sincronia.",
+      "tagline": "Escolas de surf encontram instrutores por zona, nível e dia da semana e pedem aulas. Os instrutores escolhem quando dão aulas e respondem a cada pedido.",
+      "photoAlt": "Espuma de ondas no Atlântico, vista de cima."
+    },
     "cta": {
       "signUp": "Criar conta",
       "signIn": "Entrar"
     },
-    "forSchools": {
-      "title": "Para escolas de surf",
-      "description": "Encontra e reserva instrutores verificados para as tuas aulas, com disponibilidade semanal."
+    "audiences": {
+      "schools": {
+        "title": "para escolas",
+        "intro": "Encontra instrutores para as aulas da tua escola e acompanha cada pedido até à aula.",
+        "items": {
+          "profiles": {
+            "title": "Perfis com o essencial",
+            "description": "Cada instrutor mostra o nível, as zonas onde dá aulas e o horário de cada dia da semana."
+          },
+          "bookings": {
+            "title": "Reservas num só sítio",
+            "description": "Pedidos, aulas marcadas e histórico, cada um com o seu estado."
+          },
+          "saved": {
+            "title": "Instrutores guardados",
+            "description": "Guarda os instrutores com quem queres voltar a trabalhar. Ficam guardados para toda a equipa."
+          },
+          "team": {
+            "title": "A tua equipa na mesma escola",
+            "description": "Convida colegas por email. Cada um entra com a sua conta e todos gerem as reservas da escola."
+          }
+        },
+        "signUp": "Criar conta de escola"
+      },
+      "instructors": {
+        "title": "para instrutores",
+        "intro": "Diz onde e quando dás aulas. As escolas encontram-te e enviam-te pedidos.",
+        "items": {
+          "zones": {
+            "title": "Visível nas tuas zonas",
+            "description": "Escolhe as praias onde dás aulas e indica o teu nível."
+          },
+          "availability": {
+            "title": "O teu horário",
+            "description": "Define um horário para cada dia da semana em que dás aulas. Muda-o sempre que precisares."
+          },
+          "lessons": {
+            "title": "Pedidos e aulas num só sítio",
+            "description": "Cada pedido e cada aula com a escola, o dia e o horário."
+          },
+          "pause": {
+            "title": "Pausa quando quiseres",
+            "description": "Pausa o perfil e sais da pesquisa. Reativa-o quando voltares."
+          }
+        },
+        "signUp": "Criar conta de instrutor"
+      }
     },
-    "forInstructors": {
-      "title": "Para instrutores",
-      "description": "Recebe pedidos de trabalho de escolas de surf na tua zona e gere a tua disponibilidade."
+    "steps": {
+      "title": "como funciona",
+      "intro": "Três passos de cada lado, da conta criada ao primeiro pedido.",
+      "schools": {
+        "label": "Escolas",
+        "account": {
+          "title": "Cria a conta e a escola",
+          "description": "Regista-te e preenche os dados da escola."
+        },
+        "search": {
+          "title": "Encontra instrutores",
+          "description": "Usa os filtros e abre os perfis que te interessam."
+        },
+        "request": {
+          "title": "Envia o pedido",
+          "description": "Escolhe o dia e o horário. A resposta aparece em Reservas."
+        }
+      },
+      "instructors": {
+        "label": "Instrutores",
+        "account": {
+          "title": "Cria a conta",
+          "description": "Regista-te como instrutor e confirma o email."
+        },
+        "profile": {
+          "title": "Completa o perfil",
+          "description": "Indica o nível, as zonas e o horário. O perfil fica ativo."
+        },
+        "respond": {
+          "title": "Responde aos pedidos",
+          "description": "Aceita ou recusa cada pedido em Aulas."
+        }
+      }
     },
-    "heroTitle": "Staffing de instrutores para escolas de surf",
-    "heroTitleAccent": "da costa de Lisboa.",
-    "coastLine": "Conexão · Comunidade · Crescimento"
+    "trust": {
+      "title": "regras claras, dos dois lados",
+      "intro": "Cada pedido segue as mesmas regras, para escolas e instrutores saberem sempre com o que contam.",
+      "items": {
+        "overlap": {
+          "title": "Sem sobreposições",
+          "description": "Um pedido tem de caber no horário do instrutor e não pode coincidir com outra aula pedida ou marcada."
+        },
+        "decision": {
+          "title": "O instrutor confirma",
+          "description": "Nenhuma aula fica marcada sem o instrutor aceitar. Qualquer das partes pode cancelar um pedido ou uma aula marcada."
+        },
+        "notify": {
+          "title": "Tudo notificado",
+          "description": "Pedidos, respostas e cancelamentos chegam à outra parte, na app e por email."
+        }
+      }
+    },
+    "zones": {
+      "title": "as zonas no surfsync",
+      "intro": "Os instrutores escolhem, entre estas, as zonas onde dão aulas.",
+      "regions": {
+        "leiria": "Leiria",
+        "lisboa": "Lisboa",
+        "setubal": "Setúbal",
+        "other": "Outras zonas"
+      }
+    },
+    "closing": {
+      "title": "a próxima aula começa aqui.",
+      "description": "Cria a conta como escola ou como instrutor. Os primeiros passos aparecem logo no Início.",
+      "haveAccount": "Já tens conta?"
+    },
+    "footer": {
+      "line": "A plataforma que liga escolas de surf e instrutores.",
+      "nav": "Ligações do rodapé",
+      "copyright": "© {year} surfsync"
+    }
+  },
+  "Auth": {
+    "layout": {
+      "tagline": "a conexão que impulsiona o surf"
+    },
+    "password": {
+      "show": "Mostrar palavra-passe",
+      "requirements": "Pelo menos 8 caracteres."
+    },
+    "validation": {
+      "nameRequired": "Indica o teu nome.",
+      "emailRequired": "Indica o teu email.",
+      "emailInvalid": "Indica um email válido, como nome@exemplo.pt.",
+      "passwordRequired": "Indica a palavra-passe.",
+      "passwordTooShort": "A palavra-passe precisa de pelo menos 8 caracteres.",
+      "passwordTooLong": "A palavra-passe pode ter no máximo 128 caracteres."
+    },
+    "rateLimited": "Demasiadas tentativas. Espera um minuto e tenta novamente.",
+    "resend": {
+      "submit": "Reenviar email",
+      "pending": "A reenviar…",
+      "sent": "Email reenviado.",
+      "cooldown": "Podes pedir outro email daqui a {seconds} s.",
+      "errors": {
+        "wait": "Já te enviámos um email há pouco.",
+        "daily": "Atingiste o limite de emails por hoje. Tenta novamente amanhã.",
+        "alreadyVerified": "O teu email já está confirmado.",
+        "generic": "Não foi possível enviar o email. Verifica a ligação e tenta novamente."
+      }
+    }
   },
   "SignUpPage": {
     "title": "Criar conta",
-    "subtitle": "Escolhe o tipo de conta para começar",
+    "subtitle": "Escolhe como vais usar o surfsync.",
     "accountType": {
+      "label": "Tipo de conta",
       "school_staff": {
-        "title": "Escola de Surf",
-        "description": "Procura e reserva instrutores verificados para as tuas aulas"
+        "title": "Escola de surf",
+        "description": "Encontra instrutores e pede aulas."
       },
       "instructor": {
         "title": "Instrutor",
-        "description": "Recebe pedidos de trabalho de escolas de surf na tua zona"
+        "description": "Recebe pedidos de escolas na tua zona."
       }
     },
     "name": {
@@ -37,38 +241,53 @@
     },
     "email": {
       "label": "Email",
-      "placeholder": "nome@exemplo.pt"
+      "placeholder": "nome@exemplo.pt",
+      "inviteHelper": "Recebeste um convite de uma escola? Usa o email desse convite."
     },
     "password": {
-      "label": "Palavra-passe",
-      "placeholder": "Mínimo de 8 caracteres"
+      "label": "Palavra-passe"
     },
     "submit": "Criar conta",
-    "submitting": "A criar conta...",
-    "back": "Voltar",
-    "success": "Conta criada com sucesso!",
-    "checkEmail": "Enviamos um link de verificação para o teu email. Verifica a tua caixa de entrada (e o spam) para continuar.",
-    "resend": "Reenviar email de verificação",
-    "resending": "A reenviar...",
-    "resent": "Email reenviado. Verifica a tua caixa de entrada.",
-    "resendError": "Não foi possível reenviar o email. Espera um minuto e tenta novamente.",
+    "submitting": "A criar conta…",
+    "haveAccount": "Já tens conta?",
+    "signIn": "Entrar",
+    "done": {
+      "title": "Confirma o teu email",
+      "description": "Enviámos um link para <strong>{email}</strong>. Abre-o para confirmares o teu email.",
+      "spam": "Não encontras o email? Vê na pasta de spam ou pede outro.",
+      "later": "Podes confirmar mais tarde.",
+      "continue": "Continuar"
+    },
     "errors": {
-      "emailTaken": "Este email já tem uma conta. Tenta iniciar sessão.",
-      "generic": "Não foi possível criar a conta. Verifica os dados e tenta novamente.",
-      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres."
+      "emailTaken": "Este email já tem uma conta. <link>Entrar</link>",
+      "generic": "Não foi possível criar a conta. Verifica a ligação e tenta novamente."
     }
   },
   "VerifyEmailPage": {
-    "title": "Email verificado!",
-    "description": "O teu email foi confirmado com sucesso. Já podes iniciar sessão.",
-    "failedTitle": "Link inválido ou expirado",
-    "failedDescription": "Este link de verificação não é válido ou já expirou. Pede um novo email de verificação ao recomeçar a criação de conta.",
+    "metaTitle": "Confirmar email",
+    "title": "Email confirmado",
+    "description": {
+      "signedIn": "A tua conta está pronta a usar.",
+      "signedOut": "A tua conta está pronta. Entra para continuares."
+    },
     "continue": "Continuar",
-    "backToSignIn": "Voltar ao início"
+    "back": "Voltar ao início",
+    "pending": {
+      "title": "Confirma o teu email",
+      "description": "Abre o link que enviámos para <strong>{email}</strong>. Se não o encontras ou já passaram 24 horas, pede outro."
+    },
+    "failedTitle": "Este link já não é válido",
+    "failedDescription": "Os links de confirmação são válidos durante 24 horas e só podem ser usados uma vez.",
+    "failed": {
+      "signInHint": "Entra na tua conta para pedires um novo email de confirmação.",
+      "signIn": "Entrar",
+      "alreadyVerified": "O teu email já está confirmado. Podes continuar.",
+      "resendHint": "Pede um novo email de confirmação para <strong>{email}</strong>."
+    }
   },
   "SignInPage": {
     "title": "Entrar",
-    "subtitle": "Que bom ter-te de volta ao SurfSync",
+    "subtitle": "Entra com o email e a palavra-passe da tua conta.",
     "email": {
       "label": "Email",
       "placeholder": "nome@exemplo.pt"
@@ -78,276 +297,589 @@
     },
     "forgotPassword": "Esqueceste-te da palavra-passe?",
     "submit": "Entrar",
-    "submitting": "A entrar...",
-    "signUpInstead": "Não tens conta? Criar conta",
-    "resetSuccess": "Palavra-passe redefinida com sucesso. Inicia sessão com a tua nova palavra-passe.",
+    "submitting": "A entrar…",
+    "noAccount": "Ainda não tens conta?",
+    "signUp": "Criar conta",
+    "resetSuccess": "Palavra-passe alterada. Entra com a nova palavra-passe.",
     "errors": {
-      "invalidCredentials": "Email ou palavra-passe incorretos.",
-      "generic": "Não foi possível iniciar sessão. Tenta novamente."
+      "invalidCredentials": "Email ou palavra-passe incorretos. Verifica os dados e tenta novamente.",
+      "generic": "Não foi possível entrar. Verifica a ligação e tenta novamente."
     }
   },
   "ForgotPasswordPage": {
     "title": "Recuperar palavra-passe",
-    "subtitle": "Indica o teu email e enviamos um link para redefinir a palavra-passe.",
+    "subtitle": "Indica o email da tua conta. Enviamos-te um link para definires uma nova palavra-passe.",
     "email": {
       "label": "Email",
       "placeholder": "nome@exemplo.pt"
     },
     "submit": "Enviar link",
-    "submitting": "A enviar...",
-    "checkEmail": "Se este email existe na nossa base, enviamos um link de redefinição. Verifica a tua caixa de entrada (e o spam). O link é válido durante 1 hora.",
-    "useAnotherEmail": "Usar outro email",
+    "submitting": "A enviar…",
+    "remembered": "Já te lembraste?",
+    "signIn": "Entrar",
+    "done": {
+      "title": "Verifica o teu email",
+      "description": "Se existir uma conta com <strong>{email}</strong>, enviámos um link para redefinires a palavra-passe. O link é válido durante 1 hora.",
+      "spam": "Não encontras o email? Vê na pasta de spam.",
+      "useAnotherEmail": "Usar outro email"
+    },
     "errors": {
-      "generic": "Não foi possível enviar o email. Tenta novamente."
+      "generic": "Não foi possível enviar o email. Verifica a ligação e tenta novamente."
     }
   },
   "ResetPasswordPage": {
-    "title": "Redefinir palavra-passe",
-    "subtitle": "Escolhe uma nova palavra-passe para a tua conta.",
+    "title": "Nova palavra-passe",
+    "subtitle": "Escolhe a nova palavra-passe da tua conta. Por segurança, terminamos a sessão em todos os dispositivos.",
     "newPassword": {
       "label": "Nova palavra-passe"
     },
     "confirmPassword": {
-      "label": "Confirmar nova palavra-passe"
+      "label": "Confirmar palavra-passe"
     },
-    "submit": "Redefinir palavra-passe",
-    "submitting": "A redefinir...",
+    "submit": "Guardar palavra-passe",
+    "submitting": "A guardar…",
     "invalid": {
-      "title": "Link inválido ou expirado",
-      "description": "Este link de redefinição não é válido ou já expirou (validade de 1 hora, utilização única).",
-      "requestNew": "Pedir novo link"
+      "title": "Este link já não é válido",
+      "description": "Os links para redefinir a palavra-passe são válidos durante 1 hora e só podem ser usados uma vez.",
+      "requestNew": "Pedir novo link",
+      "remembered": "Já te lembraste da palavra-passe?",
+      "signIn": "Entrar"
     },
     "errors": {
-      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres.",
       "passwordMismatch": "As palavras-passe não coincidem.",
-      "invalidToken": "Este link já foi utilizado ou expirou. Peça um novo link de redefinição.",
-      "generic": "Não foi possível redefinir a palavra-passe. Tenta novamente."
+      "generic": "Não foi possível guardar a palavra-passe. Verifica a ligação e tenta novamente."
     }
   },
   "AccountSettingsPage": {
-    "title": "Definições de conta",
-    "sessions": {
-      "title": "Sessões ativas",
-      "description": "Dispositivos com sessão iniciada na tua conta. Terminar uma sessão faz logout nesse dispositivo.",
-      "loading": "A carregar sessões...",
-      "current": "esta sessão",
-      "expires": "expira a",
-      "revoke": "Terminar",
-      "revoking": "A terminar...",
-      "revokeOthers": "Terminar outras sessões",
-      "signOutEverywhere": "Terminar sessão em todos os dispositivos"
+    "title": "Conta",
+    "backToProfile": "Perfil",
+    "account": {
+      "heading": "Dados da conta",
+      "name": "Nome",
+      "email": "Email",
+      "type": "Tipo de conta",
+      "types": {
+        "instructor": "Instrutor",
+        "school_staff": "Escola de surf"
+      },
+      "resend": "Reenviar email de confirmação",
+      "unverified": "Por confirmar"
+    },
+    "security": {
+      "heading": "Segurança",
+      "changePassword": "Alterar palavra-passe"
     },
     "password": {
       "title": "Alterar palavra-passe",
-      "description": "Ao alterar, todas as outras sessões serão terminadas.",
+      "description": "Ao alterares, terminamos a sessão nos outros dispositivos. Neste continuas com sessão iniciada.",
       "current": "Palavra-passe atual",
       "new": "Nova palavra-passe",
+      "cancel": "Cancelar",
       "submit": "Alterar palavra-passe",
-      "submitting": "A alterar..."
+      "submitting": "A alterar…",
+      "changed": "Palavra-passe alterada. As outras sessões foram terminadas."
     },
-    "passwordChanged": "Palavra-passe alterada. As outras sessões foram terminadas.",
+    "sessions": {
+      "heading": "Sessões ativas",
+      "description": "Dispositivos com sessão iniciada na tua conta.",
+      "loading": "A carregar sessões…",
+      "loadFailed": "Não foi possível carregar as sessões. Verifica a ligação e tenta novamente.",
+      "retry": "Tentar novamente",
+      "current": "Este dispositivo",
+      "started": "Iniciada {when}",
+      "startedAt": "{day, select, today {hoje} yesterday {ontem} other {a {date}}} {hour, plural, =1 {à} other {às}} {time}",
+      "expires": "expira a {date}",
+      "unknownDevice": "Dispositivo desconhecido",
+      "unknownBrowser": "Navegador",
+      "revoke": "Terminar",
+      "revokeLabel": "Terminar a sessão em {device}, iniciada {when}",
+      "revoking": "A terminar…",
+      "revoked": "Sessão terminada.",
+      "actionsLabel": "Terminar sessões",
+      "revokeOthers": "Terminar outras sessões",
+      "othersRevoked": "Outras sessões terminadas.",
+      "othersConfirm": {
+        "title": "Terminar as outras sessões?",
+        "description": "Os outros dispositivos ficam sem sessão iniciada. Neste continuas com sessão iniciada.",
+        "confirm": "Terminar sessões",
+        "cancel": "Manter sessões"
+      },
+      "signOutEverywhere": "Terminar todas as sessões",
+      "allConfirm": {
+        "title": "Terminar todas as sessões?",
+        "description": "Sais da tua conta neste e em todos os outros dispositivos. Para voltar, entra outra vez.",
+        "confirm": "Terminar todas",
+        "cancel": "Manter sessões"
+      }
+    },
+    "signOut": "Terminar sessão",
     "errors": {
-      "revokeFailed": "Não foi possível terminar a sessão. Tente novamente.",
-      "passwordTooShort": "A palavra-passe deve ter pelo menos 8 caracteres.",
+      "revokeFailed": "Não foi possível terminar a sessão. Verifica a ligação e tenta novamente.",
+      "signOutFailed": "Não foi possível terminar sessão. Verifica a ligação e tenta novamente.",
       "invalidPassword": "A palavra-passe atual está incorreta.",
-      "generic": "Não foi possível alterar a palavra-passe. Tente novamente."
+      "generic": "Não foi possível alterar a palavra-passe. Verifica a ligação e tenta novamente."
     }
   },
-  "InstructorDashboardPage": {
-    "title": "Painel do instrutor",
+  "InstructorHomePage": {
+    "title": "Início",
+    "greeting": "Olá, {name} 👋",
+    "greetingNoName": "Olá 👋",
     "status": {
-      "active": "Perfil ativo — visível para escolas na pesquisa.",
-      "inactive": "Perfil pausado — não aparece na pesquisa. Reativa quando quiseres voltar.",
-      "incomplete": "Completa os passos abaixo para ativar o teu perfil."
+      "active": "Perfil ativo · visível para as escolas",
+      "inactive": "Perfil pausado · não apareces na pesquisa",
+      "pending_review": "Perfil em revisão · ainda não apareces na pesquisa",
+      "suspended": "Perfil suspenso · não apareces na pesquisa",
+      "incomplete": "Perfil por ativar · ainda não apareces na pesquisa"
     },
-    "viewBookings": "As tuas aulas",
-    "steps": {
-      "1": "Passo 1",
-      "2": "Passo 2",
-      "3": "Passo 3"
+    "onboarding": {
+      "title": "Ativa o teu perfil",
+      "description": "{remaining, plural, one {Falta # passo para as escolas te encontrarem na pesquisa.} other {Faltam # passos para as escolas te encontrarem na pesquisa.}}",
+      "progress": "{done} de {total} passos concluídos",
+      "done": "Concluído",
+      "steps": {
+        "complete_profile": {
+          "title": "Completar perfil",
+          "description": "O teu nome, nível e as zonas onde dás aulas.",
+          "doneDescription": "Nome, nível e zonas guardados."
+        },
+        "set_availability": {
+          "title": "Definir disponibilidade",
+          "description": "Os dias e as horas em que podes dar aulas.",
+          "doneDescription": "Dias e horas guardados."
+        }
+      }
     },
-    "stepLabels": {
-      "verify_email": "Verificar email",
-      "complete_profile": "Completar perfil",
-      "set_availability": "Definir disponibilidade"
+    "email": {
+      "title": "Confirma o teu email",
+      "description": "Os pedidos das escolas chegam a {email}. Abre o link que te enviámos para confirmares que o endereço está certo.",
+      "resend": {
+        "action": "Reenviar email",
+        "sending": "A enviar…",
+        "sent": "Enviámos um novo link para {email}.",
+        "error": "Não foi possível enviar o email. Tenta novamente daqui a pouco."
+      }
     },
-    "profile": {
-      "title": "O teu perfil",
-      "description": "Nome apresentado às escolas, bio, experiência e zonas onde dá aulas.",
-      "displayName": "Nome apresentado às escolas",
-      "bio": "Bio",
-      "experience": "Nível de experiência",
-      "locations": "Zonas",
-      "save": "Guardar perfil",
-      "saving": "A guardar...",
-      "saved": "Perfil guardado."
+    "paused": {
+      "title": "O teu perfil está pausado",
+      "description": "As escolas não te encontram na pesquisa nem te podem pedir aulas.",
+      "descriptionNoDays": "Não tens dias definidos. Escolhe pelo menos um dia para voltares a aparecer na pesquisa.",
+      "reactivate": "Reativar perfil",
+      "reactivating": "A reativar…",
+      "done": "Perfil reativado.",
+      "setAvailability": "Definir disponibilidade"
     },
-    "availability": {
-      "title": "Disponibilidade semanal",
-      "description": "O template recorrente de disponibilidade por dia da semana.",
-      "save": "Guardar disponibilidade",
-      "saving": "A guardar...",
-      "saved": "Disponibilidade guardada."
+    "requests": {
+      "title": "Pedidos por responder",
+      "viewAll": "Ver todos"
+    },
+    "upcoming": {
+      "title": "Próximas aulas",
+      "viewAll": "Ver todas",
+      "emptyTitle": "Sem aulas marcadas",
+      "emptyDescription": "Quando aceitares o pedido de uma escola, a aula aparece aqui."
+    },
+    "stats": {
+      "title": "Estatísticas",
+      "lessons": "Aulas este mês",
+      "hours": "Horas este mês"
+    },
+    "banner": {
+      "title": "Revê a tua disponibilidade",
+      "description": "Só recebes pedidos nos dias e horas que definires."
+    }
+  },
+  "InstructorAvailabilityPage": {
+    "title": "Disponibilidade",
+    "description": "Os dias e as horas em que as escolas te podem pedir aulas.",
+    "active": {
+      "title": "Visibilidade",
+      "label": "Ativo",
+      "on": "Visível para as escolas na pesquisa.",
+      "off": "Pausado: não apareces na pesquisa.",
+      "willActivate": "Ao guardares, voltas a aparecer na pesquisa.",
+      "willPause": "Ao guardares, deixas de aparecer na pesquisa.",
+      "incomplete": "O teu perfil fica ativo assim que guardares a disponibilidade.",
+      "pending_review": "O teu perfil está em revisão. Podes ir atualizando os teus horários.",
+      "suspended": "O teu perfil está suspenso. Podes atualizar os teus horários, mas não apareces na pesquisa."
     },
     "days": {
-      "mon": "Segunda",
-      "tue": "Terça",
-      "wed": "Quarta",
-      "thu": "Quinta",
-      "fri": "Sexta",
-      "sat": "Sábado",
-      "sun": "Domingo"
+      "label": "Dias da semana",
+      "none": "Sem dias escolhidos, as escolas não te podem pedir aulas."
     },
-    "experience": {
+    "hours": {
+      "title": "Horários",
+      "empty": "Escolhe os dias da semana para definires as horas.",
+      "start": "{day}: início",
+      "end": "{day}: fim",
+      "endBeforeStart": "A hora de fim tem de ser depois do início."
+    },
+    "save": "Guardar alterações",
+    "saveActivate": "Guardar e ativar perfil",
+    "saving": "A guardar…",
+    "saved": "Alterações guardadas.",
+    "activated": "Perfil ativado. Já apareces na pesquisa.",
+    "paused": "Perfil pausado.",
+    "reactivated": "Perfil reativado.",
+    "errors": {
+      "invalid": "Corrige os horários assinalados para guardares.",
+      "activateNeedsDays": "Escolhe pelo menos um dia para ativares o perfil.",
+      "reactivateNeedsDays": "Escolhe pelo menos um dia para reativares o perfil.",
+      "activeNeedsDays": "Escolhe pelo menos um dia. Para deixares de aparecer na pesquisa, desliga Ativo."
+    },
+    "needsProfile": {
+      "title": "Primeiro, completa o teu perfil",
+      "description": "As escolas precisam de saber quem és antes de verem a tua disponibilidade.",
+      "action": "Completar perfil"
+    }
+  },
+  "InstructorProfilePage": {
+    "title": "Perfil",
+    "newProfile": "Completa o teu perfil para as escolas te encontrarem.",
+    "status": {
+      "active": "Ativo",
+      "inactive": "Pausado",
+      "incomplete": "Por ativar",
+      "pending_review": "Em revisão",
+      "suspended": "Suspenso"
+    },
+    "levels": {
       "beginner": "Iniciante",
       "intermediate": "Intermédio",
       "advanced": "Avançado",
       "expert": "Especialista"
     },
-    "pause": {
-      "title": "Pausar perfil",
-      "description": "Perfil pausado deixa de aparecer nos resultados de pesquisa das escolas.",
-      "pause": "Pausar perfil",
-      "reactivate": "Reativar perfil",
-      "notAvailable": "Disponível após completar perfil e disponibilidade."
+    "form": {
+      "title": "Os teus dados",
+      "description": "É assim que as escolas te veem na pesquisa.",
+      "displayName": "Nome",
+      "displayNameHelper": "O nome que as escolas veem.",
+      "displayNameError": "Indica o teu nome, com pelo menos 2 letras.",
+      "bio": "Sobre ti",
+      "bioHelper": "Certificações, anos de experiência, línguas que falas.",
+      "level": "Nível",
+      "levelError": "Escolhe o teu nível.",
+      "zones": "Zonas",
+      "zonesHelper": "As praias onde dás aulas.",
+      "zonesError": "Escolhe pelo menos uma zona.",
+      "save": "Guardar alterações",
+      "create": "Guardar perfil",
+      "saving": "A guardar…",
+      "saved": "Alterações guardadas.",
+      "created": "Perfil guardado.",
+      "nextStep": "Definir disponibilidade"
     },
-    "eyebrow": "Instrutor"
+    "menu": {
+      "label": "Mais",
+      "visibility": "Visibilidade",
+      "visibilityActive": "Visível",
+      "visibilityPaused": "Pausado",
+      "availability": "Disponibilidade",
+      "availabilityValue": "{count, plural, =0 {Por definir} one {# dia} other {# dias}}",
+      "account": "Conta"
+    }
   },
   "SchoolDashboardPage": {
-    "title": "Escola",
+    "title": "Início",
+    "address": "{address}, {city}",
     "findInstructors": "Encontrar instrutores",
-    "viewBookings": "Reservas da escola",
+    "stats": {
+      "heading": "Resumo",
+      "pending": "Pedidos pendentes",
+      "thisWeek": "Aulas esta semana",
+      "thisMonth": "Aulas este mês",
+      "saved": "Instrutores guardados"
+    },
+    "upcoming": {
+      "title": "Próximas aulas",
+      "viewAll": "Ver todas",
+      "emptyTitle": "Ainda não tens aulas marcadas",
+      "emptyDescription": "Encontra um instrutor disponível e envia o primeiro pedido.",
+      "emptyPendingDescription": "Tens pedidos à espera de resposta. Quando um instrutor aceitar, a aula aparece aqui.",
+      "viewPending": "Ver pedidos"
+    },
+    "team": {
+      "title": "Equipa",
+      "description": "Todos os membros têm as mesmas permissões.",
+      "members": "Membros da equipa",
+      "you": "Tu",
+      "joined": "Desde {date}",
+      "pendingBadge": "Convite pendente",
+      "expires": "Expira a {date}",
+      "inviteLabel": "Convidar por email",
+      "invitePlaceholder": "colega@escola.pt",
+      "inviteHelper": "A pessoa entra na equipa quando criar conta com este email.",
+      "invite": "Convidar",
+      "invited": "Convite enviado.",
+      "invalidEmail": "Indica um email válido."
+    },
     "create": {
-      "title": "Criar a tua escola",
-      "description": "Dados da escola para o perfil e contactos. Poderá convidar colegas depois.",
+      "title": "Cria a tua escola",
+      "description": "Começa pelos dados da escola. Depois podes encontrar instrutores e convidar a tua equipa.",
+      "schoolSection": "Escola",
+      "contactSection": "Contacto",
+      "locationSection": "Localização",
       "name": "Nome da escola",
-      "descriptionField": "Descrição",
+      "descriptionField": "Descrição (opcional)",
+      "descriptionHelper": "Tipo de aulas, público e há quanto tempo existe.",
       "contactEmail": "Email de contacto",
-      "contactPhone": "Telefone de contacto",
+      "contactPhone": "Telefone (opcional)",
       "address": "Morada",
       "city": "Cidade",
       "submit": "Criar escola",
-      "saving": "A criar...",
-      "saved": "Escola criada."
-    },
-    "staff": {
-      "title": "Equipa",
-      "description": "Todos os membros da equipa têm as mesmas permissões (sem papéis).",
-      "joined": "entrou a",
-      "pending": "Convites pendentes",
-      "expires": "expira a",
-      "inviteLabel": "Convidar colega por email",
-      "invite": "Convidar",
-      "inviting": "A enviar convite...",
-      "invited": "Convite enviado. A pessoa fica ligada à escola ao criar conta com esse email."
-    },
-    "eyebrow": "Escola de surf"
+      "saving": "A criar…",
+      "saved": "Escola criada.",
+      "errors": {
+        "name": "Indica o nome da escola.",
+        "contactEmail": "Indica um email válido.",
+        "address": "Indica a morada da escola.",
+        "city": "Indica a cidade."
+      }
+    }
   },
   "DiscoveryPage": {
     "title": "Encontrar instrutores",
-    "subtitle": "Pesquisa instrutores ativos por zona, experiência e disponibilidade.",
+    "description": "Instrutores ativos por zona, nível e dia da semana.",
+    "views": {
+      "label": "Instrutores",
+      "all": "Todos",
+      "saved": "Guardados",
+      "savedCount": "{count, plural, one {# instrutor} other {# instrutores}}"
+    },
     "filters": {
+      "label": "Filtrar instrutores",
       "location": "Zona",
-      "anyLocation": "Qualquer zona",
-      "experience": "Experiência",
-      "anyExperience": "Qualquer nível",
-      "day": "Dia disponível",
-      "anyDay": "Qualquer dia"
+      "anyLocation": "Todas",
+      "level": "Nível",
+      "anyLevel": "Todos",
+      "day": "Dia",
+      "anyDay": "Todos",
+      "reset": "Limpar filtros"
     },
-    "resultsCount": "{count, plural, =0 {Nenhum instrutor encontrado} one {# instrutor encontrado} other {# instrutores encontrados}}",
-    "noResults": "Nenhum instrutor corresponde aos filtros. Experimenta alargar a pesquisa.",
-    "bookmark": "Guardar",
-    "backToSearch": "Voltar à pesquisa",
-    "profile": {
-      "title": "Perfil do instrutor",
-      "bio": "Sobre",
-      "locations": "Zonas",
-      "availability": "Disponibilidade",
-      "none": "—"
+    "resultsCount": "{count, plural, =0 {Nenhum instrutor} one {# instrutor} other {# instrutores}}",
+    "empty": {
+      "title": "Nenhum instrutor com estes filtros",
+      "description": "Experimenta outra zona, outro nível ou outro dia."
     },
-    "experience": {
+    "emptySaved": {
+      "title": "Ainda não guardaste instrutores",
+      "description": "Guarda os instrutores com quem queres voltar a trabalhar para os teres sempre à mão.",
+      "action": "Ver todos os instrutores"
+    },
+    "row": {
+      "availableOn": "Disponível: {days}.",
+      "noAvailability": "Sem disponibilidade definida."
+    },
+    "bookmark": {
+      "label": "Guardar {name}",
+      "saved": "Instrutor guardado.",
+      "removed": "Removido dos guardados.",
+      "undo": "Anular",
+      "failed": "Não foi possível guardar. Verifica a ligação e tenta novamente."
+    },
+    "levels": {
       "beginner": "Iniciante",
       "intermediate": "Intermédio",
       "advanced": "Avançado",
       "expert": "Especialista"
     },
-    "days": {
-      "mon": "Segunda",
-      "tue": "Terça",
-      "wed": "Quarta",
-      "thu": "Quinta",
-      "fri": "Sexta",
-      "sat": "Sábado",
-      "sun": "Domingo"
+    "profile": {
+      "metaTitle": "Perfil do instrutor",
+      "back": "Instrutores",
+      "about": "Sobre",
+      "availability": "Disponibilidade semanal",
+      "availabilityDescription": "Horário habitual. Os pedidos têm de caber nestes horários.",
+      "unavailable": "Indisponível"
     },
-    "eyebrow": "Procurar"
+    "emptyAll": {
+      "title": "Ainda não há instrutores ativos",
+      "description": "Os instrutores aparecem aqui depois de ativarem o perfil. Volta mais tarde."
+    }
   },
   "BookingRequestForm": {
-    "title": "Pedir reserva",
-    "description": "Escolhe data e horas dentro da disponibilidade semanal do instrutor.",
-    "date": "Data",
+    "title": "Pedir aula",
+    "description": "O instrutor recebe o pedido e aceita ou recusa.",
+    "date": "Dia",
+    "datePlaceholder": "Escolhe um dia",
     "start": "Início",
     "end": "Fim",
-    "notes": "Notas (opcional)",
+    "timePlaceholder": "––:––",
+    "range": "Disponível das {start} às {end}.",
+    "duration": "Duração: {hours, number} h",
+    "notes": "Notas para o instrutor (opcional)",
+    "notesHelper": "Número de alunos, nível e material, por exemplo.",
+    "cta": "Pedir aula",
     "submit": "Enviar pedido",
-    "submitting": "A enviar...",
-    "requested": "Pedido enviado. O instrutor foi notificado."
+    "submitting": "A enviar…",
+    "sent": "Pedido enviado.",
+    "viewBookings": "Ver reservas",
+    "errors": {
+      "date": "Escolhe um dia.",
+      "time": "A hora de fim tem de ser depois do início."
+    },
+    "noAvailability": {
+      "title": "Sem horários disponíveis",
+      "description": "Este instrutor ainda não definiu a disponibilidade semanal. Guarda-o e volta mais tarde."
+    }
   },
   "SchoolBookingsPage": {
     "title": "Reservas",
-    "subtitle": "Pedidos da tua escola e o seu estado.",
-    "cancel": "Cancelar",
-    "empty": "Ainda sem reservas. Pesquisa instrutores e pede a primeira aula.",
-    "requestedBy": "pedido por {name}",
+    "description": "Os pedidos da tua escola e as aulas marcadas.",
+    "tabs": {
+      "label": "Reservas",
+      "requests": "Pendentes",
+      "upcoming": "Próximas",
+      "history": "Histórico",
+      "requestsCount": "{count, plural, one {# pedido} other {# pedidos}}"
+    },
     "status": {
-      "requested": "À espera de resposta",
+      "requested": "Pendente",
       "accepted": "Confirmada",
       "declined": "Recusada",
       "cancelled": "Cancelada",
-      "completed": "Concluída"
+      "completed": "Concluída",
+      "expired": "Sem resposta"
+    },
+    "requestedBy": "Pedido por {name}",
+    "declineReason": "Motivo: {reason}",
+    "cancel": {
+      "lesson": "Cancelar aula",
+      "request": "Cancelar pedido",
+      "lessonContext": "com {instructor}, {when}",
+      "requestContext": "a {instructor}, {when}",
+      "lessonTitle": "Cancelar a aula de {day}?",
+      "requestTitle": "Cancelar o pedido de {day}?",
+      "description": "Das {start} às {end}, com {instructor}. Enviamos-lhe um aviso do cancelamento. Esta ação não pode ser anulada.",
+      "keepLesson": "Manter aula",
+      "keepRequest": "Manter pedido",
+      "pending": "A cancelar…",
+      "lessonDone": "Aula cancelada.",
+      "requestDone": "Pedido cancelado."
+    },
+    "empty": {
+      "requests": {
+        "title": "Sem pedidos pendentes",
+        "description": "Os pedidos que enviares ficam aqui até o instrutor responder."
+      },
+      "upcoming": {
+        "title": "Ainda não tens aulas marcadas",
+        "description": "Quando um instrutor aceitar um pedido, a aula aparece aqui."
+      },
+      "history": {
+        "title": "Ainda sem histórico",
+        "description": "As aulas concluídas, recusadas e canceladas aparecem aqui."
+      },
+      "action": "Encontrar instrutores"
     },
     "notifications": {
-      "title": "Notificações",
-      "unread": "{count, plural, =0 {Sem novidades} one {# não lida} other {# não lidas}}",
-      "markAll": "Marcar tudo como lido"
-    },
-    "notificationTypes": {
-      "booking_requested": "{school} pediu {instructor} para {date}",
-      "booking_accepted": "{instructor} confirmou a aula de {date}",
-      "booking_declined": "{instructor} recusou o pedido de {date}",
-      "booking_cancelled": "Reserva de {date} cancelada"
-    },
-    "eyebrow": "Reservas"
+      "empty": "Sem notificações. Quando um instrutor responder a um pedido, avisamos aqui.",
+      "types": {
+        "booking_accepted": "<strong>{instructor}</strong> confirmou a aula de {day}.",
+        "booking_accepted_at": "<strong>{instructor}</strong> confirmou a aula de {day} · {time}.",
+        "booking_declined": "<strong>{instructor}</strong> recusou o pedido de {day}.",
+        "booking_declined_at": "<strong>{instructor}</strong> recusou o pedido de {day} · {time}.",
+        "booking_cancelled": "<strong>{name}</strong> cancelou a aula de {day}.",
+        "booking_cancelled_at": "<strong>{name}</strong> cancelou a aula de {day} · {time}.",
+        "booking_cancelled_anonymous": "A aula de {day} foi cancelada.",
+        "booking_cancelled_anonymous_at": "A aula de {day} · {time} foi cancelada.",
+        "other": "Há uma atualização numa reserva."
+      }
+    }
   },
   "InstructorBookingsPage": {
-    "title": "As tuas aulas",
-    "subtitle": "Pedidos de escolas e reservas confirmadas.",
-    "accept": "Aceitar",
-    "decline": "Recusar",
-    "confirmDecline": "Confirmar recusa",
-    "declineReason": "Motivo (opcional, visível para a escola)",
-    "back": "Voltar",
-    "cancel": "Cancelar",
-    "empty": "Ainda sem pedidos. Completa o perfil para as escolas te encontrarem.",
-    "requestedBy": "pedido por {name}",
+    "title": "Aulas",
+    "description": "Pedidos das escolas e as tuas aulas marcadas.",
+    "tabs": {
+      "label": "Aulas",
+      "requests": "Pedidos",
+      "requestsCount": "{count, plural, one {# por responder} other {# por responder}}",
+      "upcoming": "Próximas",
+      "history": "Histórico"
+    },
+    "empty": {
+      "requests": {
+        "title": "Sem pedidos por responder",
+        "description": "Quando uma escola te pedir uma aula, o pedido aparece aqui."
+      },
+      "upcoming": {
+        "title": "Ainda não tens aulas marcadas",
+        "description": "Quando aceitares um pedido, a aula aparece aqui."
+      },
+      "history": {
+        "title": "Ainda sem histórico",
+        "description": "As aulas passadas, recusadas e canceladas ficam aqui."
+      },
+      "off": {
+        "paused": "O teu perfil está pausado, por isso as escolas não te encontram na pesquisa.",
+        "review": "O teu perfil está em revisão. Quando for aprovado, as escolas podem pedir-te aulas.",
+        "suspended": "O teu perfil está suspenso, por isso as escolas não te encontram na pesquisa.",
+        "setup": "O teu perfil ainda não está ativo, por isso as escolas não te encontram na pesquisa.",
+        "setupAction": "Ver o que falta",
+        "setAvailability": "Definir disponibilidade"
+      }
+    },
+    "notifications": {
+      "types": {
+        "booking_requested": "<strong>{school}</strong> pediu uma aula para {day}.",
+        "booking_requested_at": "<strong>{school}</strong> pediu uma aula para {day} · {time}.",
+        "booking_cancelled": "<strong>{school}</strong> cancelou a aula de {day}.",
+        "booking_cancelled_at": "<strong>{school}</strong> cancelou a aula de {day} · {time}.",
+        "other": "Tens uma nova notificação."
+      },
+      "empty": "Sem notificações. Avisamos-te aqui quando uma escola te pedir ou cancelar uma aula."
+    }
+  },
+  "InstructorBookingRow": {
     "status": {
-      "requested": "Novo pedido",
+      "requested": "Por responder",
       "accepted": "Confirmada",
       "declined": "Recusada",
       "cancelled": "Cancelada",
-      "completed": "Concluída"
+      "completed": "Concluída",
+      "expired": "Sem resposta"
     },
-    "notifications": {
-      "title": "Notificações",
-      "unread": "{count, plural, =0 {Sem novidades} one {# não lida} other {# não lidas}}",
-      "markAll": "Marcar tudo como lido"
+    "requestedBy": "Pedido por {name}",
+    "noteFrom": "{name}: {note}",
+    "declineReason": "Motivo: {reason}",
+    "requestContext": "pedido de {school}, {when}",
+    "lessonContext": "com {school}, {when}",
+    "accept": {
+      "action": "Aceitar",
+      "pending": "A aceitar…",
+      "done": "Pedido aceite."
     },
-    "notificationTypes": {
-      "booking_requested": "{school} pediu uma aula para {date}",
-      "booking_accepted": "Confirmou a aula de {date}",
-      "booking_declined": "Recusou a aula de {date}",
-      "booking_cancelled": "Reserva de {date} cancelada"
+    "decline": {
+      "action": "Recusar",
+      "title": "Recusar o pedido de {day}?",
+      "description": "A escola é avisada de que não podes dar esta aula.",
+      "reason": "Motivo (opcional)",
+      "reasonHelper": "A escola vê este motivo.",
+      "keep": "Manter pedido",
+      "confirm": "Recusar pedido",
+      "pending": "A recusar…",
+      "done": "Pedido recusado."
     },
-    "eyebrow": "Agenda"
+    "cancel": {
+      "action": "Cancelar aula",
+      "title": "Cancelar a aula de {day}?",
+      "description": "A escola é avisada e a aula sai da tua agenda.",
+      "keep": "Manter aula",
+      "confirm": "Cancelar aula",
+      "pending": "A cancelar…",
+      "done": "Aula cancelada."
+    },
+    "months": {
+      "jan": "jan",
+      "feb": "fev",
+      "mar": "mar",
+      "apr": "abr",
+      "may": "mai",
+      "jun": "jun",
+      "jul": "jul",
+      "aug": "ago",
+      "sep": "set",
+      "oct": "out",
+      "nov": "nov",
+      "dec": "dez"
+    }
   }
 }

@@ -1,11 +1,19 @@
 import { loadEnvConfig } from "@next/env";
+import { sql } from "drizzle-orm";
 
 loadEnvConfig(process.cwd());
 
+// Launch zones, by district. Keep in sync with scripts/seed-locations.sql.
 const launchLocations = [
-  { name: "Cascais", region: "Lisbon area" },
-  { name: "Costa da Caparica", region: "Lisbon area" },
-  { name: "Ericeira", region: "Lisbon area" },
+  { name: "Nazaré", region: "Leiria" },
+  { name: "Peniche", region: "Leiria" },
+  { name: "Ericeira", region: "Lisboa" },
+  { name: "Guincho", region: "Lisboa" },
+  { name: "Cascais", region: "Lisboa" },
+  { name: "Carcavelos", region: "Lisboa" },
+  { name: "Costa da Caparica", region: "Setúbal" },
+  { name: "Costa da Caparica Norte", region: "Setúbal" },
+  { name: "Sesimbra", region: "Setúbal" },
 ];
 
 async function main() {
@@ -19,7 +27,7 @@ async function main() {
     .values(launchLocations)
     .onConflictDoUpdate({
       target: location.name,
-      set: { region: "Lisbon area" },
+      set: { region: sql`excluded.region` },
     });
 }
 

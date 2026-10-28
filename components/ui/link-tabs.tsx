@@ -1,0 +1,104 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+import {
+  StableLabel,
+  tabsListClassName,
+  tabsScrollClassName,
+  tabsTriggerClassName,
+} from "@/components/ui/tab-styles"
+
+/**
+ * surfsync DS (COMPONENTS.md "Tabs") — underline tabs driven by the URL.
+ * Same look as <Tabs>, but each tab is a link, so the selection survives
+ * reloads, can be shared, and lets a Server Component filter the data.
+ * Props are plain data, so a Server Component can render it.
+ *
+ *   // app/instructor/bookings/page.tsx
+ *   const tab = (await searchParams).tab === "history" ? "history" : "requests"
+ *   <LinkTabs
+ *     label="Aulas"
+ *     value={tab}
+ *     items={[
+ *       { value: "requests", href: "/instructor/bookings?tab=requests", label: "Pedidos", badge: <TabCount count={2} label="2 por responder" /> },
+ *       { value: "history", href: "/instructor/bookings?tab=history", label: "Histórico" },
+ *     ]}
+ *   />
+ *
+ * The page decides which tab is active (`value`) — from searchParams or the
+ * pathname. Links keep the scroll position by default (`scroll={false}`).
+ *
+ * When the tabs don't fit (count badges on a 360px phone, 200% text) the
+ * strip scrolls sideways on its own; the page never does. The active tab
+ * is scrolled into view on load and on every change, and a tab reached
+ * with Tab scrolls into view as usual. No overflow class needed.
+ */
+type LinkTabItem = {
+  value: string
+  href: string
+  label: string
+  /** Trailing count or badge, e.g. <Badge variant="count">2</Badge>. */
+  badge?: React.ReactNode
+}
+
+function LinkTabs({
+  items,
+  value,
+  label,
+  scroll = false,
+  className,
+}: {
+  items: readonly LinkTabItem[]
+  /** The active item's value. */
+  value: string
+  /** Accessible name of the tab navigation. */
+  label: string
+  /** Scroll to top on change. Off by default (tabs swap content in place). */
+  scroll?: boolean
+  className?: string
+}) {
+  const navRef = React.useRef<HTMLElement>(null)
+
+  // Bring the active tab into the strip's view — sideways only, so the
+  // page itself never scrolls.
+  React.useEffect(() => {
+    const nav = navRef.current
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]')
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return
+    const strip = nav.getBoundingClientRect()
+    const tab = active.getBoundingClientRect()
+    if (tab.left < strip.left) nav.scrollLeft -= strip.left - tab.left
+    else if (tab.right > strip.right) nav.scrollLeft += tab.right - strip.right
+  }, [value])
+
+  return (
+    <nav ref={navRef} aria-label={label} data-slot="link-tabs" className={cn(tabsScrollClassName, className)}>
+      <ul className={cn(tabsListClassName, "min-w-max")}>
+        {items.map((item) => {
+          const active = item.value === value
+          return (
+            <li key={item.value} className="flex flex-1 md:flex-none">
+              <Link
+                href={item.href}
+                scroll={scroll}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  tabsTriggerClassName,
+                  "after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity after:duration-(--duration-base)",
+                  active && "after:opacity-100"
+                )}
+              >
+                <StableLabel>{item.label}</StableLabel>
+                {item.badge}
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
+  )
+}
+
+export { LinkTabs, type LinkTabItem }

@@ -62,9 +62,12 @@ async function main() {
     console.log("✓ 2. verification email captured (outbox), link has token");
 
     // 3. Immediate resend is rate limited (1/min).
-    //    NOTE: Better Auth's unauthenticated resend path masks hook errors
-    //    (anti-enumeration) and returns {status:true} regardless. Ground
-    //    truth is the outbox: no second email may exist for this address.
+    //    Signed in (the sign-up's session cookie) and resending to your own
+    //    unconfirmed address, the limiter answers 429 with the cooldown code
+    //    (lib/auth/server.ts hooks.before), so the UI can say so. A
+    //    signed-out resend by address stays silent: Better Auth answers
+    //    200 regardless (anti-enumeration). Either way the ground truth is
+    //    the outbox: no second email may exist for this address.
     const cookie = signup.res.headers.get("set-cookie")?.split(";")[0] ?? "";
     const resend = await jfetch(`${API}/send-verification-email`, {
       method: "POST",
@@ -72,13 +75,21 @@ async function main() {
       body: JSON.stringify({ email, callbackURL: "/verify-email" }),
     });
     if (resend.res.status >= 500) fail("resend blew up", resend.res.status);
+    if (cookie) {
+      const code = (resend.body as { code?: string } | null)?.code;
+      if (resend.res.status !== 429 || code !== "VERIFICATION_EMAIL_COOLDOWN") {
+        fail("signed-in resend within 1min answers 429 VERIFICATION_EMAIL_COOLDOWN", `${resend.res.status} ${code}`);
+      }
+    } else if (resend.res.status !== 200) {
+      fail("signed-out resend stays silent (200)", resend.res.status);
+    }
     await new Promise((r) => setTimeout(r, 1500)); // allow any (wrong) send to land
     const outboxFiles2 = (await readdir(join(process.cwd(), ".email-outbox")))
       .filter((f) => f.endsWith(`${email}.json`));
     if (outboxFiles2.length !== 1) {
       fail("resend within 1min must not send a second email", `${outboxFiles2.length} emails in outbox`);
     }
-    console.log("✓ 3. immediate resend rate-limited (outbox still has exactly 1 email)");
+    console.log(`✓ 3. immediate resend rate-limited (${resend.res.status}; outbox still has exactly 1 email)`);
 
     // 4. Clicking the link verifies the email
     const click = await fetch(url, { redirect: "manual" });

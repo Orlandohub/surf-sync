@@ -59,11 +59,11 @@ export async function requestBooking(
   const schoolId = await requireSchoolId(userId);
 
   if (input.startTime >= input.endTime) {
-    throw new APIError("BAD_REQUEST", { message: "A hora de fim tem de ser depois do início." });
+    throw new APIError("BAD_REQUEST", { message: "A hora de fim tem de ser depois da hora de início." });
   }
   const date = new Date(`${input.bookingDate}T00:00:00Z`);
   if (Number.isNaN(date.getTime()) || date.getTime() < Date.now() - 24 * 60 * 60 * 1000) {
-    throw new APIError("BAD_REQUEST", { message: "Data inválida ou no passado." });
+    throw new APIError("BAD_REQUEST", { message: "Escolhe um dia a partir de hoje." });
   }
 
   const [instructor] = await db
@@ -76,7 +76,7 @@ export async function requestBooking(
     .where(eq(instructorProfile.userId, input.instructorId))
     .limit(1);
   if (!instructor || instructor.status !== "active") {
-    throw new APIError("NOT_FOUND", { message: "Instrutor não disponível." });
+    throw new APIError("NOT_FOUND", { message: "Este instrutor não está a aceitar pedidos." });
   }
 
   // Slot must sit inside the instructor's weekly availability for that weekday.
@@ -98,7 +98,7 @@ export async function requestBooking(
   );
   if (!insideAvailability) {
     throw new APIError("BAD_REQUEST", {
-      message: "Fora da disponibilidade semanal do instrutor para esse dia.",
+      message: "O instrutor não está disponível a essa hora nesse dia. Escolhe outro horário.",
     });
   }
 
@@ -120,7 +120,7 @@ export async function requestBooking(
       b.startTime.slice(0, 5) < input.endTime,
   );
   if (overlaps) {
-    throw new APIError("CONFLICT", { message: "O instrutor já tem reserva nesse horário." });
+    throw new APIError("CONFLICT", { message: "O instrutor já tem uma aula nesse horário. Escolhe outro horário." });
   }
 
   const [requester] = await db
@@ -161,7 +161,7 @@ export async function requestBooking(
     startTime: input.startTime,
     endTime: input.endTime,
     byUserName: requester.name,
-  });
+  }, "instructor");
 
   return created.id;
 }
@@ -177,7 +177,7 @@ export async function respondToBooking(
 
   const [row] = await db.select().from(booking).where(eq(booking.id, bookingId)).limit(1);
   if (!row || row.instructorId !== instructorId) {
-    throw new APIError("NOT_FOUND", { message: "Reserva não encontrada." });
+    throw new APIError("NOT_FOUND", { message: "Não encontrámos esta reserva. Atualiza a página e tenta novamente." });
   }
   if (row.status !== "requested") {
     throw new APIError("BAD_REQUEST", { message: "Este pedido já foi respondido." });
@@ -217,14 +217,14 @@ export async function respondToBooking(
     startTime: row.startTime,
     endTime: row.endTime,
     declineReason: accept ? undefined : declineReason,
-  });
+  }, "school");
 }
 
 /** Either side cancels a requested/accepted booking. */
 export async function cancelBooking(userId: string, bookingId: string): Promise<void> {
   const [row] = await db.select().from(booking).where(eq(booking.id, bookingId)).limit(1);
   if (!row) {
-    throw new APIError("NOT_FOUND", { message: "Reserva não encontrada." });
+    throw new APIError("NOT_FOUND", { message: "Não encontrámos esta reserva. Atualiza a página e tenta novamente." });
   }
   if (row.status !== "requested" && row.status !== "accepted") {
     throw new APIError("BAD_REQUEST", { message: "Esta reserva já não pode ser cancelada." });
@@ -236,7 +236,7 @@ export async function cancelBooking(userId: string, bookingId: string): Promise<
     .from(user)
     .where(eq(user.id, userId))
     .limit(1);
-  if (!u) throw new APIError("UNAUTHORIZED", { message: "Sessão expirada." });
+  if (!u) throw new APIError("UNAUTHORIZED", { message: "A tua sessão terminou. Entra novamente para continuares." });
 
   let isSchoolSide = false;
   if (u.type === "school_staff") {
@@ -245,7 +245,7 @@ export async function cancelBooking(userId: string, bookingId: string): Promise<
   }
   const isInstructorSide = u.type === "instructor" && row.instructorId === userId;
   if (!isSchoolSide && !isInstructorSide) {
-    throw new APIError("FORBIDDEN", { message: "Sem permissão sobre esta reserva." });
+    throw new APIError("FORBIDDEN", { message: "Não tens acesso a esta reserva." });
   }
 
   await db
@@ -286,14 +286,14 @@ export async function cancelBooking(userId: string, bookingId: string): Promise<
       .from(user)
       .where(eq(user.id, row.instructorId))
       .limit(1);
-    await notifyBookingEvent(row.instructorId, instructorUser.email, "booking_cancelled", payload);
+    await notifyBookingEvent(row.instructorId, instructorUser.email, "booking_cancelled", payload, "instructor");
   } else {
     const [requester] = await db
       .select({ email: user.email })
       .from(user)
       .where(eq(user.id, row.requestedByUserId))
       .limit(1);
-    await notifyBookingEvent(row.requestedByUserId, requester.email, "booking_cancelled", payload);
+    await notifyBookingEvent(row.requestedByUserId, requester.email, "booking_cancelled", payload, "school");
   }
 }
 

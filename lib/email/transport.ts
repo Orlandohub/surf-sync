@@ -48,7 +48,7 @@ export async function sendEmail(input: SendEmailInput): Promise<{ id: string | n
   }
 
   const { data, error } = await client.emails.send({
-    from: process.env.EMAIL_FROM ?? "SurfSync <onboarding@resend.dev>",
+    from: process.env.EMAIL_FROM ?? "surfsync <onboarding@resend.dev>",
     to: input.to,
     subject: input.subject,
     html: input.html,

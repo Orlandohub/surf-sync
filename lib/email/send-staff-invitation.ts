@@ -16,10 +16,12 @@ export async function sendStaffInvitationEmail({
   schoolName: string;
   signupUrl: string;
 }): Promise<void> {
-  const { html, text } = await renderStaffInvitationEmail(schoolName, signupUrl);
+  // inviteSchoolStaff returns "" if the school row has vanished.
+  const name = schoolName.trim() || "uma escola de surf";
+  const { html, text } = await renderStaffInvitationEmail(name, signupUrl);
   await sendEmail({
     to,
-    subject: `Convite para a equipa ${schoolName} — SurfSync`,
+    subject: `Convite para a equipa de ${name} no surfsync`,
     html,
     text,
   });

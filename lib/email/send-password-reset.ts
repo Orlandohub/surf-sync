@@ -18,7 +18,7 @@ export async function sendPasswordResetEmail({
   const { html, text } = await renderPasswordResetEmail(url);
   await sendEmail({
     to,
-    subject: "Redefina a sua palavra-passe — SurfSync",
+    subject: "Redefine a tua palavra-passe do surfsync",
     html,
     text,
   });

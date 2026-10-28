@@ -1,22 +1,30 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { SignUpForm } from "@/components/auth/sign-up-form";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { SignUpForm } from "@/components/auth/sign-up-form";
+import { isAccountType } from "@/components/auth/auth-helpers";
 
 export async function generateMetadata() {
   const t = await getTranslations("SignUpPage");
   return { title: t("title") };
 }
 
-export default async function SignUpPage() {
+export default async function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>;
+}) {
   // Signed-in users have no business on signup — send them home.
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getSession();
   if (session) redirect("/");
 
+  // Optional preselection, e.g. /sign-up?type=instructor from a landing CTA.
+  const { type } = await searchParams;
+
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-16">
-      <SignUpForm />
-    </main>
+    <AuthLayout>
+      <SignUpForm defaultType={isAccountType(type) ? type : null} />
+    </AuthLayout>
   );
 }

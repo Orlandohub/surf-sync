@@ -37,19 +37,18 @@ export function PasswordResetEmail({
   url: string;
 }) {
   return (
-    <Html lang="pt">
+    <Html lang="pt-PT">
       <Head />
-      <Preview>Redefine a tua palavra-passe do SurfSync</Preview>
+      <Preview>O link é válido durante 1 hora.</Preview>
       <Body style={{ fontFamily: "system-ui, sans-serif", margin: 0, padding: "24px 0", backgroundColor: canvas }}>
         <Container style={{ maxWidth: 480, margin: "0 auto", backgroundColor: "#ffffff", borderRadius: 16, padding: 32 }}>
           <Lockup />
           <Heading as="h1" style={{ fontSize: 20, lineHeight: "28px", marginTop: 0, color: ink }}>
-            Redefinir palavra-passe
+            Redefine a tua palavra-passe
           </Heading>
           <Text style={{ fontSize: 15, lineHeight: "22px", color: muted }}>
-            Recebemos um pedido para redefinir a palavra-passe da tua conta
-            SurfSync. O link é válido durante 1 hora e pode ser utilizado uma
-            única vez.
+            Recebemos um pedido para redefinir a palavra-passe da tua conta no
+            surfsync. O link é válido durante 1 hora e só pode ser usado uma vez.
           </Text>
           <Section style={{ margin: "24px 0" }}>
             <Button
@@ -60,16 +59,16 @@ export function PasswordResetEmail({
             </Button>
           </Section>
           <Text style={{ fontSize: 13, lineHeight: "18px", color: muted }}>
-            Se o botão não funcionar, copia e cola este link no teu browser:
+            Se o botão não funcionar, copia este link para o navegador:
           </Text>
           <Link href={url} style={{ fontSize: 13, color: teal, wordBreak: "break-all" }}>
             {url}
           </Link>
           <Hr style={{ borderColor: hairline, margin: "24px 0" }} />
           <Text style={{ fontSize: 12, lineHeight: "16px", color: faint }}>
-            Se não pediste a redefinição, ignora este email — a tua palavra-passe
-            permanece inalterada. Por segurança, todas as sessões serão
-            terminadas quando a palavra-passe for redefinida.
+            Não pediste para redefinir a palavra-passe? Podes ignorar este email:
+            a tua palavra-passe não muda. Quando a redefinires, terminamos a
+            sessão em todos os dispositivos.
           </Text>
         </Container>
       </Body>

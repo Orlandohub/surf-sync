@@ -1,125 +1,131 @@
 "use client";
 
-import { useState } from "react";
+import * as React from "react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useTranslations } from "next-intl";
+import { PageHeader } from "@/components/ui/page-header";
+import { PasswordInput } from "@/components/auth/password-input";
+import { AuthAltLink, AuthNotice, authStandaloneLinkClass } from "@/components/auth/auth-parts";
+import { emailProblem, homeFor, signInErrorKey } from "@/components/auth/auth-helpers";
 
-export function SignInForm() {
+type Errors = { email?: string; password?: string; form?: string };
+
+export function SignInForm({
+  resetSuccess = false,
+  next: nextPath = null,
+}: {
+  resetSuccess?: boolean;
+  /** A checked same-site path to open after signing in (safeNextPath). */
+  next?: string | null;
+}) {
   const t = useTranslations("SignInPage");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(false);
-  // Banner after a successful password reset redirect (?reset=success).
-  // Read once on mount from location.search — avoids useSearchParams,
-  // which would force a Suspense boundary on this page.
-  const [resetSuccess] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("reset") === "success",
-  );
+  const tv = useTranslations("Auth.validation");
+  const ta = useTranslations("Auth");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [errors, setErrors] = React.useState<Errors>({});
+  const [pending, setPending] = React.useState(false);
+  const emailRef = React.useRef<HTMLInputElement>(null);
+  const passwordRef = React.useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    const problem = emailProblem(email);
+    const next: Errors = {
+      email: problem ? tv(problem) : undefined,
+      password: password ? undefined : tv("passwordRequired"),
+    };
+    if (next.email || next.password) {
+      setErrors(next);
+      (next.email ? emailRef : passwordRef).current?.focus();
+      return;
+    }
+
+    setErrors({});
     setPending(true);
     try {
-      const { error } = await authClient.signIn.email({
-        email,
-        password,
-      });
-
+      const { error } = await authClient.signIn.email({ email: email.trim(), password });
       if (error) {
-        // better-auth@1.6: UNAUTHORIZED + INVALID_EMAIL_OR_PASSWORD for bad
-        // credentials. Message stays generic — never reveal which part was
-        // wrong.
-        setError(t("errors.invalidCredentials"));
+        // Generic on purpose — never reveal which part was wrong.
+        const key = signInErrorKey(error);
+        setErrors({ form: key === "rateLimited" ? ta("rateLimited") : t(`errors.${key}`) });
+        setPending(false);
         return;
       }
-
-      // Route to the caller's own dashboard by account type.
+      // Back to where the person was sent from (`next`), else their own
+      // dashboard by account type. Full navigation so the server-rendered
+      // shell picks up the session.
+      if (nextPath) {
+        window.location.href = nextPath;
+        return;
+      }
       const { data: session } = await authClient.getSession();
-      const type = session?.user?.type;
-      window.location.href =
-        type === "instructor" ? "/instructor" : type === "school_staff" ? "/school" : "/";
-    } catch {
-      setError(t("errors.generic"));
-    } finally {
+      window.location.href = homeFor(session?.user?.type);
+    } catch (err) {
+      console.error(err);
+      setErrors({ form: t("errors.generic") });
       setPending(false);
     }
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {resetSuccess && (
-            <p className="text-meta text-muted-foreground" role="status">
-              {t("resetSuccess")}
-            </p>
-          )}
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="email">{t("email.label")}</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("email.placeholder")}
-              required
-              autoComplete="email"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">{t("password.label")}</Label>
-              <Link
-                href="/forgot-password"
-                className="text-meta text-muted-foreground underline-offset-4 hover:underline"
-              >
-                {t("forgotPassword")}
-              </Link>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+    <div className="flex flex-col gap-8">
+      <PageHeader title={t("title")} description={t("subtitle")} />
+
+      <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {resetSuccess && <AuthNotice>{t("resetSuccess")}</AuthNotice>}
+
+        <Field id="email" label={t("email.label")} error={errors.email}>
+          <Input
+            ref={emailRef}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder={t("email.placeholder")}
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email) setErrors((s) => ({ ...s, email: undefined }));
+            }}
+          />
+        </Field>
+
+        {/* 14px: clears the link's 44px touch area (13px above its line). */}
+        <div className="flex flex-col gap-3.5">
+          <Field id="password" label={t("password.label")} error={errors.password}>
+            <PasswordInput
+              ref={passwordRef}
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors((s) => ({ ...s, password: undefined }));
+              }}
             />
-          </div>
-          {error && (
-            <p className="text-body text-destructive" role="alert">
-              {error}
-            </p>
-          )}
-          <Button type="submit" disabled={pending}>
-            {pending ? t("submitting") : t("submit")}
-          </Button>
-          <Link
-            href="/sign-up"
-            className="text-meta text-muted-foreground underline-offset-4 hover:underline"
-          >
-            {t("signUpInstead")}
+          </Field>
+          <Link href="/forgot-password" className={`${authStandaloneLinkClass} self-start text-meta`}>
+            {t("forgotPassword")}
           </Link>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+
+        {errors.form && <FieldError>{errors.form}</FieldError>}
+
+        <Button type="submit" size="lg" className="mt-1" pending={pending} pendingLabel={t("submitting")}>
+          {t("submit")}
+          <ArrowRight aria-hidden strokeWidth={1.75} />
+        </Button>
+      </form>
+
+      <AuthAltLink lead={t("noAccount")} href="/sign-up">
+        {t("signUp")}
+      </AuthAltLink>
+    </div>
   );
 }
