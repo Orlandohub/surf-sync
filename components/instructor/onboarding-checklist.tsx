@@ -83,7 +83,8 @@ export function OnboardingChecklist({
 
       {/* A size container (rem-based, so larger text counts): under 16rem
           (200% text on a phone) each step's number sits above its text,
-          which then has the card's full width. */}
+          which then has the card's full width (stretched, not sized by
+          its longest word, so "disponibilidade" breaks inside it). */}
       <ol role="list" className="@container border-t">
         {steps.map((step, i) => {
           const state = stateOf(step);
@@ -92,8 +93,8 @@ export function OnboardingChecklist({
               key={step.key}
               aria-current={state === "current" ? "step" : undefined}
               className={cn(
-                "relative flex min-h-18 items-start gap-3 px-card py-4 @max-3xs:flex-col sm:px-6",
-                "not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border sm:not-first:before:left-18 @max-3xs:not-first:before:left-card",
+                "relative flex min-h-18 items-start gap-3 px-card py-4 @max-3xs:flex-col @max-3xs:items-stretch sm:px-6",
+                "not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-rule-circle not-first:before:h-px not-first:before:bg-border sm:not-first:before:left-18 @max-3xs:not-first:before:left-card",
               )}
             >
               <span

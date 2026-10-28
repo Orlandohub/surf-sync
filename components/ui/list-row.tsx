@@ -318,7 +318,9 @@ function MenuGroup({
       role="list"
       aria-label={label}
       data-slot="menu-group"
-      className={cn("overflow-hidden rounded-card border bg-card shadow-card", className)}
+      // A size container too: a row's divider follows its icon, which
+      // hides under 16rem (a row can't query its own size).
+      className={cn("@container overflow-hidden rounded-card border bg-card shadow-card", className)}
     >
       {children}
     </ul>
@@ -506,9 +508,10 @@ function MenuRow({
         // A size container: the row lays out by its own width in rem, so
         // larger text counts (see the icon and `trailing`).
         "@container relative",
-        // Inset divider: starts at the text, not the card edge.
+        // Inset divider: starts at the text, not the card edge (also once
+        // the icon is hidden, under 16rem: MenuGroup is the container).
         "not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-card not-first:before:h-px not-first:before:bg-border",
-        "not-first:has-data-[slot=menu-row-icon]:before:left-12"
+        "not-first:has-data-[slot=menu-row-icon]:before:left-rule-icon @max-3xs:not-first:has-data-[slot=menu-row-icon]:before:left-card"
       )}
     >
       {control}
@@ -638,7 +641,7 @@ function NotificationRow({
       data-unread={unread || undefined}
       // Inset divider: starts at the text (at the card edge once the
       // circle is hidden).
-      className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-16 not-first:before:h-px not-first:before:bg-border @max-3xs:not-first:before:left-card"
+      className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-rule-circle not-first:before:h-px not-first:before:bg-border @max-3xs:not-first:before:left-card"
     >
       {href ? (
         <Link

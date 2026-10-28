@@ -168,8 +168,18 @@
 
   /* ---------------- Spacing ---------------- */
   --spacing: 0.25rem;                /* 4px grid (Tailwind default, restated) */
-  --spacing-gutter: 1.25rem;         /* 20 — screen side padding (px-gutter) */
-  --spacing-card: 1rem;              /* 16 — card inner padding (p-card) */
+  /* The screen gutter and card padding scale down with smaller text but
+     never grow past their 100% size: larger text gets the width (as iOS
+     Dynamic Type scales text, not margins). In rem they doubled at 200%
+     text and took 45% of a 360 px phone. Page zoom still scales them. */
+  --spacing-gutter: min(1.25rem, 20px); /* 20 — screen side padding (px-gutter) */
+  --spacing-card: min(1rem, 16px);      /* 16 — card inner padding (p-card) */
+  /* Inset hairlines start at a row's text: the card padding, the leading
+     element and gap-3. Built on --spacing-card so they stay on the text
+     at every text size (before:left-rule-icon). */
+  --spacing-rule-icon: calc(var(--spacing-card) + 2rem);     /* 48 — 20 px icon (MenuRow) */
+  --spacing-rule-circle: calc(var(--spacing-card) + 3rem);   /* 64 — 36 px circle (NotificationRow, onboarding step) */
+  --spacing-rule-avatar: calc(var(--spacing-card) + 3.5rem); /* 72 — 44 px avatar (Equipa) */
   --spacing-stack: 0.75rem;          /* 12 — gap between cards in a list */
   --spacing-section: 1.75rem;        /* 28 — gap between screen sections */
   --spacing-tap: 2.75rem;            /* 44 — minimum touch target (size-tap) */

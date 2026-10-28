@@ -11,7 +11,7 @@ import type { SchoolDashboardData } from "@/lib/services/school";
 import { cn } from "@/lib/utils";
 
 const divider =
-  "relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-18 not-first:before:h-px not-first:before:bg-border";
+  "relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-rule-avatar not-first:before:h-px not-first:before:bg-border";
 
 /**
  * Equipa on Início: members (avatar, name, email, "Desde 27 de outubro"),

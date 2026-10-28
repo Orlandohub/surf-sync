@@ -207,7 +207,7 @@ Underline tabs, not shadcn's default pill. `TabsList`: `w-full justify-between b
 
 ### Menu row (Perfil, Definições)
 
-Rows grouped in one card, dividers `border-border` inset to the text. Leading icon 20 px muted, label `text-body`, optional trailing value muted, `ChevronRight`. Row height 52 px. Destructive row ("Terminar sessão") is `text-destructive`, no chevron, last in its own group. Large text: the label wraps (never truncates), the value and a trailing badge or button move under the label when they don't fit beside it, and the decorative icon gives its room to the label in a row under 16rem.
+Rows grouped in one card, dividers `border-border` inset to the text. Leading icon 20 px muted, label `text-body`, optional trailing value muted, `ChevronRight`. Row height 52 px. Destructive row ("Terminar sessão") is `text-destructive`, no chevron, last in its own group. Large text: the label wraps (never truncates), the value and a trailing badge or button move under the label when they don't fit beside it, and the decorative icon gives its room to the label in a row under 16rem (the inset divider then starts at the card's padding, under the label).
 
 ### Message row
 
@@ -235,7 +235,7 @@ Label above, `text-meta font-medium`, always visible. Input `h-12 rounded-contro
 
 ### Switch
 
-shadcn `Switch`: track `bg-control-off data-[state=checked]:bg-primary`, thumb `bg-card shadow-card`, thumb travel `duration-instant ease-move`. The off track is `--control-off` (atlantic-500, 4.3:1 on a card), not the deck's pale `bg-input` (1.7:1): a switch's state must read at 3:1 (WCAG 1.4.11). Label on the left, switch on the right, full row tappable. Changes in a settings list apply immediately; on a form screen they wait for "Guardar alterações".
+shadcn `Switch`: track `bg-control-off data-[state=checked]:bg-primary`, thumb `bg-card shadow-card`, thumb travel `duration-instant ease-move`. The off track is `--control-off` (atlantic-500, 4.3:1 on a card), not the deck's pale `bg-input` (1.7:1): a switch's state must read at 3:1 (WCAG 1.4.11). Label on the left, switch on the right, full row tappable. Changes in a settings list apply immediately; on a form screen they wait for "Guardar alterações". Large text: in a row under 16rem the switch moves under the label and description, which take the full width (as iOS does at accessibility sizes).
 
 ### Day chips (weekday selector)
 
@@ -329,13 +329,13 @@ Where each spec above lives. Copy goes through next-intl; dates and times throug
 | Text field | `Field`, `FieldError` + `Input` / `Textarea` / `Select` / `TimeSelect` | `Field` wires label, helper, error and aria onto the control and owns its id. Field errors are announced (live region); a standalone `FieldError` is `role="alert"`. Controls share `controlClassName` (`border-field-border`). `TimeSelect` is never narrower than 7rem, so the time always shows: put a start–end pair in a size container and stack it below about 16rem (both the availability form and Pedir aula do). A `Select` with long option labels (dates) takes `wrap`: once hydrated a copy of the shown value wraps over the native select (the field grows taller) instead of truncating to "Esco…"; the select stays the control. |
 | Date picker | native `<Select wrap>` of `upcomingDates(count, { now, days })` — `lib/format` | Options labelled `formatDayDate(date, { now })` ("Amanhã · 28 de outubro"), submitting `YYYY-MM-DD`; pass `now` from the server render so server and client lists match (see `components/school/booking-request-form.tsx`). Never `<input type="date">`. |
 | Radio | `RadioGroup`, `Radio` — `components/ui/radio-group` | Thin wrappers over Base UI; `Radio` has no look of its own (style with `data-checked:` / `group-data-checked:`), renders `<span role=radio>` (name it with aria-labelledby). For short options prefer `ChipToggleGroup multiple={false} required`. |
-| Switch | `Switch`, `SwitchRow` — `components/ui/switch` | |
+| Switch | `Switch`, `SwitchRow` — `components/ui/switch` | `SwitchRow` is a size container; under 16rem the switch sits under the text. |
 | Day chips | `DayChips`, `ChipToggleGroup` — `components/ui/chip-toggle-group` | `name` submits hidden inputs. DayChips wraps at large text; chip labels wrap inside the chip. |
 | Avatar & stack | `Avatar`, `AvatarStack` — `components/ui/avatar` | Sizes 32 / 44 / 88 / 96. |
 | Row actions | instructor `booking-actions`, school `CancelBookingButton` | Named the same way on both sides: the visible verb plus sr-only context, `{verb} pedido de/a {name}, {when}` — "Aceitar pedido de Onda Norte, Sábado · 10:00–12:00", "Cancelar pedido a Tiago Nunes, Segunda · 9:00–12:00", "Cancelar aula com Ana Marques, Amanhã · 9:00–11:00". The visible label starts the name (WCAG 2.5.3); no `aria-label` override. |
 | Sheet / Dialog | `ConfirmDialog`, `Dialog…` — `components/ui/dialog` | Bottom sheet < md, centred dialog ≥ md. A server refusal stays in the dialog: `setError(res.error); return false`, then refresh when it closes. `finalFocus` for when the opener is gone on close. |
 | Toast | `toast()` — `components/ui/toast` | `<Toaster />` is in the root layout, above `--bottom-clearance` (tab bar + any pinned CTA); no per-toast offsets. |
-| Focus | `FocusReveal` — `components/shell/focus-reveal` (mounted once in the layout); `refocusWhenRemoved`, `byId` — `components/shell/focus` | FocusReveal scrolls a keyboard-focused field inside `#conteudo` clear of the bars (Chrome only reveals the caret). `refocusWhenRemoved(el, fallback)` moves focus when an in-place action removes the focused control (to a heading or section with tabIndex -1). |
+| Focus | `FocusReveal` — `components/shell/focus-reveal` (mounted once in the layout); `refocusWhenRemoved`, `byId`, `planRowFocus` — `components/shell/focus` | FocusReveal scrolls a keyboard-focused field inside `#conteudo` clear of the bars (Chrome only reveals the caret). `refocusWhenRemoved(el, fallback)` moves focus when an in-place action removes the focused control (to a heading or section with tabIndex -1). A row action that takes its row out of a list (both bookings screens) plans the target with `planRowFocus(control)` before the refresh: the next row's first control, else the previous row's, else the list's current tab, else its heading. |
 | Empty state | `EmptyState` — `components/ui/empty-state` | Title, body and action never exceed the card's padding; under 16rem the action drops its side padding and decorative arrow so its label fits. |
 | Loading | `Skeleton`, `SkeletonRow` — `components/ui/skeleton` | |
 | Availability glyph | `CalendarWave` — `components/brand/icons` | Every `icon` prop takes `IconComponent` (Lucide or ours). |

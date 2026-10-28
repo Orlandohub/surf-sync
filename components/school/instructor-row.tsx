@@ -23,7 +23,8 @@ import type { InstructorCard } from "@/lib/services/discovery";
  *   week strip on its own line.
  * - Below 16rem (a phone at 125% text and more): avatar and bookmark on
  *   the first line and the text under them at full width, so the name
- *   always has room. Names wrap; they are never cut.
+ *   always has room. Names wrap; they are never cut, and the zones (two
+ *   lines at most in a wider row) show in full.
  */
 export function InstructorRow({
   instructor,
@@ -55,7 +56,7 @@ export function InstructorRow({
             {verified && <VerifiedMark />}
           </span>
           {instructor.locations.length > 0 && (
-            <span className="mt-0.5 line-clamp-2 text-meta break-words text-muted-foreground">
+            <span className="mt-0.5 line-clamp-2 text-meta break-words text-muted-foreground @max-3xs:line-clamp-none">
               {instructor.locations.join(", ")}
             </span>
           )}

@@ -482,7 +482,7 @@ function Stacked({ label, value, badge }: { label: string; value: string; badge?
 
 function SessionSkeleton() {
   return (
-    <li aria-hidden className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-12 not-first:before:h-px not-first:before:bg-border">
+    <li aria-hidden className="relative not-first:before:absolute not-first:before:top-0 not-first:before:right-0 not-first:before:left-rule-icon not-first:before:h-px not-first:before:bg-border">
       <div className="flex min-h-16 items-center gap-3 px-card py-3">
         <Skeleton className="size-5 shrink-0 rounded-full" />
         <div className="flex flex-1 flex-col gap-2">

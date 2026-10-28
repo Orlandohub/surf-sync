@@ -7,7 +7,7 @@ import { cancelBookingAction } from "@/lib/actions/booking";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
-import { byId, refocusWhenRemoved } from "@/components/shell/focus";
+import { byId, planRowFocus, refocusWhenRemoved } from "@/components/shell/focus";
 import { formatTime } from "@/lib/format";
 
 /**
@@ -20,8 +20,9 @@ import { formatTime } from "@/lib/format";
  * pattern of the instructor's row actions: "Cancelar pedido a Ana Marques,
  * Sábado · 10:00–12:00" (the label is the start of the name, WCAG 2.5.3).
  * After a cancel the row leaves the tab (or loses this button), so focus
- * moves to the list's current tab (visible focus, as after an instructor's
- * row action), else to `focusAfter`, the list's heading.
+ * moves as after an instructor's row action (planRowFocus): to the next
+ * row's first control, else the previous row's, else the list's current
+ * tab, else to `focusAfter`, the list's heading.
  */
 export function CancelBookingButton({
   bookingId,
@@ -89,10 +90,9 @@ export function CancelBookingButton({
           return false;
         }
         toast(lesson ? t("lessonDone") : t("requestDone"));
-        refocusWhenRemoved(document.querySelector(`[data-cancel-booking="${bookingId}"]`), () => {
-          const heading = byId(focusAfter)();
-          return heading?.closest("section")?.querySelector<HTMLElement>("[aria-current=page]") ?? heading;
-        });
+        const button = document.querySelector(`[data-cancel-booking="${bookingId}"]`);
+        const target = planRowFocus(button);
+        refocusWhenRemoved(button, () => target() ?? byId(focusAfter)());
         startTransition(() => router.refresh());
       }}
     />

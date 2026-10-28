@@ -164,7 +164,7 @@ Montserrat appears in the deck as presentation body text; it is not part of the 
 
 ## 7. Layout, shape, elevation, motion
 
-**Grid & spacing.** 4 px base. Screen gutter 20 px (`px-gutter`), card padding 16 px (`p-card`), gap between cards 12 px (`gap-stack`), between sections 28 px (`gap-section`). No arbitrary pixel values `[SS16]`.
+**Grid & spacing.** 4 px base. Screen gutter 20 px (`px-gutter`), card padding 16 px (`p-card`), gap between cards 12 px (`gap-stack`), between sections 28 px (`gap-section`). The gutter and card padding never grow past those sizes with larger text (`min(1.25rem, 20px)`, `min(1rem, 16px)`): text scales, margins don't, as with iOS Dynamic Type. An inset hairline that starts at a row's text uses `left-rule-icon`, `left-rule-circle` or `left-rule-avatar` (card padding + leading element + gap), never a fixed rem offset, so it stays on the text at any size. No arbitrary pixel values `[SS16]`.
 
 **Touch.** Every interactive element is ≥ 44 × 44 (`size-tap`, or the `tap` utility to extend a smaller visual).
 
@@ -219,7 +219,7 @@ Further rules: focus is always visible (2 px `ring`, 2 px offset); never colour 
 
 **Field borders.** The border is all that shows where a text field or select is on a white card, so it must reach 3:1 against what is around it (WCAG 1.4.11). Controls use `border-field-border` — `--field-border`, halfway between `atlantic-400` and `atlantic-500` (`#828E9B`; `atlantic-500` in dark mode). The deck's pale `--input` (`atlantic-300`, `#BFC9D1`; `atlantic-700` in dark mode) stays on outline buttons only, whose label already identifies them; never use it for a field.
 
-**Large text.** Every screen must work at 200 % text on a 360 px phone: no page scrolls sideways, no label or value is clipped or truncated (a title wraps, a long word breaks, a badge or button label wraps inside its box), and decorative leading icons give their room to the text in a row under 16rem. Layouts that must change with the text size use size containers with rem breakpoints (`@container`, `@max-3xs:`), not viewport media queries.
+**Large text.** Every screen must work at 200 % text on a 360 px phone: no page scrolls sideways, no label or value is clipped or truncated (a title wraps, a long word breaks, a badge or button label wraps inside its box), and decorative leading icons give their room to the text in a row under 16rem. Layouts that must change with the text size use size containers with rem breakpoints (`@container`, `@max-3xs:`), not viewport media queries. A row's two-line clamp (a description, an instructor's zones) lifts under 16rem. The one exception is a preview of free text: a booking's note on Início stays at two lines, because its section's "Ver todas" opens the list where the note is shown in full.
 
 ## 9. Don't
 

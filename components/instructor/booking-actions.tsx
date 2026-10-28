@@ -10,6 +10,7 @@ import { ConfirmDialog } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
+import { planRowFocus } from "@/components/shell/focus";
 import type { InstructorBooking } from "@/components/instructor/instructor-booking";
 import { formatRelativeDay } from "@/lib/format";
 
@@ -44,26 +45,21 @@ function useRefresh(tab: "requests" | "upcoming" | "history") {
   return { refreshing, refresh };
 }
 
-type FocusPlan = { next: Element | null; section: Element | null };
-
 /**
  * An answered request (or cancelled lesson) leaves its list, taking the
  * focused button with it. Before that happens, `plan()` notes where focus
- * should go; when this action unmounts with focus lost to <body>, it moves
- * to the next row's first control, else the section's first heading or
- * current tab, else the page content. Keyboard and screen-reader users
- * keep their place.
+ * should go (planRowFocus, shared with the school's cancel); when this
+ * action unmounts with focus lost to <body>, it moves to the next row's
+ * first control, else the previous row's, else the list's current tab or
+ * heading, else the page content. Keyboard and screen-reader users keep
+ * their place.
  */
 function useFocusAfterRemoval() {
   const anchorRef = useRef<HTMLButtonElement>(null);
-  const focusPlan = useRef<FocusPlan | null>(null);
+  const focusPlan = useRef<(() => HTMLElement | null) | null>(null);
 
   function plan() {
-    const row = anchorRef.current?.closest("li") ?? null;
-    focusPlan.current = {
-      next: row?.nextElementSibling ?? row?.previousElementSibling ?? null,
-      section: row?.closest("section") ?? null,
-    };
+    focusPlan.current = planRowFocus(anchorRef.current);
   }
 
   useEffect(() => {
@@ -73,18 +69,7 @@ function useFocusAfterRemoval() {
       if (!target) return;
       const active = document.activeElement;
       if (active && active !== document.body) return;
-      const control = target.next?.isConnected
-        ? target.next.querySelector<HTMLElement>("button:not(:disabled), a[href]")
-        : null;
-      // The current tab (visible focus) before the section's heading.
-      const landmark = target.section?.isConnected
-        ? (target.section.querySelector<HTMLElement>("[aria-current=page]") ??
-          target.section.querySelector<HTMLElement>("h2, h3"))
-        : null;
-      const next = control ?? landmark ?? document.getElementById("conteudo");
-      if (!next) return;
-      if (next === landmark && !next.matches("a[href]")) next.tabIndex = -1;
-      next.focus();
+      (target() ?? document.getElementById("conteudo"))?.focus();
     };
   }, []);
 
